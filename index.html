@@ -1,0 +1,206 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RMC Sales &amp; Staff System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--p:#1a56db;--a:#f59e0b;--d:#e02424;--s:#057a55;--pu:#7c3aed;--tl:#0891b2;--bg:#f4f6fb;--card:#fff;--b:#e2e8f0;--t:#1e293b;--m:#64748b;--r:10px;--sh:0 2px 16px rgba(30,41,59,.10)}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+header{background:linear-gradient(135deg,#1a56db,#1245b0);color:#fff;padding:0 18px;display:flex;align-items:center;justify-content:space-between;min-height:62px;box-shadow:0 2px 12px rgba(26,86,219,.25);position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:6px}
+.hl{display:flex;align-items:center;gap:10px}.hl .ico{font-size:26px}
+.ht h1{font-size:1.07rem;font-weight:700}.ht p{font-size:.7rem;opacity:.8}
+.ha{display:flex;gap:6px;flex-wrap:wrap;padding:7px 0}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:7px;border:none;cursor:pointer;font-size:.82rem;font-weight:600;transition:all .18s;white-space:nowrap}
+.bw{background:#fff;color:var(--p)}.bw:hover{background:#e8f0fe}
+.ba{background:var(--a);color:#fff}.ba:hover{background:#d97706}
+.bs{background:var(--s);color:#fff}.bs:hover{background:#065f46}
+.bd{background:var(--d);color:#fff}.bd:hover{background:#9b1c1c}
+.bp{background:var(--pu);color:#fff}.bp:hover{background:#6d28d9}
+.bwa{background:#25D366;color:#fff}.bwa:hover{background:#128C7E}
+.bo{background:transparent;color:var(--p);border:1.5px solid var(--p)}.bo:hover{background:#e8f0fe}
+.bsm{padding:5px 9px;font-size:.77rem}
+main{max-width:1500px;margin:0 auto;padding:16px 13px}
+.alert-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #f59e0b;border-radius:var(--r);padding:12px 16px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px}
+.alert-banner .ab-ico{font-size:20px;flex-shrink:0}.alert-banner .ab-content h3{font-size:.9rem;font-weight:700;color:#92400e;margin-bottom:4px}
+.alert-banner .ab-content p{font-size:.8rem;color:#78350f;line-height:1.6}.alert-banner .ab-close{margin-left:auto;border:none;background:transparent;font-size:18px;cursor:pointer;color:#92400e}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.sc{background:var(--card);border-radius:var(--r);padding:13px;box-shadow:var(--sh);border-left:4px solid var(--p)}
+.sc.a{border-left-color:var(--a)}.sc.s{border-left-color:var(--s)}.sc.d{border-left-color:var(--d)}.sc.pu{border-left-color:var(--pu)}.sc.tl{border-left-color:var(--tl)}
+.sl{font-size:.7rem;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}.sv{font-size:1.6rem;font-weight:800}
+.tabs{display:flex;border-bottom:2px solid var(--b);margin-bottom:14px;overflow-x:auto}
+.tb{padding:8px 15px;border:none;background:transparent;font-size:.82rem;font-weight:600;color:var(--m);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap}
+.tb.act{color:var(--p);border-bottom-color:var(--p)}.tb:hover{background:#f1f5f9}
+.tp{display:none}.tp.act{display:block}
+.toolbar{background:var(--card);border-radius:var(--r);padding:12px;box-shadow:var(--sh);margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sw{flex:1;min-width:160px;position:relative}.sw input{width:100%;padding:8px 11px 8px 33px;border:1.5px solid var(--b);border-radius:7px;font-size:.875rem;outline:none}
+.sw input:focus{border-color:var(--p)}.sw .si{position:absolute;left:9px;top:50%;transform:translateY(-50%)}
+select.fs{padding:7px 9px;border:1.5px solid var(--b);border-radius:7px;font-size:.8rem;background:#fff;outline:none;cursor:pointer}
+select.fs:focus{border-color:var(--p)}
+.tc{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.tch{padding:12px 15px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px}
+.tch h2{font-size:.92rem;font-weight:700}.tr2{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.79rem}
+thead th{background:#f1f5f9;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:9px 10px;text-align:left;border-bottom:2px solid var(--b);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{background:#e2e8f0}tbody tr:hover{background:#f8fafc}
+tbody tr:nth-child(even){background:#fafbfd}tbody tr:nth-child(even):hover{background:#f1f5f9}
+td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+.nd{text-align:center;padding:35px;color:var(--m)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700}
+.bb{background:#dbeafe;color:#1e40af}.bg{background:#d1fae5;color:#065f46}.by{background:#fef3c7;color:#92400e}
+.br{background:#fee2e2;color:#991b1b}.bgy{background:#f1f5f9;color:#475569}.bpu{background:#ede9fe;color:#5b21b6}.bor{background:#ffedd5;color:#9a3412}
+.ra{display:flex;gap:3px}.ib{border:none;background:transparent;cursor:pointer;padding:4px 5px;border-radius:5px;font-size:14px}.ib:hover{background:#f1f5f9}
+.pag{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;border-top:1px solid var(--b);flex-wrap:wrap;gap:7px}
+.pi{font-size:.79rem;color:var(--m)}.pbs{display:flex;gap:3px}
+.pb{padding:5px 9px;border:1.5px solid var(--b);background:#fff;border-radius:5px;cursor:pointer;font-size:.79rem}
+.pb:hover,.pb.act{background:var(--p);color:#fff;border-color:var(--p)}.pb:disabled{opacity:.35;cursor:not-allowed}
+.mo{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:12px;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.open{opacity:1;pointer-events:all}
+.md{background:#fff;border-radius:14px;width:100%;max-width:700px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(15,23,42,.22);transform:scale(.95);transition:transform .2s}
+.mo.open .md{transform:scale(1)}
+.mh{padding:16px 20px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.mh h3{font-size:1rem;font-weight:700}.mcl{border:none;background:transparent;font-size:19px;cursor:pointer;color:var(--m);padding:4px 6px;border-radius:5px}.mcl:hover{background:#f1f5f9}
+.mb2{padding:20px}.mf2{padding:12px 20px;border-top:1px solid var(--b);display:flex;justify-content:flex-end;gap:8px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fi{display:flex;flex-direction:column;gap:4px}.fi.full{grid-column:1/-1}
+.fi label{font-size:.73rem;font-weight:700;color:var(--m);text-transform:uppercase}
+.fi input,.fi select,.fi textarea{padding:8px 10px;border:1.5px solid var(--b);border-radius:7px;font-size:.875rem;outline:none;font-family:inherit}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:var(--p)}.fi textarea{resize:vertical;min-height:60px}
+.sgr2{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:12px;padding:14px}
+.scard{background:#f8fafc;border:1.5px solid var(--b);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:7px;position:relative;transition:box-shadow .15s}
+.scard:hover{box-shadow:0 4px 18px rgba(26,86,219,.10);border-color:#c7d7f8}
+.sav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;font-weight:700;color:#fff;flex-shrink:0}
+.stop{display:flex;align-items:center;gap:9px}.snm{font-weight:700;font-size:.92rem}.srl{font-size:.73rem;color:var(--m)}.sdt{font-size:.78rem;color:var(--m)}.sca{position:absolute;top:8px;right:8px;display:flex;gap:3px}
+.att-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;padding:14px}
+.att-card{background:#f8fafc;border:1.5px solid var(--b);border-radius:10px;padding:14px}
+.att-name{font-weight:700;font-size:.9rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.att-btns{display:flex;gap:5px;flex-wrap:wrap}
+.att-btn{padding:5px 10px;border-radius:6px;border:1.5px solid transparent;cursor:pointer;font-size:.74rem;font-weight:700;transition:all .15s}
+.att-btn.P{background:#d1fae5;color:#065f46;border-color:#6ee7b7}.att-btn.P.sel,.att-btn.P:hover{background:#057a55;color:#fff}
+.att-btn.A{background:#fee2e2;color:#991b1b;border-color:#fca5a5}.att-btn.A.sel,.att-btn.A:hover{background:#e02424;color:#fff}
+.att-btn.H{background:#fef3c7;color:#92400e;border-color:#fcd34d}.att-btn.H.sel,.att-btn.H:hover{background:#f59e0b;color:#fff}
+.att-btn.L{background:#ede9fe;color:#5b21b6;border-color:#c4b5fd}.att-btn.L.sel,.att-btn.L:hover{background:#7c3aed;color:#fff}
+.tc2{position:fixed;bottom:18px;right:18px;z-index:999;display:flex;flex-direction:column;gap:5px}
+.toast{background:var(--t);color:#fff;padding:10px 15px;border-radius:8px;font-size:.83rem;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:sIn .22s ease}
+.toast.success{background:var(--s)}.toast.error{background:var(--d)}.toast.info{background:var(--p)}
+@keyframes sIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:10px}.di label{font-size:.71rem;font-weight:700;color:var(--m);text-transform:uppercase;display:block;margin-bottom:2px}.di .val{font-size:.87rem}.di.full{grid-column:1/-1}
+.ph{display:none;text-align:center;margin-bottom:10px}
+@media print{header,.toolbar,.sg,.tch .btn,.ra,.pag,.mo,.tc2,.tabs,.alert-banner{display:none!important}body{background:#fff}main{padding:0;max-width:100%}.tc{box-shadow:none;border:1px solid #ccc}.ph{display:block!important}table{font-size:8pt}thead th,tbody tr:nth-child(even){-webkit-print-color-adjust:exact;print-color-adjust:exact}.tp{display:block!important}#tp-2,#tp-3,#tp-4,#tp-5,#tp-6,#tp-7{display:none!important}}
+@media(max-width:640px){header{min-height:auto;padding:10px}.fg{grid-template-columns:1fr}.sg{grid-template-columns:repeat(2,1fr)}.dg{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hl"><span class="ico">&#127959;</span><div class="ht"><h1>RMC Sales &amp; Staff System</h1><p>Ready-Mix Concrete &mdash; Management Portal</p></div></div>
+  <div class="ha">
+    <button class="btn bw" onclick="openAddVisitModal()">&#10133; Add Visit</button>
+    <button class="btn bp" onclick="openAddStaffModal()">&#128100; Add Staff</button>
+    <button class="btn ba" onclick="exportPDF()">&#128196; PDF Report</button>
+    <button class="btn bw" onclick="window.print()">&#128424; Print</button>
+  </div>
+</header>
+<div class="tc2" id="tc2"></div>
+<div class="mo" id="mo"><div class="md"><div class="mh"><h3 id="mt">Modal</h3><button class="mcl" onclick="closeModal()">&#x2715;</button></div><div class="mb2" id="mb2"></div><div class="mf2" id="mf2"></div></div></div>
+<main>
+  <div class="alert-banner" id="reminderBanner" style="display:none"><div class="ab-ico">&#128276;</div><div class="ab-content"><h3>&#9888; Upcoming Requirements!</h3><p id="reminderText"></p></div><button class="ab-close" onclick="document.getElementById('reminderBanner').style.display='none'">&#x2715;</button></div>
+  <div class="sg" id="sg"></div>
+  <div class="tabs">
+    <button class="tb act" onclick="swTab(this,'tp-1')">&#128203; Visits</button>
+    <button class="tb" onclick="swTab(this,'tp-2')">&#9200; Upcoming</button>
+    <button class="tb" onclick="swTab(this,'tp-3')">&#128101; Staff</button>
+    <button class="tb" onclick="swTab(this,'tp-4')">&#127970; Office Work</button>
+    <button class="tb" onclick="swTab(this,'tp-5')">&#128197; Attendance</button>
+    <button class="tb" onclick="swTab(this,'tp-6')">&#128176; Quotations</button>
+    <button class="tb" onclick="swTab(this,'tp-7')">&#128202; Analytics</button>
+  </div>
+  <div class="tp act" id="tp-1">
+    <div class="toolbar">
+      <div class="sw"><span class="si">&#128269;</span><input type="text" id="srch" placeholder="Search site, customer, contractor, grade..." oninput="applyF()"></div>
+      <select class="fs" id="fsp" onchange="applyF()"><option value="">All Salespersons</option></select>
+      <select class="fs" id="fgr" onchange="applyF()"><option value="">All Grades</option></select>
+      <select class="fs" id="fdt" onchange="applyF()"><option value="">All Dates</option></select>
+      <button class="btn bo bsm" onclick="clrF()">&#x2715; Clear</button>
+    </div>
+    <div class="tc">
+      <div class="ph"><h2>RMC Sales Visit Report</h2><p id="pd"></p></div>
+      <div class="tch"><h2>Visit Records <span id="rc" style="font-size:.8rem;color:var(--m);font-weight:400"></span></h2>
+        <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap">
+          <button class="btn bs bsm" onclick="expCSV()">&#11015; CSV</button>
+          <button class="btn bwa bsm" onclick="waShareAll()">&#128241; WhatsApp All</button>
+        </div>
+      </div>
+      <div class="tr2"><table><thead><tr>
+        <th>#</th><th onclick="srt('sp')">Salesperson &#8597;</th><th onclick="srt('vd')">Visit Date &#8597;</th>
+        <th>Customer</th><th>Contact</th><th>Contractor</th><th>Cont.No.</th>
+        <th onclick="srt('si')">Site/Project &#8597;</th><th>Address</th>
+        <th onclick="srt('ar')">Area &#8597;</th><th onclick="srt('gr')">Grade &#8597;</th>
+        <th onclick="srt('rd')">Req.Date &#8597;</th><th>Remarks</th><th>Actions</th>
+      </tr></thead><tbody id="tb"></tbody></table></div>
+      <div class="pag" id="pgb"></div>
+    </div>
+  </div>
+  <div class="tp" id="tp-2">
+    <div class="tc"><div class="tch"><h2>&#9200; Upcoming Requirements (Next 60 Days)</h2></div>
+      <div class="tr2"><table><thead><tr><th>Salesperson</th><th>Customer</th><th>Contractor</th><th>Site</th><th>Area</th><th>Grade</th><th>Required Date</th><th>Days Left</th><th>Remarks</th><th>Share</th></tr></thead><tbody id="utb"></tbody></table></div></div>
+  </div>
+  <div class="tp" id="tp-3">
+    <div class="tc"><div class="tch"><h2>&#128101; Staff Directory</h2><button class="btn bp" onclick="openAddStaffModal()">&#128100; Add New Staff</button></div><div id="stgr" class="sgr2"></div></div>
+  </div>
+  <div class="tp" id="tp-4">
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div class="tc" style="flex:1;min-width:240px"><div class="tch"><h2>&#127970; Office Staff</h2><button class="btn bp bsm" onclick="openAddOSModal()">&#128100; Add</button></div><div id="osl" style="padding:12px;display:flex;flex-direction:column;gap:8px"></div></div>
+      <div class="tc" style="flex:2;min-width:300px"><div class="tch"><h2>&#128221; Work Log</h2><button class="btn bs bsm" onclick="openAddWLModal()">&#10133; Add Entry</button></div>
+        <div class="tr2"><table><thead><tr><th>#</th><th>Staff</th><th>Date</th><th>Task</th><th>Status</th><th>Priority</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="wlb"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+  <div class="tp" id="tp-5">
+    <div class="tc" style="margin-bottom:14px">
+      <div class="tch"><h2>&#128197; Attendance Tracker</h2>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <label style="font-size:.82rem;font-weight:600;color:var(--m)">Date:</label>
+          <input type="date" id="attDate" style="padding:6px 10px;border:1.5px solid var(--b);border-radius:7px;font-size:.82rem;outline:none" onchange="rAtt()">
+          <button class="btn bs bsm" onclick="saveAttendance()">&#128190; Save</button>
+          <button class="btn ba bsm" onclick="exportAttPDF()">&#128196; PDF</button>
+        </div>
+      </div>
+      <div id="attGrid" class="att-grid"></div>
+    </div>
+    <div class="tc">
+      <div class="tch"><h2>&#128203; Attendance Log</h2>
+        <div style="display:flex;gap:7px">
+          <select class="fs" id="attFS" onchange="rAttLog()"><option value="">All Staff</option></select>
+          <select class="fs" id="attST" onchange="rAttLog()"><option value="">All Status</option><option>Present</option><option>Absent</option><option>Half Day</option><option>Leave</option></select>
+        </div>
+      </div>
+      <div class="tr2"><table><thead><tr><th>#</th><th>Staff</th><th>Dept</th><th>Date</th><th>Status</th><th>Notes</th><th>Del</th></tr></thead><tbody id="attLB"></tbody></table></div>
+    </div>
+  </div>
+  <div class="tp" id="tp-6">
+    <div class="toolbar">
+      <div class="sw"><span class="si">&#128269;</span><input type="text" id="qsrch" placeholder="Search customer, site, grade..." oninput="rQt()"></div>
+      <select class="fs" id="qfst" onchange="rQt()"><option value="">All Status</option><option>Draft</option><option>Sent</option><option>Follow-up</option><option>Accepted</option><option>Rejected</option></select>
+    </div>
+    <div class="tc"><div class="tch"><h2>&#128176; Quotation Tracker</h2>
+      <div style="display:flex;gap:7px"><button class="btn bs bsm" onclick="openAddQtModal()">&#10133; Add Quotation</button><button class="btn ba bsm" onclick="exportQtPDF()">&#128196; PDF</button></div>
+    </div>
+    <div class="tr2"><table><thead><tr>
+      <th>#</th><th onclick="srtQ('dt')">Date &#8597;</th><th>Customer</th><th>Contractor</th><th>Site</th><th>Grade</th>
+      <th onclick="srtQ('qty')">Qty(m&#179;)</th><th onclick="srtQ('rate')">Rate(&#8377;)</th><th onclick="srtQ('total')">Total(&#8377;)</th>
+      <th>Status</th><th>Valid Till</th><th>Actions</th>
+    </tr></thead><tbody id="qtb"></tbody></table></div></div>
+  </div>
+  <div class="tp" id="tp-7">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+      <div class="tc"><div class="tch"><h2>&#128202; Visits by Salesperson</h2></div><table><thead><tr><th>Salesperson</th><th>Visits</th><th>Area(sqft)</th></tr></thead><tbody id="an1"></tbody></table></div>
+      <div class="tc"><div class="tch"><h2>&#129521; Grade Distribution</h2></div><table><thead><tr><th>Grade</th><th>Count</th><th>%</th></tr></thead><tbody id="an2"></tbody></table></div>
+      <div class="tc"><div class="tch"><h2>&#128101; Staff by Dept</h2></div><table><thead><tr><th>Department</th><th>Count</th></tr></thead><tbody id="an3"></tbody></table></div>
+      <div class="tc"><div class="tch"><h2>&#128176; Quotation Summary</h2></div><table><thead><tr><th>Status</th><th>Count</th><th>Total Value</th></tr></thead><tbody id="an4"></tbody></table></div>
+      <div class="tc"><div class="tch"><h2>&#128197; Attendance This Month</h2></div><table><thead><tr><th>Staff</th><th>Present</th><th>Absent</th><th>Leave</th></tr></thead><tbody id="an5"></tbody></table></div>
+    </div>
+  </div>
+</main>
