@@ -2046,7 +2046,10 @@ function pmNormalizeMaterials(){
   });
 }
 function pmUpdateMaterialPreview(){
-  var o=pmNum((document.getElementById("mo")||{}).value);
+  /* IMPORTANT: the modal overlay itself uses id="mo", so the Opening Stock
+     input must NOT use that same id. Using duplicate ids was the reason
+     Opening Stock was always being read as 0. */
+  var o=pmNum((document.getElementById("mopen")||{}).value);
   var r=pmNum((document.getElementById("mr")||{}).value);
   var c=pmNum((document.getElementById("mc")||{}).value);
   var el=document.getElementById("matCurrentPreview");
@@ -2071,7 +2074,7 @@ function pmOpenMaterial(id){
   var body=pmForm([
     pmField("Material *","mn",x.name||""),
     pmField("Unit","mu",x.unit||"MT"),
-    pmField("Opening Stock","mo",b.opening,"number"),
+    pmField("Opening Stock","mopen",b.opening,"number"),
     pmField("Received","mr",b.received,"number"),
     pmField("Consumed","mc",b.consumed,"number"),
     pmField("Reorder Level","mre",b.reorder,"number"),
@@ -2079,7 +2082,7 @@ function pmOpenMaterial(id){
   ]);
   pmModal(id?"Edit Material":"Add / Update Material",body,"Save Material","pmSaveMaterial");
   window.pmEditId=id||0;
-  ["mo","mr","mc"].forEach(function(k){var el=document.getElementById(k);if(el)el.addEventListener("input",pmUpdateMaterialPreview);});
+  ["mopen","mr","mc"].forEach(function(k){var el=document.getElementById(k);if(el)el.addEventListener("input",pmUpdateMaterialPreview);});
   pmUpdateMaterialPreview();
 }
 function pmSaveMaterial(){
@@ -2087,10 +2090,10 @@ function pmSaveMaterial(){
   var d={
     name:(document.getElementById("mn").value||"").trim(),
     unit:(document.getElementById("mu").value||"MT").trim()||"MT",
-    opening:pmNum(document.getElementById("mo").value),
-    received:pmNum(document.getElementById("mr").value),
-    consumed:pmNum(document.getElementById("mc").value),
-    reorder:pmNum(document.getElementById("mre").value)
+    opening:pmNum((document.getElementById("mopen")||{}).value),
+    received:pmNum((document.getElementById("mr")||{}).value),
+    consumed:pmNum((document.getElementById("mc")||{}).value),
+    reorder:pmNum((document.getElementById("mre")||{}).value)
   };
   if(!d.name){toast("Material name required","error");return;}
   if(window.pmEditId){
