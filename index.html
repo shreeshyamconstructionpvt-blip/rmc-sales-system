@@ -1880,6 +1880,7 @@ function pmLoad(){
       {id:pmIds.m++,name:"Admixture",unit:"L",opening:0,received:0,consumed:0,reorder:500}
     ];
   }
+  pmNormalizeMaterials();
   pmSave();
 }
 function pmSave(){
@@ -1907,7 +1908,8 @@ function pmRenderDashboard(){
   var pending=PM_ORDERS.filter(x=>!["Delivered","Completed"].includes(x.status)).length;
   var dispatched=PM_ORDERS.filter(x=>x.status==="Dispatched").length;
   var todayQty=PM_ORDERS.filter(x=>x.schedule===today).reduce((s,x)=>s+(Number(x.qty)||0),0);
-  var stockAlerts=PM_MAT.filter(x=>(Number(x.opening)+Number(x.received)-Number(x.consumed))<=Number(x.reorder)).length;
+  pmNormalizeMaterials();
+  var stockAlerts=PM_MAT.filter(function(x){var b=pmMaterialBalance(x);return b.balance<=b.reorder;}).length;
   var maintOpen=PM_MAINT.filter(x=>x.status!=="Completed").length;
   var outstanding=PM_BILL.reduce((s,x)=>s+(Number(x.outstanding)||0),0);
   document.getElementById("pmStats").innerHTML=[
@@ -1923,8 +1925,8 @@ function pmRenderDashboard(){
   document.getElementById("pmSnapshot").innerHTML=[
     ["Plant Status","Operational","pm-ok"],["Pending Orders",pending,"pm-info"],["Low Stock Items",stockAlerts,stockAlerts?"pm-warn":"pm-ok"],["Open Maintenance",maintOpen,maintOpen?"pm-warn":"pm-ok"],["Active Plant Staff",PM_STAFF.filter(x=>x.status==="Active").length,"pm-purple"]
   ].map(function(x){return"<div class='pm-row'><div class='pm-row-title'>"+x[0]+"</div><span class='pm-pill "+x[2]+"'>"+x[1]+"</span></div>";}).join("");
-  var mats=PM_MAT.filter(function(x){return Number(x.opening)+Number(x.received)-Number(x.consumed)<=Number(x.reorder);});
-  document.getElementById("pmMaterialAlerts").innerHTML=mats.length?mats.map(function(x){var cur=Number(x.opening)+Number(x.received)-Number(x.consumed);return"<div class='pm-row'><div class='pm-row-main'><div class='pm-row-title'>"+pmEsc(x.name)+"</div><div class='pm-row-sub'>Current "+cur+" "+pmEsc(x.unit)+" · Reorder "+x.reorder+"</div></div><span class='pm-pill pm-warn'>Reorder</span></div>";}).join(""):"<div class='pm-empty'>All materials above reorder level.</div>";
+  var mats=PM_MAT.filter(function(x){var b=pmMaterialBalance(x);return b.balance<=b.reorder;});
+  document.getElementById("pmMaterialAlerts").innerHTML=mats.length?mats.map(function(x){var b=pmMaterialBalance(x);return"<div class='pm-row'><div class='pm-row-main'><div class='pm-row-title'>"+pmEsc(x.name)+"</div><div class='pm-row-sub'>Current "+b.balance+" "+pmEsc(x.unit)+" · Reorder "+b.reorder+"</div></div><span class='pm-pill pm-warn'>Reorder</span></div>";}).join(""):"<div class='pm-empty'>All materials above reorder level.</div>";
 }
 function pmStatusClass(s){return s==="Completed"||s==="Delivered"||s==="Available"?"pm-ok":s==="Dispatched"||s==="In Transit"?"pm-info":s==="Pending"?"pm-warn":"pm-purple";}
 function pmPriorityClass(s){return s==="High"?"pm-bad":s==="Medium"?"pm-warn":"pm-info";}
@@ -2022,27 +2024,82 @@ function pmSaveQC(){
   if(window.pmEditId){var i=PM_QC.findIndex(x=>x.id===window.pmEditId);PM_QC[i]=Object.assign({},PM_QC[i],d);}else{d.id=pmIds.q++;PM_QC.push(d);}
   pmSave();closeModal();pmRenderAll();toast("QC record saved","success");
 }
+function pmNum(v){
+  var n=parseFloat(String(v==null?"":v).replace(/,/g,""));
+  return Number.isFinite(n)?n:0;
+}
+function pmMaterialBalance(x){
+  x=x||{};
+  var opening=x.opening!=null && x.opening!=="" ? pmNum(x.opening) : (x.stock!=null && x.stock!=="" ? pmNum(x.stock) : (x.qty!=null && x.qty!=="" ? pmNum(x.qty) : (x.balance!=null && x.balance!=="" ? pmNum(x.balance) : 0)));
+  var received=pmNum(x.received);
+  var consumed=pmNum(x.consumed);
+  var reorder=pmNum(x.reorder);
+  return {opening:opening,received:received,consumed:consumed,reorder:reorder,balance:opening+received-consumed};
+}
+function pmNormalizeMaterials(){
+  if(!Array.isArray(PM_MAT))PM_MAT=[];
+  PM_MAT=PM_MAT.map(function(x){
+    var b=pmMaterialBalance(x);
+    x.opening=b.opening; x.received=b.received; x.consumed=b.consumed; x.reorder=b.reorder;
+    if(!x.unit)x.unit="MT";
+    return x;
+  });
+}
+function pmUpdateMaterialPreview(){
+  var o=pmNum((document.getElementById("mo")||{}).value);
+  var r=pmNum((document.getElementById("mr")||{}).value);
+  var c=pmNum((document.getElementById("mc")||{}).value);
+  var el=document.getElementById("matCurrentPreview");
+  if(el)el.textContent=(o+r-c).toLocaleString("en-IN",{maximumFractionDigits:3});
+}
+
 function pmRenderMat(){
+  pmNormalizeMaterials();
   var low=0;
-  document.getElementById("pmMatBody").innerHTML=PM_MAT.map(function(x){var cur=Number(x.opening)+Number(x.received)-Number(x.consumed);var lowNow=cur<=Number(x.reorder);if(lowNow)low++;return"<tr><td><strong>"+pmEsc(x.name)+"</strong></td><td>"+pmEsc(x.unit)+"</td><td>"+x.opening+"</td><td>"+x.received+"</td><td>"+x.consumed+"</td><td><strong>"+cur+"</strong></td><td>"+x.reorder+"</td><td><span class='pm-pill "+(lowNow?"pm-warn":"pm-ok")+"'>"+(lowNow?"Reorder":"Healthy")+"</span></td><td><button class='ib' onclick='pmOpenMaterial("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"m\","+x.id+")'>&#128465;</button></td></tr>";}).join("")||"<tr><td colspan='9' class='pm-empty'>No materials.</td></tr>";
+  document.getElementById("pmMatBody").innerHTML=PM_MAT.map(function(x){
+    var b=pmMaterialBalance(x),lowNow=b.balance<=b.reorder;
+    if(lowNow)low++;
+    return "<tr><td><strong>"+pmEsc(x.name)+"</strong></td><td>"+pmEsc(x.unit)+"</td><td>"+b.opening.toLocaleString("en-IN",{maximumFractionDigits:3})+"</td><td>"+b.received.toLocaleString("en-IN",{maximumFractionDigits:3})+"</td><td>"+b.consumed.toLocaleString("en-IN",{maximumFractionDigits:3})+"</td><td><strong>"+b.balance.toLocaleString("en-IN",{maximumFractionDigits:3})+"</strong></td><td>"+b.reorder.toLocaleString("en-IN",{maximumFractionDigits:3})+"</td><td><span class='pm-pill "+(lowNow?"pm-warn":"pm-ok")+"'>"+(lowNow?"Reorder":"Healthy")+"</span></td><td><button class='ib' onclick='pmOpenMaterial("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"m\","+x.id+")'>&#128465;</button></td></tr>";
+  }).join("")||"<tr><td colspan='9' class='pm-empty'>No materials.</td></tr>";
   document.getElementById("pmMatKpi").textContent=low+" low-stock";
 }
 function pmOpenMaterial(id){
-  var x=id?PM_MAT.find(function(a){return a.id===id;}):{};
-  pmModal(id?"Edit Material":"Add / Update Material",pmForm([
+  pmNormalizeMaterials();
+  var x=id?PM_MAT.find(function(a){return Number(a.id)===Number(id);}):{};
+  x=x||{};
+  var b=pmMaterialBalance(x);
+  var body=pmForm([
     pmField("Material *","mn",x.name||""),
     pmField("Unit","mu",x.unit||"MT"),
-    pmField("Opening Stock","mo",x.opening||0,"number"),
-    pmField("Received","mr",x.received||0,"number"),
-    pmField("Consumed","mc",x.consumed||0,"number"),
-    pmField("Reorder Level","mre",x.reorder||0,"number")
-  ]),"Save Material","pmSaveMaterial");window.pmEditId=id||0;
+    pmField("Opening Stock","mo",b.opening,"number"),
+    pmField("Received","mr",b.received,"number"),
+    pmField("Consumed","mc",b.consumed,"number"),
+    pmField("Reorder Level","mre",b.reorder,"number"),
+    "<div class='fi full'><label>Current Stock (Opening + Received − Consumed)</label><div id='matCurrentPreview' style='padding:10px 12px;border:1.5px solid #bbf7d0;border-radius:10px;background:#f0fdf4;color:#166534;font-weight:800;font-size:.95rem'>"+b.balance.toLocaleString("en-IN",{maximumFractionDigits:3})+"</div></div>"
+  ]);
+  pmModal(id?"Edit Material":"Add / Update Material",body,"Save Material","pmSaveMaterial");
+  window.pmEditId=id||0;
+  ["mo","mr","mc"].forEach(function(k){var el=document.getElementById(k);if(el)el.addEventListener("input",pmUpdateMaterialPreview);});
+  pmUpdateMaterialPreview();
 }
 function pmSaveMaterial(){
-  var d={name:document.getElementById("mn").value.trim(),unit:document.getElementById("mu").value.trim(),opening:Number(document.getElementById("mo").value)||0,received:Number(document.getElementById("mr").value)||0,consumed:Number(document.getElementById("mc").value)||0,reorder:Number(document.getElementById("mre").value)||0};
+  pmNormalizeMaterials();
+  var d={
+    name:(document.getElementById("mn").value||"").trim(),
+    unit:(document.getElementById("mu").value||"MT").trim()||"MT",
+    opening:pmNum(document.getElementById("mo").value),
+    received:pmNum(document.getElementById("mr").value),
+    consumed:pmNum(document.getElementById("mc").value),
+    reorder:pmNum(document.getElementById("mre").value)
+  };
   if(!d.name){toast("Material name required","error");return;}
-  if(window.pmEditId){var i=PM_MAT.findIndex(x=>x.id===window.pmEditId);PM_MAT[i]=Object.assign({},PM_MAT[i],d);}else{d.id=pmIds.m++;PM_MAT.push(d);}
-  pmSave();closeModal();pmRenderAll();toast("Material saved","success");
+  if(window.pmEditId){
+    var i=PM_MAT.findIndex(function(x){return Number(x.id)===Number(window.pmEditId);});
+    if(i<0){toast("Material record not found","error");return;}
+    PM_MAT[i]=Object.assign({},PM_MAT[i],d);
+  }else{d.id=pmIds.m++;PM_MAT.push(d);}
+  pmNormalizeMaterials();
+  pmSave();closeModal();pmRenderAll();toast("Material saved. Stock balance updated.","success");
 }
 function pmRenderBill(){
   var out=PM_BILL.reduce((s,x)=>s+(Number(x.outstanding)||0),0);
