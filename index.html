@@ -114,7 +114,7 @@ td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
 .toast{background:var(--t);color:#fff;padding:10px 15px;border-radius:8px;font-size:.83rem;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:sIn .22s ease}
 .toast.success{background:var(--s)}.toast.error{background:var(--d)}.toast.info{background:var(--p)}
 @keyframes sIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.admin-only{display:none}.admin-mode .admin-only{display:inline-flex}
+.admin-only{display:none}.admin-mode .admin-only,.office-mode .office-access{display:inline-flex}
 .staff-badge{background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:700}
 .ph{display:none;text-align:center;margin-bottom:10px}
 @media print{header,.toolbar,.sg,.tch .btn,.ra,.pag,.mo,.tc2,.tabs,.alert-banner,.dashboard-welcome,.login-wrap{display:none!important}body{background:#fff}main{padding:0;max-width:100%}.tc{box-shadow:none;border:1px solid #ccc}.ph{display:block!important}table{font-size:8pt}.tp{display:block!important}#tp-2,#tp-3,#tp-4,#tp-5,#tp-6,#tp-7{display:none!important}}
@@ -390,6 +390,9 @@ td{padding:9px 10px}
   .mb2{padding:16px}
 }
 
+
+.office-mode .office-access{display:inline-flex}
+
 </style>
 </head>
 <body>
@@ -456,7 +459,7 @@ td{padding:9px 10px}
     <button class="tb act" onclick="swTab(this,'tp-1')">&#128203; Visits</button>
     <button class="tb" onclick="swTab(this,'tp-2')">&#9200; Upcoming</button>
     <button class="tb admin-only" onclick="swTab(this,'tp-3')">&#128101; Staff</button>
-    <button class="tb admin-only" onclick="swTab(this,'tp-4')">&#127970; Office Work</button>
+    <button class="tb admin-only office-access" onclick="swTab(this,'tp-4')">&#127970; Office Work</button>
     <button class="tb admin-only" onclick="swTab(this,'tp-5')">&#128197; Attendance</button>
     <button class="tb admin-only" onclick="swTab(this,'tp-6')">&#128176; Quotations</button>
     <button class="tb admin-only" onclick="swTab(this,'tp-7')">&#128202; Analytics</button>
@@ -685,7 +688,8 @@ function doLogin(){
     document.getElementById('loginPage').style.display='none';
     document.getElementById('app').style.display='block';
     if(CU.role==='admin'){document.getElementById('app').classList.add('admin-mode');}
-    document.getElementById('userBadge').innerHTML='&#128100; '+CU.name+' <span class="'+(CU.role==='admin'?'badge bb':'staff-badge')+'">'+(CU.role==='admin'?'ADMIN':'STAFF')+'</span>';
+    if(CU.role==='office'){document.getElementById('app').classList.add('office-mode');}
+    document.getElementById('userBadge').innerHTML='&#128100; '+CU.name+' <span class="'+(CU.role==='admin'?'badge bb':'staff-badge')+'">'+(CU.role==='admin'?'ADMIN':(CU.role==='office'?'OFFICE':'STAFF'))+'</span>';
     var dw=document.getElementById('dwUser');if(dw)dw.textContent=CU.name;
     document.getElementById('hSub').textContent = CU.role==='admin'?'Admin Mode — Full Access':'Staff Mode — View & Add Visits';
     initApp();
@@ -700,12 +704,13 @@ function doLogout(){
   CU=null;
   document.getElementById('app').classList.remove('admin-mode');
   document.getElementById('app').style.display='none';
+  document.getElementById('app').classList.remove('admin-mode','office-mode');
   document.getElementById('loginPage').style.display='flex';
   document.getElementById('lUser').value='';document.getElementById('lPass').value='';
   document.getElementById('lErr').style.display='none';
 }
 function canEdit(){return CU && CU.role==='admin';}
-function canAddVisit(){return CU && (CU.role==='admin' || CU.role==='staff');}
+function canAddVisit(){return CU && (CU.role==='admin' || CU.role==='staff') && CU.role!=='office';}
 
 // ===== DATA =====
 var AT=[],nAid=1,attState={};
@@ -1053,10 +1058,66 @@ function saveStaff(){
 }
 
 // ===== OFFICE STAFF =====
-function openAddOSModal(){if(!canEdit())return;eid=null;document.getElementById("mt").textContent="Add Office Staff";document.getElementById("mb2").innerHTML="<div class='fg'><div class='fi full'><label>Name *</label><input id='onm' placeholder='Full name'></div><div class='fi'><label>Role</label><input id='orl' placeholder='e.g. Accountant'></div><div class='fi'><label>Dept</label><input id='odp' placeholder='e.g. Finance'></div><div class='fi'><label>Phone</label><input id='oph' placeholder='Mobile'></div><div class='fi'><label>Status</label><select id='ost'><option>Active</option><option>Inactive</option></select></div></div>";document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveOS()'>Save</button>";openModal();}
-function saveOS(){var nm=document.getElementById("onm").value.trim();if(!nm){toast("Name required","error");return;}OS.push({id:nOid++,nm:nm,rl:document.getElementById("orl").value.trim(),dp:document.getElementById("odp").value.trim(),ph:document.getElementById("oph").value.trim(),st:document.getElementById("ost").value,cl:"#64748b"});closeModal();rOS();rStats();}
+function getOfficeLogin(name){
+  var found="";
+  Object.keys(USERS).some(function(k){
+    var u=USERS[k];
+    if(u && u.name===name && u.type==="office"){found=k;return true;}
+    return false;
+  });
+  return found;
+}
+function openAddOSModal(){
+  if(!canEdit())return;
+  eid=null;
+  document.getElementById("mt").textContent="Add Office Staff + Login";
+  document.getElementById("mb2").innerHTML=
+    "<div style='margin-bottom:14px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#fff1f2,#fff7ed);border:1px solid #fecdd3'>"+
+      "<div style='font-weight:800;color:#991b1b;font-size:.86rem'>&#128273; Create Login Account</div>"+
+      "<div style='font-size:.72rem;color:#6b7280;margin-top:3px'>Create the Office Staff profile and their Login ID + Password together.</div>"+
+    "</div>"+
+    "<div class='fg'>"+
+      "<div class='fi full'><label>Name *</label><input id='onm' placeholder='Full name'></div>"+
+      "<div class='fi'><label>Login ID / Username *</label><input id='oun' autocomplete='off' placeholder='e.g. sunita'></div>"+
+      "<div class='fi'><label>Password *</label><input id='opw' type='password' autocomplete='new-password' placeholder='Create login password'></div>"+
+      "<div class='fi'><label>Role</label><input id='orl' placeholder='e.g. Accountant'></div>"+
+      "<div class='fi'><label>Dept</label><input id='odp' placeholder='e.g. Finance'></div>"+
+      "<div class='fi'><label>Phone</label><input id='oph' placeholder='Mobile'></div>"+
+      "<div class='fi'><label>Status</label><select id='ost'><option>Active</option><option>Inactive</option></select></div>"+
+      "<div class='fi full' style='padding:11px 12px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;font-size:.74rem;color:#64748b'><strong style='color:#334155'>&#9989; Login ready:</strong> After saving, this employee can sign in using the Login ID and Password created above.</div>"+
+    "</div>";
+  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveOS()'>&#128190; Save Staff + Login</button>";
+  openModal();
+}
+function saveOS(){
+  if(!canEdit())return;
+  var nm=document.getElementById("onm").value.trim();
+  var login=(document.getElementById("oun").value||"").trim().toLowerCase();
+  var pass=(document.getElementById("opw").value||"").trim();
+  if(!nm){toast("Name required","error");return;}
+  if(!/^[a-z0-9._-]{3,30}$/.test(login)){toast("Login ID must be 3-30 characters: letters, numbers, dot, _ or -","error");return;}
+  if(pass.length<4){toast("Password must be at least 4 characters","error");return;}
+  if(userExists(login)){toast("Login ID already exists","error");return;}
+
+  var os={
+    id:nOid++,
+    nm:nm,
+    rl:document.getElementById("orl").value.trim(),
+    dp:document.getElementById("odp").value.trim(),
+    ph:document.getElementById("oph").value.trim(),
+    st:document.getElementById("ost").value,
+    cl:"#64748b",
+    loginId:login
+  };
+  OS.push(os);
+  USERS[login]={pass:pass,role:"office",type:"office",name:nm};
+  saveUsers();
+
+  closeModal();rOS();rStats();
+  toast("Office staff and login created: "+login,"success");
+}
 function delOS(id){if(!confirm("Delete?"))return;OS=OS.filter(function(x){return x.id!==id;});rOS();rStats();}
-function rOS(){var el=document.getElementById("osl");if(!el)return;el.innerHTML=OS.map(function(s){return "<div class='scard' style='flex-direction:row;align-items:center;gap:10px;padding:10px 12px'><div class='sav' style='background:"+s.cl+";width:34px;height:34px;font-size:.9rem'>"+s.nm.charAt(0)+"</div><div style='flex:1'><div style='font-weight:700;font-size:.87rem'>"+s.nm+"</div><div style='font-size:.73rem;color:var(--m)'>"+s.rl+" &middot; "+s.dp+"</div></div><span class='badge "+(s.st==="Active"?"bg":"br")+"'>"+s.st+"</span><button class='ib' onclick='delOS("+s.id+")'>&#128465;</button></div>";}).join("");}
+function rOS(){var el=document.getElementById("osl");if(!el)return;el.innerHTML=OS.map(function(s){return "<div class='scard' style='flex-direction:row;align-items:center;gap:10px;padding:10px 12px'><div class='sav' style='background:"+s.cl+";width:34px;height:34px;font-size:.9rem'>"+s.nm.charAt(0)+"</div><div style='flex:1'><div style='font-weight:700;font-size:.87rem'>"+s.nm+"</div><div style='font-size:.73rem;color:var(--m)'>"+s.rl+" &middot; "+s.dp+"</div>"+(s.loginId?"<div style='font-size:.68rem;color:#991b1b;margin-top:2px'>&#128273; Login: "+s.loginId+"</div>":"")+"</div><span class='badge "+(s.st==="Active"?"bg":"br")+"'>"+s.st+"</span><button class='ib' onclick='delOS("+s.id+")'>&#128465;</button></div>";}).join("");}
 // ===== WORK LOG =====
 function openAddWLModal(){if(!canEdit())return;eid=null;var osOpts=OS.map(function(s){return"<option>"+s.nm+"</option>";}).join("");document.getElementById("mt").textContent="Add Work Log";document.getElementById("mb2").innerHTML="<div class='fg'><div class='fi'><label>Staff *</label><select id='wnm'>"+osOpts+"</select></div><div class='fi'><label>Date *</label><input id='wdt' type='date' value='"+new Date().toISOString().slice(0,10)+"'></div><div class='fi full'><label>Task / Work Description *</label><textarea id='wtk' placeholder='Enter work description (press Enter for new line)...' style='min-height:90px;resize:vertical'></textarea></div><div class='fi'><label>Status</label><select id='wst'><option>Pending</option><option>In Progress</option><option>Completed</option></select></div><div class='fi'><label>Priority</label><select id='wpr'><option>Low</option><option selected>Medium</option><option>High</option></select></div><div class='fi full'><label>Notes</label><textarea id='wnt'></textarea></div></div>";document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveWL()'>Save</button>";openModal();}
 function saveWL(){
