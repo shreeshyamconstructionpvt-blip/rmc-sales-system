@@ -892,22 +892,7 @@ td{padding:9px 10px}
       <div class="tr2"><table><thead><tr><th>#</th><th>Plant Manager</th><th>Date</th><th>Task / Activity</th><th>Status</th><th>Priority</th><th>Remarks</th></tr></thead><tbody id="adminPmTaskBody"></tbody></table></div>
     </div>
   </div>
-  
-<div id="pmStockBalance" class="tc" style="margin-top:14px">
-  <div class="tch">
-    <h2>📦 Stock Balance</h2>
-    <div style="display:flex;gap:8px;align-items:center">
-      <span class="pm-kpi" id="pmStockCount"></span>
-      <button class="btn bo bsm" onclick="swPlantTab(null,'pm-materials')">Open Stock</button>
-    </div>
-  </div>
-  <div class="tr2"><table>
-    <thead><tr><th>Material</th><th>Unit</th><th>Opening</th><th>Received</th><th>Consumed</th><th>Current Balance</th></tr></thead>
-    <tbody id="pmStockBalanceBody"></tbody>
-  </table></div>
-</div>
-
-<!-- TAB 5: ATTENDANCE (Admin Only) -->
+  <!-- TAB 5: ATTENDANCE (Admin Only) -->
   <div class="tp" id="tp-5">
     <div class="tc" style="margin-bottom:14px">
       <div class="tch"><h2>&#128197; Attendance Tracker</h2>
@@ -1877,36 +1862,6 @@ function pmLoadTasks(){try{PM_TASKS=JSON.parse(localStorage.getItem("RMC_PM_TASK
 function pmSaveTasks(){try{localStorage.setItem("RMC_PM_TASKS",JSON.stringify(PM_TASKS));}catch(e){}}
 function pmAddTask(activity,status,priority,remarks,date){PM_TASKS.push({id:pmTaskId++,nm:"Parveen Dahiya",dt:date||new Date().toISOString().slice(0,10),tk:activity,sts:status||"Completed",pr:priority||"Medium",nt:remarks||""});pmSaveTasks();}
 function renderAdminPmTasks(){var tb=document.getElementById("adminPmTaskBody"),kp=document.getElementById("adminPmTaskKpi");if(!tb)return;var rows=PM_TASKS.slice().sort(function(a,b){return String(b.dt).localeCompare(String(a.dt))||Number(b.id)-Number(a.id);});if(kp)kp.textContent=rows.length+" tasks";tb.innerHTML=rows.length?rows.map(function(w,i){var sc={Completed:"bg","In Progress":"by",Pending:"bgy"}[w.sts]||"bgy",pc={High:"br",Medium:"bor",Low:"bgy"}[w.pr]||"bgy";return "<tr><td>"+(i+1)+"</td><td><strong>"+pmEsc(w.nm)+"</strong></td><td>"+fd(w.dt)+"</td><td>"+pmEsc(w.tk)+"</td><td><span class='badge "+sc+"'>"+pmEsc(w.sts)+"</span></td><td><span class='badge "+pc+"'>"+pmEsc(w.pr)+"</span></td><td>"+pmEsc(w.nt||"-")+"</td></tr>";}).join(""):"<tr><td colspan='7' class='nd'>No Plant Manager tasks recorded yet.</td></tr>";}
-
-function pmMaterialBalance(m){
-  var opening=Number(m.opening||m.stock||m.qty||0);
-  var received=Number(m.received||0);
-  var consumed=Number(m.consumed||0);
-  var balance=Number.isFinite(Number(m.balance)) ? Number(m.balance) : (opening+received-consumed);
-  return {opening:opening,received:received,consumed:consumed,balance:balance};
-}
-function pmNormalizeMaterials(){
-  if(!Array.isArray(PM.materials)) PM.materials=[];
-  PM.materials=PM.materials.map(function(m){
-    var b=pmMaterialBalance(m);
-    m.opening=b.opening;m.received=b.received;m.consumed=b.consumed;m.balance=b.balance;
-    return m;
-  });
-}
-
-
-function renderPmStockBalance(){
-  var tb=document.getElementById("pmStockBalanceBody"),kp=document.getElementById("pmStockCount");
-  if(!tb)return;
-  pmNormalizeMaterials();
-  var rows=PM.materials||[];
-  if(kp)kp.textContent=rows.length+" materials";
-  tb.innerHTML=rows.length?rows.map(function(m){
-    var b=pmMaterialBalance(m);
-    return "<tr><td><strong>"+pmEsc(m.name||"-")+"</strong></td><td>"+pmEsc(m.unit||"-")+"</td><td>"+b.opening+"</td><td>"+b.received+"</td><td>"+b.consumed+"</td><td><strong>"+b.balance+"</strong></td></tr>";
-  }).join(""):"<tr><td colspan='6' class='pm-empty'>No stock entries yet. Use Open Stock → Add / Update Material.</td></tr>";
-}
-
 // ===== PLANT MANAGER DATA =====
 var PM_ORDERS=[], PM_FLEET=[], PM_STAFF=[], PM_QC=[], PM_MAT=[], PM_BILL=[], PM_MAINT=[];
 var pmIds={o:1,f:1,s:1,q:1,m:1,b:1,x:1};
@@ -1969,7 +1924,7 @@ function pmForm(fields){return "<div class='fg'>"+fields.join("")+"</div>";}
 function pmField(label,id,val,type,full){
   return "<div class='fi "+(full?"full":"")+"'><label>"+label+"</label><input id='"+id+"' type='"+(type||"text")+"' value='"+pmEsc(val||"")+"' /></div>";
 }
-function pmRenderAll(){renderPmStockBalance();
+function pmRenderAll(){
   if(!CU||CU.accountKind!=="plant")return;
   pmRenderDashboard();pmRenderOrders();pmRenderFleet();pmRenderStaff();pmRenderQC();pmRenderMat();pmRenderBill();pmRenderMaint();
 }
@@ -2154,7 +2109,7 @@ function pmOpenMaint(id){
     "<div class='fi'><label>Priority</label><select id='xp'>"+["Low","Medium","High"].map(function(s){return"<option "+(x.priority===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
     "<div class='fi'><label>Status</label><select id='xst'>"+["Open","In Progress","Completed"].map(function(s){return"<option "+(x.status===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
     pmField("Next Service","xn",x.next||"","date"),
-    pmField("Remarks","xrm",x.remarks||"","text",true),pmField("Assigned To","xby",x.by||""),pmField("Remarks","xrm",x.remarks||"","text",true)
+    pmField("Assigned To","xby",x.by||""),pmField("Remarks","xrm",x.remarks||"","text",true)
   ]),"Save Maintenance","pmSaveMaint");window.pmEditId=id||0;
 }
 function pmSaveMaint(){
@@ -2171,9 +2126,7 @@ function pmDelete(type,id){
   var i=arr.findIndex(x=>x.id===id);if(i>=0)arr.splice(i,1);
   pmSave();pmRenderAll();toast("Record deleted","error");
 }
-pmLoad();pmNormalizeMaterials();
-if(Array.isArray(PM.maint)){PM.maint=PM.maint.map(function(x){x.remarks=x.remarks||x.rm||"";return x;});}
-pmSave();pmLoadTasks();
+pmLoad();pmLoadTasks();
 
 // ===== INIT =====
 function initApp(){
