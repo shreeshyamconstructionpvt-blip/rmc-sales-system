@@ -115,7 +115,7 @@ td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
 .toast.success{background:var(--s)}.toast.error{background:var(--d)}.toast.info{background:var(--p)}
 @keyframes sIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
 .admin-only{display:none}.admin-mode .admin-only,.office-mode .office-access{display:inline-flex}
-.staff-badge{background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:700}
+.plant-badge{background:#e0f2fe;color:#075985;border:1px solid #38bdf8;border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:700}.staff-badge{background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:700}
 .ph{display:none;text-align:center;margin-bottom:10px}
 @media print{header,.toolbar,.sg,.tch .btn,.ra,.pag,.mo,.tc2,.tabs,.alert-banner,.dashboard-welcome,.login-wrap{display:none!important}body{background:#fff}main{padding:0;max-width:100%}.tc{box-shadow:none;border:1px solid #ccc}.ph{display:block!important}table{font-size:8pt}.tp{display:block!important}#tp-2,#tp-3,#tp-4,#tp-5,#tp-6,#tp-7{display:none!important}}
 @media(max-width:640px){header{min-height:auto;padding:10px}.fg{grid-template-columns:1fr}.sg{grid-template-columns:repeat(2,1fr)}}
@@ -607,6 +607,58 @@ td{padding:9px 10px}
   .login-security,.login-btn::before{animation:none!important}
 }
 
+
+/* ===== PLANT MANAGER / RMC OPERATIONS SUITE ===== */
+.plant-only{display:none}
+.plant-mode .plant-only{display:inline-flex}
+.plant-mode .sales-access,.plant-mode .admin-only,.plant-mode .office-access{display:none!important}
+.plant-panel{display:none}
+.plant-panel.act{display:block}
+.pm-hero{
+  margin-bottom:16px;padding:22px;border-radius:18px;color:#fff;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 88% 12%,rgba(255,255,255,.18),transparent 24%),
+    linear-gradient(120deg,#111827 0%,#252a35 46%,#8f1027 100%);
+  box-shadow:0 18px 42px rgba(15,23,42,.18);
+}
+.pm-hero::after{content:"";position:absolute;width:230px;height:230px;right:-60px;bottom:-110px;border:1px solid rgba(255,255,255,.15);border-radius:50%;box-shadow:0 0 0 24px rgba(255,255,255,.025),0 0 0 48px rgba(255,255,255,.02)}
+.pm-kicker{font-size:.67rem;font-weight:800;letter-spacing:1.5px;opacity:.72;text-transform:uppercase}
+.pm-title{font-size:1.55rem;font-weight:850;margin-top:5px;letter-spacing:-.6px}
+.pm-sub{font-size:.76rem;opacity:.8;margin-top:5px}
+.pm-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.pm-chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);font-size:.68rem;font-weight:700}
+.pm-grid{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.pm-stat{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+.pm-stat::after{content:"";position:absolute;right:-20px;bottom:-30px;width:90px;height:90px;border-radius:50%;background:rgba(185,28,47,.05)}
+.pm-stat .label{font-size:.66rem;color:#64748b;text-transform:uppercase;font-weight:800;letter-spacing:.5px}
+.pm-stat .num{font-size:1.65rem;font-weight:850;margin-top:6px;color:#111827}
+.pm-stat .hint{font-size:.68rem;color:#64748b;margin-top:4px}
+.pm-layout{display:grid;grid-template-columns:1.35fr .9fr;gap:14px}
+.pm-mini{background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:14px}
+.pm-mini-head{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pm-mini-head h3{font-size:.88rem;font-weight:850}
+.pm-list{padding:10px 14px}
+.pm-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 2px;border-bottom:1px solid #f1f5f9}
+.pm-row:last-child{border-bottom:0}
+.pm-row-main{min-width:0}.pm-row-title{font-size:.78rem;font-weight:800}.pm-row-sub{font-size:.67rem;color:#64748b;margin-top:2px}
+.pm-pill{font-size:.64rem;font-weight:800;padding:4px 8px;border-radius:999px;white-space:nowrap}
+.pm-ok{background:#dcfce7;color:#166534}.pm-warn{background:#fef3c7;color:#92400e}.pm-bad{background:#fee2e2;color:#991b1b}.pm-info{background:#e0f2fe;color:#075985}.pm-purple{background:#ede9fe;color:#5b21b6}
+.pm-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.pm-search{flex:1;min-width:180px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;outline:none}
+.pm-search:focus{border-color:#dc2626;box-shadow:0 0 0 4px rgba(220,38,38,.08)}
+.pm-table-wrap{overflow:auto}
+.pm-table{width:100%;border-collapse:collapse;font-size:.74rem}
+.pm-table th{padding:10px;background:#f8fafc;text-align:left;font-size:.66rem;text-transform:uppercase;color:#475569;letter-spacing:.4px;white-space:nowrap}
+.pm-table td{padding:9px 10px;border-top:1px solid #f1f5f9;white-space:nowrap}
+.pm-table tr:hover td{background:#fff7f7}
+.pm-empty{padding:30px;text-align:center;color:#64748b;font-size:.78rem}
+.pm-section-note{padding:10px 13px;border-radius:11px;background:linear-gradient(135deg,#fff7f7,#fff7ed);border:1px solid #fecdd3;color:#7f1d1d;font-size:.72rem;margin-bottom:12px}
+.pm-actions{display:flex;gap:5px;flex-wrap:wrap}
+.pm-kpi-strip{display:flex;gap:8px;flex-wrap:wrap}
+.pm-kpi{padding:8px 10px;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;font-size:.7rem;font-weight:750;color:#475569}
+@media(max-width:1050px){.pm-grid{grid-template-columns:repeat(2,minmax(180px,1fr))}.pm-layout{grid-template-columns:1fr}}
+@media(max-width:640px){.pm-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pm-stat{padding:12px}.pm-stat .num{font-size:1.35rem}.pm-title{font-size:1.2rem}}
+
 </style>
 </head>
 <body>
@@ -685,6 +737,15 @@ td{padding:9px 10px}
   <div class="alert-banner" id="reminderBanner" style="display:none"><div class="ab-ico">&#128276;</div><div class="ab-content"><h3>&#9888; Upcoming Requirements!</h3><p id="reminderText"></p></div><button class="ab-close" onclick="document.getElementById('reminderBanner').style.display='none'">&#x2715;</button></div>
   <div class="sg" id="sg"></div>
   <div class="tabs">
+
+    <button class="tb plant-only act" onclick="swPlantTab(this,'pm-dashboard')">&#127981; Plant Dashboard</button>
+    <button class="tb plant-only" onclick="swPlantTab(this,'pm-orders')">&#128230; Orders &amp; Dispatch</button>
+    <button class="tb plant-only" onclick="swPlantTab(this,'pm-fleet')">&#128666; Fleet</button>
+    <button class="tb plant-only" onclick="swPlantTab(this,'pm-staff')">&#128101; Staff &amp; Operators</button>
+    <button class="tb plant-only" onclick="swPlantTab(this,'pm-quality')">&#129514; Quality</button>
+    <button class="tb plant-only" onclick="swPlantTab(this,'pm-materials')">&#128230; Materials</button>
+    <button class="tb plant-only" onclick="swPlantTab(this,'pm-billing')">&#128176; Billing</button>
+    <button class="tb plant-only" onclick="swPlantTab(this,'pm-maint')">&#128295; Maintenance</button>
     <button class="tb act sales-access" onclick="swTab(this,'tp-1')">&#128203; Visits</button>
     <button class="tb sales-access" onclick="swTab(this,'tp-2')">&#9200; Upcoming</button>
     <button class="tb admin-only" onclick="swTab(this,'tp-3')">&#128101; Staff</button>
@@ -693,6 +754,91 @@ td{padding:9px 10px}
     <button class="tb admin-only" onclick="swTab(this,'tp-6')">&#128176; Quotations</button>
     <button class="tb admin-only" onclick="swTab(this,'tp-7')">&#128202; Analytics</button>
   </div>
+
+  <!-- ===== PLANT MANAGER OPERATIONS SUITE ===== -->
+  <section class="plant-panel act" id="pm-dashboard">
+    <div class="pm-hero">
+      <div class="pm-kicker">&#127981; Ready-Mix Concrete Plant Operations</div>
+      <div class="pm-title">Plant Manager Control Centre</div>
+      <div class="pm-sub">Welcome, <strong>Parveen Dahiya</strong> · Production, dispatch, fleet, quality, materials, billing and maintenance in one private workspace.</div>
+      <div class="pm-chips">
+        <span class="pm-chip">&#128274; Plant Manager Access</span>
+        <span class="pm-chip">&#9881; Operations Control</span>
+        <span class="pm-chip">&#128202; Live Plant Overview</span>
+      </div>
+    </div>
+    <div class="pm-grid" id="pmStats"></div>
+    <div class="pm-layout">
+      <div>
+        <div class="pm-mini"><div class="pm-mini-head"><h3>&#128230; Today / Recent Dispatch</h3><button class="btn bs bsm" onclick="swPlantTab(null,'pm-orders')">Open Dispatch</button></div><div class="pm-list" id="pmRecentOrders"></div></div>
+        <div class="pm-mini"><div class="pm-mini-head"><h3>&#128295; Maintenance Alerts</h3><button class="btn bo bsm" onclick="swPlantTab(null,'pm-maint')">Maintenance</button></div><div class="pm-list" id="pmMaintAlerts"></div></div>
+      </div>
+      <div>
+        <div class="pm-mini"><div class="pm-mini-head"><h3>&#128202; Plant Snapshot</h3></div><div class="pm-list" id="pmSnapshot"></div></div>
+        <div class="pm-mini"><div class="pm-mini-head"><h3>&#128167; Material Alerts</h3><button class="btn bo bsm" onclick="swPlantTab(null,'pm-materials')">Stock</button></div><div class="pm-list" id="pmMaterialAlerts"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="plant-panel" id="pm-orders">
+    <div class="pm-section-note">&#128230; Manage concrete orders and the complete dispatch cycle: customer → site → mix grade → quantity → loading → dispatch → arrival.</div>
+    <div class="pm-toolbar">
+      <input class="pm-search" id="pmOrderSearch" placeholder="Search customer, site, grade, vehicle..." oninput="pmRenderOrders()">
+      <button class="btn bs" onclick="pmOpenOrder()">&#10133; New Concrete Order</button>
+    </div>
+    <div class="pm-mini"><div class="pm-mini-head"><h3>Concrete Orders &amp; Dispatch Board</h3><span class="pm-kpi" id="pmOrderKpi"></span></div>
+      <div class="pm-table-wrap"><table class="pm-table"><thead><tr><th>Order</th><th>Customer / Site</th><th>Grade</th><th>Qty m³</th><th>Schedule</th><th>Vehicle</th><th>Status</th><th>Actions</th></tr></thead><tbody id="pmOrdersBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="plant-panel" id="pm-fleet">
+    <div class="pm-section-note">&#128666; Fleet control for transit mixers, drivers, trips, loading, dispatch and arrival status.</div>
+    <div class="pm-toolbar"><button class="btn bs" onclick="pmOpenFleet()">&#10133; Add Vehicle / Driver</button></div>
+    <div class="pm-mini"><div class="pm-mini-head"><h3>Transit Mixer &amp; Driver Register</h3><span class="pm-kpi" id="pmFleetKpi"></span></div>
+      <div class="pm-table-wrap"><table class="pm-table"><thead><tr><th>Vehicle</th><th>Driver</th><th>Capacity</th><th>Today Trips</th><th>Current Status</th><th>Last Trip</th><th>Actions</th></tr></thead><tbody id="pmFleetBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="plant-panel" id="pm-staff">
+    <div class="pm-section-note">&#128101; Plant team register for plant manager, batch operators, drivers, mechanics, QC and support staff. This view is visible only to Admin and the Plant Manager.</div>
+    <div class="pm-toolbar"><button class="btn bs" onclick="pmOpenStaff()">&#10133; Add Plant Staff</button></div>
+    <div class="pm-mini"><div class="pm-mini-head"><h3>Plant Staff &amp; Operators</h3><span class="pm-kpi" id="pmStaffKpi"></span></div>
+      <div class="pm-table-wrap"><table class="pm-table"><thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Phone</th><th>Shift</th><th>Status</th><th>Actions</th></tr></thead><tbody id="pmStaffBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="plant-panel" id="pm-quality">
+    <div class="pm-section-note">&#129514; Quality control register for mix design, slump, cube tests, materials and testing records.</div>
+    <div class="pm-toolbar"><button class="btn bs" onclick="pmOpenQC()">&#10133; Add QC Test</button></div>
+    <div class="pm-mini"><div class="pm-mini-head"><h3>Quality Control &amp; Testing Records</h3><span class="pm-kpi" id="pmQcKpi"></span></div>
+      <div class="pm-table-wrap"><table class="pm-table"><thead><tr><th>Date</th><th>Batch / Order</th><th>Grade</th><th>Slump mm</th><th>Cube 7d</th><th>Cube 28d</th><th>QC Status</th><th>Tested By</th><th>Actions</th></tr></thead><tbody id="pmQcBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="plant-panel" id="pm-materials">
+    <div class="pm-section-note">&#128230; Track cement, aggregates, sand and admixture stock, consumption and reorder requirements.</div>
+    <div class="pm-toolbar"><button class="btn bs" onclick="pmOpenMaterial()">&#10133; Add / Update Material</button></div>
+    <div class="pm-mini"><div class="pm-mini-head"><h3>Raw Material Stock &amp; Consumption</h3><span class="pm-kpi" id="pmMatKpi"></span></div>
+      <div class="pm-table-wrap"><table class="pm-table"><thead><tr><th>Material</th><th>Unit</th><th>Opening</th><th>Received</th><th>Consumed</th><th>Current Stock</th><th>Reorder Level</th><th>Status</th><th>Actions</th></tr></thead><tbody id="pmMatBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="plant-panel" id="pm-billing">
+    <div class="pm-section-note">&#128176; Plant-level commercial control for rates, orders, invoices and payment status. Admin retains company-wide finance control.</div>
+    <div class="pm-toolbar"><button class="btn bs" onclick="pmOpenBill()">&#10133; Add Invoice / Payment</button></div>
+    <div class="pm-mini"><div class="pm-mini-head"><h3>Billing &amp; Payment Register</h3><span class="pm-kpi" id="pmBillKpi"></span></div>
+      <div class="pm-table-wrap"><table class="pm-table"><thead><tr><th>Invoice</th><th>Customer</th><th>Order</th><th>Amount</th><th>Due Date</th><th>Payment</th><th>Outstanding</th><th>Status</th><th>Actions</th></tr></thead><tbody id="pmBillBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="plant-panel" id="pm-maint">
+    <div class="pm-section-note">&#128295; Maintenance register for batching plant, mixer trucks, pumps, breakdowns, service and preventive maintenance.</div>
+    <div class="pm-toolbar"><button class="btn bs" onclick="pmOpenMaint()">&#10133; Log Maintenance</button></div>
+    <div class="pm-mini"><div class="pm-mini-head"><h3>Equipment &amp; Maintenance</h3><span class="pm-kpi" id="pmMaintKpi"></span></div>
+      <div class="pm-table-wrap"><table class="pm-table"><thead><tr><th>Date</th><th>Equipment</th><th>Issue / Service</th><th>Type</th><th>Priority</th><th>Status</th><th>Next Service</th><th>Assigned To</th><th>Actions</th></tr></thead><tbody id="pmMaintBody"></tbody></table></div>
+    </div>
+  </section>
+
   <!-- TAB 1: ALL VISITS -->
   <div class="tp act" id="tp-1">
     <div class="toolbar">
@@ -795,6 +941,7 @@ td{padding:9px 10px}
 var USERS = {
   admin:     {pass:"admin@123", role:"admin", name:"Administrator"},
   parvinder: {pass:"staff@123", role:"staff", name:"Parvinder Kumar"},
+  parveen:   {pass:"plant@123", role:"plant", type:"plant", name:"Parveen Dahiya"},
   pawan:     {pass:"staff@123", role:"staff", name:"Pawan Kumar"}
 };
 var CU = null; // current user
@@ -951,7 +1098,7 @@ function setRole(r,btn){
   btn.classList.add('act');
   document.getElementById('lHint').innerHTML = r==='admin'
     ? '<strong>Admin:</strong> use your Admin Login ID and password'
-    : '<strong>Staff:</strong> use your Sales / Office Staff Login ID and password';
+    : '<strong>Staff:</strong> use your Sales / Office Staff / Plant Manager Login ID and password';
 }
 function togglePassword(){
   var inp=document.getElementById("lPass");
@@ -977,8 +1124,36 @@ function accountKind(account){
   if(!account)return "staff";
   if(account.role==="admin")return "admin";
   if(account.role==="office" || account.type==="office")return "office";
+  if(account.role==="plant" || account.type==="plant")return "plant";
   return "staff";
 }
+
+function applyPlantAccess(){
+  var app=document.getElementById("app");
+  if(!app)return;
+  var isPlant=CU&&CU.accountKind==="plant";
+  app.classList.toggle("plant-mode",!!isPlant);
+  document.querySelectorAll(".plant-panel").forEach(function(p){p.classList.remove("act");});
+  if(isPlant){
+    var first=document.getElementById("pm-dashboard");if(first)first.classList.add("act");
+    document.querySelectorAll(".tabs .tb").forEach(function(b){b.classList.remove("act");});
+    var pt=document.querySelector(".tabs .tb.plant-only");if(pt)pt.classList.add("act");
+    pmInit();
+  }
+}
+function swPlantTab(btn,id){
+  if(!CU||CU.accountKind!=="plant"){return;}
+  document.querySelectorAll(".plant-panel").forEach(function(p){p.classList.remove("act");});
+  var el=document.getElementById(id);if(el)el.classList.add("act");
+  document.querySelectorAll(".tabs .tb").forEach(function(b){b.classList.remove("act");});
+  if(btn)btn.classList.add("act");
+  else{
+    var b=[].slice.call(document.querySelectorAll(".tabs .tb.plant-only")).find(function(x){return (x.getAttribute("onclick")||"").indexOf("'"+id+"'")>=0;});
+    if(b)b.classList.add("act");
+  }
+  pmRenderAll();
+}
+
 function doLogin(){
   var u=document.getElementById('lUser').value.trim().toLowerCase();
   var p=document.getElementById('lPass').value;
@@ -992,7 +1167,9 @@ function doLogin(){
         "Staff Account Detected",
         kind==="office"
           ? "You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials."
-          : "You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials."
+          : kind==="plant"
+            ? "You are a Plant Manager user. Kindly select the Staff Login section and sign in with your Plant Manager credentials."
+            : "You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials."
       );
       return;
     }
@@ -1009,10 +1186,11 @@ function doLogin(){
     document.getElementById('app').style.display='block';
     document.getElementById('app').classList.remove('admin-mode','staff-mode','office-mode');
     document.getElementById('app').classList.add(kind==='admin'?'admin-mode':kind==='office'?'office-mode':'staff-mode');
-    document.getElementById('userBadge').innerHTML='&#128100; '+CU.name+' <span class="'+(kind==='admin'?'badge bb':kind==='office'?'staff-badge office-badge':'staff-badge')+'">'+(kind==='admin'?'ADMIN':kind==='office'?'OFFICE':'STAFF')+'</span>';
+    document.getElementById('userBadge').innerHTML='&#128100; '+CU.name+' <span class="'+(kind==='admin'?'badge bb':kind==='office'?'staff-badge office-badge':kind==='plant'?'staff-badge plant-badge':'staff-badge')+'">'+(kind==='admin'?'ADMIN':kind==='office'?'OFFICE':kind==='plant'?'PLANT MANAGER':'STAFF')+'</span>';
     var dw=document.getElementById('dwUser');if(dw)dw.textContent=CU.name;
-    document.getElementById('hSub').textContent=kind==='admin'?'Admin Mode — Full Access':kind==='office'?'Office Staff Mode — My Work Only':'Sales Staff Mode — My Visits Only';
+    document.getElementById('hSub').textContent=kind==='admin'?'Admin Mode — Full Access':kind==='office'?'Office Staff Mode — My Work Only':kind==='plant'?'Plant Manager Mode — Operations Control':'Sales Staff Mode — My Visits Only';
     applyRoleAccess();
+    applyPlantAccess();
     initApp();
     toast('Welcome, '+CU.name+'!','success');
   }else{
@@ -1657,10 +1835,277 @@ function exportPDF(){
   doc.save("RMC_Sales_Report_"+new Date().toISOString().slice(0,10)+".pdf");toast("PDF saved!","success");}catch(e){toast("PDF error: "+e.message,"error");}
 }
 function expCSV(){var h=["Salesperson","Visit Date","Customer","Contact","Contractor","Cont.No.","Site","Address","Area","Grade","Required Date","Remarks"];var rows=FR.map(function(r){return[r.sp,fd(r.vd),(r.cu||""),(r.cc||""),(r.co||""),(r.cc2||""),(r.si||""),(r.sa||""),(r.ar||""),(r.gr||""),fd(r.rd),(r.rm||"")].map(function(v){return'"'+String(v).replace(/"/g,'""')+'"';}).join(",");});var csv=h.join(",")+"\n"+rows.join("\n");var a=document.createElement("a");a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);a.download="RMC_Visits.csv";a.click();toast("CSV downloaded!","success");}
+
+// ===== PLANT MANAGER DATA =====
+var PM_ORDERS=[], PM_FLEET=[], PM_STAFF=[], PM_QC=[], PM_MAT=[], PM_BILL=[], PM_MAINT=[];
+var pmIds={o:1,f:1,s:1,q:1,m:1,b:1,x:1};
+
+function pmLoad(){
+  try{
+    PM_ORDERS=JSON.parse(localStorage.getItem("RMC_PM_ORDERS")||"[]");
+    PM_FLEET=JSON.parse(localStorage.getItem("RMC_PM_FLEET")||"[]");
+    PM_STAFF=JSON.parse(localStorage.getItem("RMC_PM_STAFF")||"[]");
+    PM_QC=JSON.parse(localStorage.getItem("RMC_PM_QC")||"[]");
+    PM_MAT=JSON.parse(localStorage.getItem("RMC_PM_MAT")||"[]");
+    PM_BILL=JSON.parse(localStorage.getItem("RMC_PM_BILL")||"[]");
+    PM_MAINT=JSON.parse(localStorage.getItem("RMC_PM_MAINT")||"[]");
+    pmIds.o=Math.max(0,...PM_ORDERS.map(x=>Number(x.id)||0))+1;
+    pmIds.f=Math.max(0,...PM_FLEET.map(x=>Number(x.id)||0))+1;
+    pmIds.s=Math.max(0,...PM_STAFF.map(x=>Number(x.id)||0))+1;
+    pmIds.q=Math.max(0,...PM_QC.map(x=>Number(x.id)||0))+1;
+    pmIds.m=Math.max(0,...PM_MAT.map(x=>Number(x.id)||0))+1;
+    pmIds.b=Math.max(0,...PM_BILL.map(x=>Number(x.id)||0))+1;
+    pmIds.x=Math.max(0,...PM_MAINT.map(x=>Number(x.id)||0))+1;
+  }catch(e){}
+  if(!PM_STAFF.length){
+    PM_STAFF=[
+      {id:pmIds.s++,name:"Parveen Dahiya",role:"Plant Manager",dept:"Plant Operations",phone:"",shift:"General",status:"Active"},
+      {id:pmIds.s++,name:"Batch Operator",role:"Batch Operator",dept:"Production",phone:"",shift:"Day",status:"Active"},
+      {id:pmIds.s++,name:"QC Technician",role:"Quality Control",dept:"Quality",phone:"",shift:"Day",status:"Active"},
+      {id:pmIds.s++,name:"Mechanic",role:"Plant Mechanic",dept:"Maintenance",phone:"",shift:"Day",status:"Active"}
+    ];
+  }
+  if(!PM_FLEET.length){
+    PM_FLEET=[
+      {id:pmIds.f++,vehicle:"RMC-01",driver:"Driver 01",cap:7,trips:0,status:"Available",last:"—"},
+      {id:pmIds.f++,vehicle:"RMC-02",driver:"Driver 02",cap:7,trips:0,status:"Available",last:"—"}
+    ];
+  }
+  if(!PM_MAT.length){
+    PM_MAT=[
+      {id:pmIds.m++,name:"Cement",unit:"MT",opening:0,received:0,consumed:0,reorder:10},
+      {id:pmIds.m++,name:"20mm Aggregate",unit:"MT",opening:0,received:0,consumed:0,reorder:30},
+      {id:pmIds.m++,name:"10mm Aggregate",unit:"MT",opening:0,received:0,consumed:0,reorder:20},
+      {id:pmIds.m++,name:"Sand",unit:"MT",opening:0,received:0,consumed:0,reorder:30},
+      {id:pmIds.m++,name:"Admixture",unit:"L",opening:0,received:0,consumed:0,reorder:500}
+    ];
+  }
+  pmSave();
+}
+function pmSave(){
+  [["RMC_PM_ORDERS",PM_ORDERS],["RMC_PM_FLEET",PM_FLEET],["RMC_PM_STAFF",PM_STAFF],["RMC_PM_QC",PM_QC],["RMC_PM_MAT",PM_MAT],["RMC_PM_BILL",PM_BILL],["RMC_PM_MAINT",PM_MAINT]].forEach(function(a){try{localStorage.setItem(a[0],JSON.stringify(a[1]));}catch(e){}});
+}
+function pmInit(){pmLoad();pmRenderAll();}
+function pmMoney(n){return "Rs."+Number(n||0).toLocaleString("en-IN");}
+function pmEsc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c];});}
+function pmModal(title,body,saveLabel,fn){
+  document.getElementById("mt").textContent=title;
+  document.getElementById("mb2").innerHTML=body;
+  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='"+fn+"()'>"+(saveLabel||"Save")+"</button>";
+  openModal();
+}
+function pmForm(fields){return "<div class='fg'>"+fields.join("")+"</div>";}
+function pmField(label,id,val,type,full){
+  return "<div class='fi "+(full?"full":"")+"'><label>"+label+"</label><input id='"+id+"' type='"+(type||"text")+"' value='"+pmEsc(val||"")+"' /></div>";
+}
+function pmRenderAll(){
+  if(!CU||CU.accountKind!=="plant")return;
+  pmRenderDashboard();pmRenderOrders();pmRenderFleet();pmRenderStaff();pmRenderQC();pmRenderMat();pmRenderBill();pmRenderMaint();
+}
+function pmRenderDashboard(){
+  var today=new Date().toISOString().slice(0,10);
+  var pending=PM_ORDERS.filter(x=>!["Delivered","Completed"].includes(x.status)).length;
+  var dispatched=PM_ORDERS.filter(x=>x.status==="Dispatched").length;
+  var todayQty=PM_ORDERS.filter(x=>x.schedule===today).reduce((s,x)=>s+(Number(x.qty)||0),0);
+  var stockAlerts=PM_MAT.filter(x=>(Number(x.opening)+Number(x.received)-Number(x.consumed))<=Number(x.reorder)).length;
+  var maintOpen=PM_MAINT.filter(x=>x.status!=="Completed").length;
+  var outstanding=PM_BILL.reduce((s,x)=>s+(Number(x.outstanding)||0),0);
+  document.getElementById("pmStats").innerHTML=[
+    ["&#128230;","Orders Pending",pending,"Dispatch pipeline"],
+    ["&#128666;","Dispatched",dispatched,"Trips in movement"],
+    ["&#128170;","Scheduled Qty",todayQty.toLocaleString()+" m³","Today's requirement"],
+    ["&#128176;","Outstanding",pmMoney(outstanding),"Plant receivables"]
+  ].map(function(x){return"<div class='pm-stat'><div class='label'>"+x[0]+" "+x[1]+"</div><div class='num'>"+x[2]+"</div><div class='hint'>"+x[3]+"</div></div>";}).join("");
+  var ro=PM_ORDERS.slice().sort((a,b)=>(b.schedule||"").localeCompare(a.schedule||"")).slice(0,5);
+  document.getElementById("pmRecentOrders").innerHTML=ro.length?ro.map(function(x){return"<div class='pm-row'><div class='pm-row-main'><div class='pm-row-title'>"+pmEsc(x.customer)+" · "+pmEsc(x.grade)+"</div><div class='pm-row-sub'>"+pmEsc(x.site)+" · "+x.qty+" m³ · "+pmEsc(x.schedule)+"</div></div><span class='pm-pill "+pmStatusClass(x.status)+"'>"+pmEsc(x.status)+"</span></div>";}).join(""):"<div class='pm-empty'>No concrete orders yet.</div>";
+  var ma=PM_MAINT.filter(x=>x.status!=="Completed").slice(0,5);
+  document.getElementById("pmMaintAlerts").innerHTML=ma.length?ma.map(function(x){return"<div class='pm-row'><div class='pm-row-main'><div class='pm-row-title'>"+pmEsc(x.equipment)+"</div><div class='pm-row-sub'>"+pmEsc(x.issue)+" · "+pmEsc(x.next)+"</div></div><span class='pm-pill "+pmPriorityClass(x.priority)+"'>"+pmEsc(x.priority)+"</span></div>";}).join(""):"<div class='pm-empty'>No open maintenance alerts.</div>";
+  document.getElementById("pmSnapshot").innerHTML=[
+    ["Plant Status","Operational","pm-ok"],["Pending Orders",pending,"pm-info"],["Low Stock Items",stockAlerts,stockAlerts?"pm-warn":"pm-ok"],["Open Maintenance",maintOpen,maintOpen?"pm-warn":"pm-ok"],["Active Plant Staff",PM_STAFF.filter(x=>x.status==="Active").length,"pm-purple"]
+  ].map(function(x){return"<div class='pm-row'><div class='pm-row-title'>"+x[0]+"</div><span class='pm-pill "+x[2]+"'>"+x[1]+"</span></div>";}).join("");
+  var mats=PM_MAT.filter(function(x){return Number(x.opening)+Number(x.received)-Number(x.consumed)<=Number(x.reorder);});
+  document.getElementById("pmMaterialAlerts").innerHTML=mats.length?mats.map(function(x){var cur=Number(x.opening)+Number(x.received)-Number(x.consumed);return"<div class='pm-row'><div class='pm-row-main'><div class='pm-row-title'>"+pmEsc(x.name)+"</div><div class='pm-row-sub'>Current "+cur+" "+pmEsc(x.unit)+" · Reorder "+x.reorder+"</div></div><span class='pm-pill pm-warn'>Reorder</span></div>";}).join(""):"<div class='pm-empty'>All materials above reorder level.</div>";
+}
+function pmStatusClass(s){return s==="Completed"||s==="Delivered"||s==="Available"?"pm-ok":s==="Dispatched"||s==="In Transit"?"pm-info":s==="Pending"?"pm-warn":"pm-purple";}
+function pmPriorityClass(s){return s==="High"?"pm-bad":s==="Medium"?"pm-warn":"pm-info";}
+function pmRenderOrders(){
+  var q=((document.getElementById("pmOrderSearch")||{}).value||"").toLowerCase();
+  var rows=PM_ORDERS.filter(function(x){return !q||[x.order,x.customer,x.site,x.grade,x.vehicle,x.status].some(function(v){return String(v||"").toLowerCase().indexOf(q)>=0;});});
+  document.getElementById("pmOrderKpi").textContent=rows.length+" orders";
+  document.getElementById("pmOrdersBody").innerHTML=rows.length?rows.map(function(x){return"<tr><td><strong>"+pmEsc(x.order)+"</strong></td><td>"+pmEsc(x.customer)+"<br><small>"+pmEsc(x.site)+"</small></td><td>"+pmEsc(x.grade)+"</td><td>"+x.qty+"</td><td>"+pmEsc(x.schedule)+"</td><td>"+pmEsc(x.vehicle||"—")+"</td><td><span class='pm-pill "+pmStatusClass(x.status)+"'>"+pmEsc(x.status)+"</span></td><td><div class='pm-actions'><button class='ib' onclick='pmOpenOrder("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"o\","+x.id+")'>&#128465;</button></div></td></tr>";}).join(""):"<tr><td colspan='8' class='pm-empty'>No orders found.</td></tr>";
+}
+function pmOpenOrder(id){
+  var x=id?PM_ORDERS.find(function(a){return a.id===id;}):{};
+  var fleet=PM_FLEET.map(a=>"<option "+(x.vehicle===a.vehicle?"selected":"")+">"+pmEsc(a.vehicle)+"</option>").join("");
+  pmModal(id?"Edit Concrete Order":"New Concrete Order",pmForm([
+    pmField("Order No. *","po",x.order||"RMC-"+String(pmIds.o).padStart(4,"0")),
+    pmField("Customer *","pc",x.customer||""),
+    pmField("Site / Project *","ps",x.site||""),
+    pmField("Mix Grade *","pg",x.grade||"M25"),
+    pmField("Quantity (m³) *","pq",x.qty||"", "number"),
+    pmField("Delivery Schedule *","pd",x.schedule||new Date().toISOString().slice(0,10),"date"),
+    "<div class='fi'><label>Vehicle</label><select id='pv'><option value=''>-- Assign later --</option>"+fleet+"</select></div>",
+    "<div class='fi'><label>Status</label><select id='pst'>"+["Pending","Loading","Dispatched","In Transit","Delivered","Completed"].map(function(s){return"<option "+(x.status===s?"selected":"") +">"+s+"</option>";}).join("")+"</select></div>",
+    pmField("Delivery Address","pa",x.address||"","text",true),
+    pmField("Remarks","pr",x.remarks||"","text",true)
+  ]),"Save Order","pmSaveOrder");
+  window.pmEditId=id||0;
+}
+function pmSaveOrder(){
+  var d={order:document.getElementById("po").value.trim(),customer:document.getElementById("pc").value.trim(),site:document.getElementById("ps").value.trim(),grade:document.getElementById("pg").value.trim(),qty:Number(document.getElementById("pq").value)||0,schedule:document.getElementById("pd").value,vehicle:document.getElementById("pv").value,status:document.getElementById("pst").value,address:document.getElementById("pa").value.trim(),remarks:document.getElementById("pr").value.trim()};
+  if(!d.order||!d.customer||!d.site||!d.grade||!d.schedule){toast("Order, customer, site, grade and schedule are required","error");return;}
+  if(window.pmEditId){var i=PM_ORDERS.findIndex(x=>x.id===window.pmEditId);PM_ORDERS[i]=Object.assign({},PM_ORDERS[i],d);}else{d.id=pmIds.o++;PM_ORDERS.push(d);}
+  pmSave();closeModal();pmRenderAll();toast("Concrete order saved","success");
+}
+function pmRenderFleet(){
+  document.getElementById("pmFleetKpi").textContent=PM_FLEET.length+" vehicles";
+  document.getElementById("pmFleetBody").innerHTML=PM_FLEET.length?PM_FLEET.map(function(x){return"<tr><td><strong>"+pmEsc(x.vehicle)+"</strong></td><td>"+pmEsc(x.driver)+"</td><td>"+x.cap+" m³</td><td>"+x.trips+"</td><td><span class='pm-pill "+pmStatusClass(x.status)+"'>"+pmEsc(x.status)+"</span></td><td>"+pmEsc(x.last)+"</td><td><button class='ib' onclick='pmOpenFleet("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"f\","+x.id+")'>&#128465;</button></td></tr>";}).join(""):"<tr><td colspan='7' class='pm-empty'>No fleet records.</td></tr>";
+}
+function pmOpenFleet(id){
+  var x=id?PM_FLEET.find(function(a){return a.id===id;}):{};
+  pmModal(id?"Edit Vehicle":"Add Vehicle / Driver",pmForm([
+    pmField("Vehicle No. *","fv",x.vehicle||"RMC-"),
+    pmField("Driver *","fd",x.driver||""),
+    pmField("Capacity (m³)","fc",x.cap||7,"number"),
+    pmField("Today Trips","ft",x.trips||0,"number"),
+    "<div class='fi'><label>Status</label><select id='fst'>"+["Available","Loading","In Transit","Maintenance","Off Road"].map(function(s){return"<option "+(x.status===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
+    pmField("Last Trip / Site","fl",x.last||"")
+  ]),"Save Fleet","pmSaveFleet");window.pmEditId=id||0;
+}
+function pmSaveFleet(){
+  var d={vehicle:document.getElementById("fv").value.trim(),driver:document.getElementById("fd").value.trim(),cap:Number(document.getElementById("fc").value)||0,trips:Number(document.getElementById("ft").value)||0,status:document.getElementById("fst").value,last:document.getElementById("fl").value.trim()};
+  if(!d.vehicle||!d.driver){toast("Vehicle and driver are required","error");return;}
+  if(window.pmEditId){var i=PM_FLEET.findIndex(x=>x.id===window.pmEditId);PM_FLEET[i]=Object.assign({},PM_FLEET[i],d);}else{d.id=pmIds.f++;PM_FLEET.push(d);}
+  pmSave();closeModal();pmRenderAll();toast("Fleet record saved","success");
+}
+function pmRenderStaff(){
+  document.getElementById("pmStaffKpi").textContent=PM_STAFF.filter(x=>x.status==="Active").length+" active";
+  document.getElementById("pmStaffBody").innerHTML=PM_STAFF.map(function(x){return"<tr><td><strong>"+pmEsc(x.name)+"</strong></td><td>"+pmEsc(x.role)+"</td><td>"+pmEsc(x.dept)+"</td><td>"+pmEsc(x.phone||"—")+"</td><td>"+pmEsc(x.shift)+"</td><td><span class='pm-pill "+(x.status==="Active"?"pm-ok":"pm-bad")+"'>"+pmEsc(x.status)+"</span></td><td><button class='ib' onclick='pmOpenStaff("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"s\","+x.id+")'>&#128465;</button></td></tr>";}).join("");
+}
+function pmOpenStaff(id){
+  var x=id?PM_STAFF.find(function(a){return a.id===id;}):{};
+  pmModal(id?"Edit Plant Staff":"Add Plant Staff",pmForm([
+    pmField("Name *","sn",x.name||""),
+    pmField("Role *","sr",x.role||""),
+    pmField("Department","sd",x.dept||""),
+    pmField("Phone","sp",x.phone||""),
+    pmField("Shift","ss",x.shift||"Day"),
+    "<div class='fi'><label>Status</label><select id='sst2'><option "+(x.status!=="Inactive"?"selected":"")+">Active</option><option "+(x.status==="Inactive"?"selected":"")+">Inactive</option></select></div>"
+  ]),"Save Staff","pmSaveStaff");window.pmEditId=id||0;
+}
+function pmSaveStaff(){
+  var d={name:document.getElementById("sn").value.trim(),role:document.getElementById("sr").value.trim(),dept:document.getElementById("sd").value.trim(),phone:document.getElementById("sp").value.trim(),shift:document.getElementById("ss").value.trim(),status:document.getElementById("sst2").value};
+  if(!d.name||!d.role){toast("Name and role are required","error");return;}
+  if(window.pmEditId){var i=PM_STAFF.findIndex(x=>x.id===window.pmEditId);PM_STAFF[i]=Object.assign({},PM_STAFF[i],d);}else{d.id=pmIds.s++;PM_STAFF.push(d);}
+  pmSave();closeModal();pmRenderAll();toast("Plant staff saved","success");
+}
+function pmRenderQC(){
+  document.getElementById("pmQcKpi").textContent=PM_QC.length+" tests";
+  document.getElementById("pmQcBody").innerHTML=PM_QC.length?PM_QC.map(function(x){return"<tr><td>"+pmEsc(x.date)+"</td><td>"+pmEsc(x.batch)+"</td><td>"+pmEsc(x.grade)+"</td><td>"+x.slump+"</td><td>"+x.c7+"</td><td>"+x.c28+"</td><td><span class='pm-pill "+(x.status==="Pass"?"pm-ok":"pm-warn")+"'>"+pmEsc(x.status)+"</span></td><td>"+pmEsc(x.by)+"</td><td><button class='ib' onclick='pmOpenQC("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"q\","+x.id+")'>&#128465;</button></td></tr>";}).join(""):"<tr><td colspan='9' class='pm-empty'>No QC tests recorded.</td></tr>";
+}
+function pmOpenQC(id){
+  var x=id?PM_QC.find(function(a){return a.id===id;}):{};
+  pmModal(id?"Edit QC Test":"Add QC Test",pmForm([
+    pmField("Date *","qd",x.date||new Date().toISOString().slice(0,10),"date"),
+    pmField("Batch / Order *","qb",x.batch||""),
+    pmField("Grade *","qg",x.grade||"M25"),
+    pmField("Slump (mm)","qs",x.slump||"","number"),
+    pmField("Cube 7 Day","q7",x.c7||""),
+    pmField("Cube 28 Day","q28",x.c28||""),
+    "<div class='fi'><label>Status</label><select id='qst'>"+["Pass","Monitor","Fail"].map(function(s){return"<option "+(x.status===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
+    pmField("Tested By","qby",x.by||"")
+  ]),"Save QC Record","pmSaveQC");window.pmEditId=id||0;
+}
+function pmSaveQC(){
+  var d={date:document.getElementById("qd").value,batch:document.getElementById("qb").value.trim(),grade:document.getElementById("qg").value.trim(),slump:Number(document.getElementById("qs").value)||0,c7:document.getElementById("q7").value.trim(),c28:document.getElementById("q28").value.trim(),status:document.getElementById("qst").value,by:document.getElementById("qby").value.trim()};
+  if(!d.date||!d.batch||!d.grade){toast("Date, batch/order and grade are required","error");return;}
+  if(window.pmEditId){var i=PM_QC.findIndex(x=>x.id===window.pmEditId);PM_QC[i]=Object.assign({},PM_QC[i],d);}else{d.id=pmIds.q++;PM_QC.push(d);}
+  pmSave();closeModal();pmRenderAll();toast("QC record saved","success");
+}
+function pmRenderMat(){
+  var low=0;
+  document.getElementById("pmMatBody").innerHTML=PM_MAT.map(function(x){var cur=Number(x.opening)+Number(x.received)-Number(x.consumed);var lowNow=cur<=Number(x.reorder);if(lowNow)low++;return"<tr><td><strong>"+pmEsc(x.name)+"</strong></td><td>"+pmEsc(x.unit)+"</td><td>"+x.opening+"</td><td>"+x.received+"</td><td>"+x.consumed+"</td><td><strong>"+cur+"</strong></td><td>"+x.reorder+"</td><td><span class='pm-pill "+(lowNow?"pm-warn":"pm-ok")+"'>"+(lowNow?"Reorder":"Healthy")+"</span></td><td><button class='ib' onclick='pmOpenMaterial("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"m\","+x.id+")'>&#128465;</button></td></tr>";}).join("")||"<tr><td colspan='9' class='pm-empty'>No materials.</td></tr>";
+  document.getElementById("pmMatKpi").textContent=low+" low-stock";
+}
+function pmOpenMaterial(id){
+  var x=id?PM_MAT.find(function(a){return a.id===id;}):{};
+  pmModal(id?"Edit Material":"Add / Update Material",pmForm([
+    pmField("Material *","mn",x.name||""),
+    pmField("Unit","mu",x.unit||"MT"),
+    pmField("Opening Stock","mo",x.opening||0,"number"),
+    pmField("Received","mr",x.received||0,"number"),
+    pmField("Consumed","mc",x.consumed||0,"number"),
+    pmField("Reorder Level","mre",x.reorder||0,"number")
+  ]),"Save Material","pmSaveMaterial");window.pmEditId=id||0;
+}
+function pmSaveMaterial(){
+  var d={name:document.getElementById("mn").value.trim(),unit:document.getElementById("mu").value.trim(),opening:Number(document.getElementById("mo").value)||0,received:Number(document.getElementById("mr").value)||0,consumed:Number(document.getElementById("mc").value)||0,reorder:Number(document.getElementById("mre").value)||0};
+  if(!d.name){toast("Material name required","error");return;}
+  if(window.pmEditId){var i=PM_MAT.findIndex(x=>x.id===window.pmEditId);PM_MAT[i]=Object.assign({},PM_MAT[i],d);}else{d.id=pmIds.m++;PM_MAT.push(d);}
+  pmSave();closeModal();pmRenderAll();toast("Material saved","success");
+}
+function pmRenderBill(){
+  var out=PM_BILL.reduce((s,x)=>s+(Number(x.outstanding)||0),0);
+  document.getElementById("pmBillKpi").textContent=pmMoney(out)+" outstanding";
+  document.getElementById("pmBillBody").innerHTML=PM_BILL.length?PM_BILL.map(function(x){return"<tr><td><strong>"+pmEsc(x.inv)+"</strong></td><td>"+pmEsc(x.customer)+"</td><td>"+pmEsc(x.order)+"</td><td>"+pmMoney(x.amount)+"</td><td>"+pmEsc(x.due)+"</td><td>"+pmMoney(x.paid)+"</td><td><strong>"+pmMoney(x.outstanding)+"</strong></td><td><span class='pm-pill "+(x.status==="Paid"?"pm-ok":x.status==="Part Paid"?"pm-warn":"pm-bad")+"'>"+pmEsc(x.status)+"</span></td><td><button class='ib' onclick='pmOpenBill("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"b\","+x.id+")'>&#128465;</button></td></tr>";}).join(""):"<tr><td colspan='9' class='pm-empty'>No billing records.</td></tr>";
+}
+function pmOpenBill(id){
+  var x=id?PM_BILL.find(function(a){return a.id===id;}):{};
+  pmModal(id?"Edit Invoice":"Add Invoice / Payment",pmForm([
+    pmField("Invoice No. *","bi",x.inv||"INV-"+String(pmIds.b).padStart(4,"0")),
+    pmField("Customer *","bc",x.customer||""),
+    pmField("Order No.","bo2",x.order||""),
+    pmField("Amount","bam",x.amount||0,"number"),
+    pmField("Paid","bp2",x.paid||0,"number"),
+    pmField("Due Date","bd2",x.due||"","date"),
+    "<div class='fi'><label>Status</label><select id='bst'>"+["Unpaid","Part Paid","Paid"].map(function(s){return"<option "+(x.status===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>"
+  ]),"Save Invoice","pmSaveBill");window.pmEditId=id||0;
+}
+function pmSaveBill(){
+  var amount=Number(document.getElementById("bam").value)||0,paid=Number(document.getElementById("bp2").value)||0;
+  var d={inv:document.getElementById("bi").value.trim(),customer:document.getElementById("bc").value.trim(),order:document.getElementById("bo2").value.trim(),amount:amount,paid:paid,outstanding:Math.max(0,amount-paid),due:document.getElementById("bd2").value,status:document.getElementById("bst").value};
+  if(!d.inv||!d.customer){toast("Invoice and customer are required","error");return;}
+  if(window.pmEditId){var i=PM_BILL.findIndex(x=>x.id===window.pmEditId);PM_BILL[i]=Object.assign({},PM_BILL[i],d);}else{d.id=pmIds.b++;PM_BILL.push(d);}
+  pmSave();closeModal();pmRenderAll();toast("Billing record saved","success");
+}
+function pmRenderMaint(){
+  var open=PM_MAINT.filter(x=>x.status!=="Completed").length;
+  document.getElementById("pmMaintKpi").textContent=open+" open";
+  document.getElementById("pmMaintBody").innerHTML=PM_MAINT.length?PM_MAINT.map(function(x){return"<tr><td>"+pmEsc(x.date)+"</td><td><strong>"+pmEsc(x.equipment)+"</strong></td><td>"+pmEsc(x.issue)+"</td><td>"+pmEsc(x.type)+"</td><td><span class='pm-pill "+pmPriorityClass(x.priority)+"'>"+pmEsc(x.priority)+"</span></td><td><span class='pm-pill "+(x.status==="Completed"?"pm-ok":"pm-warn")+"'>"+pmEsc(x.status)+"</span></td><td>"+pmEsc(x.next)+"</td><td>"+pmEsc(x.by)+"</td><td><button class='ib' onclick='pmOpenMaint("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"x\","+x.id+")'>&#128465;</button></td></tr>";}).join(""):"<tr><td colspan='9' class='pm-empty'>No maintenance records.</td></tr>";
+}
+function pmOpenMaint(id){
+  var x=id?PM_MAINT.find(function(a){return a.id===id;}):{};
+  pmModal(id?"Edit Maintenance":"Log Maintenance",pmForm([
+    pmField("Date *","xd",x.date||new Date().toISOString().slice(0,10),"date"),
+    pmField("Equipment *","xe",x.equipment||"Batching Plant"),
+    pmField("Issue / Service *","xi",x.issue||"","text",true),
+    "<div class='fi'><label>Type</label><select id='xt'>"+["Preventive","Breakdown","Service","Inspection"].map(function(s){return"<option "+(x.type===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
+    "<div class='fi'><label>Priority</label><select id='xp'>"+["Low","Medium","High"].map(function(s){return"<option "+(x.priority===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
+    "<div class='fi'><label>Status</label><select id='xst'>"+["Open","In Progress","Completed"].map(function(s){return"<option "+(x.status===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
+    pmField("Next Service","xn",x.next||"","date"),
+    pmField("Assigned To","xby",x.by||"")
+  ]),"Save Maintenance","pmSaveMaint");window.pmEditId=id||0;
+}
+function pmSaveMaint(){
+  var d={date:document.getElementById("xd").value,equipment:document.getElementById("xe").value.trim(),issue:document.getElementById("xi").value.trim(),type:document.getElementById("xt").value,priority:document.getElementById("xp").value,status:document.getElementById("xst").value,next:document.getElementById("xn").value,by:document.getElementById("xby").value.trim()};
+  if(!d.date||!d.equipment||!d.issue){toast("Date, equipment and issue/service are required","error");return;}
+  if(window.pmEditId){var i=PM_MAINT.findIndex(x=>x.id===window.pmEditId);PM_MAINT[i]=Object.assign({},PM_MAINT[i],d);}else{d.id=pmIds.x++;PM_MAINT.push(d);}
+  pmSave();closeModal();pmRenderAll();toast("Maintenance record saved","success");
+}
+function pmDelete(type,id){
+  if(!CU||CU.accountKind!=="plant")return;
+  var map={o:["PM_ORDERS","id",PM_ORDERS],f:["PM_FLEET","id",PM_FLEET],s:["PM_STAFF","id",PM_STAFF],q:["PM_QC","id",PM_QC],m:["PM_MAT","id",PM_MAT],b:["PM_BILL","id",PM_BILL],x:["PM_MAINT","id",PM_MAINT]};
+  var arr=map[type]&&map[type][2];if(!arr)return;
+  if(!confirm("Delete this record?"))return;
+  var i=arr.findIndex(x=>x.id===id);if(i>=0)arr.splice(i,1);
+  pmSave();pmRenderAll();toast("Record deleted","error");
+}
+pmLoad();
+
 // ===== INIT =====
 function initApp(){
   document.getElementById("attDate").value=new Date().toISOString().slice(0,10);
-  popDD();applyF();rStats();rStg();rOS();rWL();rQt();popAttFilter();showReminders();applyRoleAccess();
+  popDD();applyF();rStats();rStg();rOS();rWL();rQt();popAttFilter();showReminders();applyRoleAccess();applyPlantAccess();
 }
 document.addEventListener("DOMContentLoaded",function(){
   var first=document.querySelector('.role-tab');if(first)setRole('admin',first);
