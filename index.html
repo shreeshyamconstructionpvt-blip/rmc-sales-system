@@ -2046,25 +2046,25 @@ function pmNormalizeMaterials(){
   });
 }
 function pmUpdateMaterialPreview(){
-  /* IMPORTANT: the modal overlay itself uses id="mo", so the Opening Stock
-     input must NOT use that same id. Using duplicate ids was the reason
-     Opening Stock was always being read as 0. */
-  var o=pmNum((document.getElementById("mopen")||{}).value);
-  var r=pmNum((document.getElementById("mr")||{}).value);
-  var c=pmNum((document.getElementById("mc")||{}).value);
+  var f=window.pmMaterialFormEls||{};
+  var opening=pmNum(f.opening ? f.opening.value : 0);
+  var received=pmNum(f.received ? f.received.value : 0);
+  var consumed=pmNum(f.consumed ? f.consumed.value : 0);
+  var current=opening+received-consumed;
   var el=document.getElementById("matCurrentPreview");
-  if(el)el.textContent=(o+r-c).toLocaleString("en-IN",{maximumFractionDigits:3});
+  if(el)el.textContent=current.toLocaleString("en-IN",{maximumFractionDigits:3});
 }
 
 function pmRenderMat(){
   pmNormalizeMaterials();
-  var low=0;
-  document.getElementById("pmMatBody").innerHTML=PM_MAT.map(function(x){
+  var low=0,body=document.getElementById("pmMatBody");
+  if(!body)return;
+  body.innerHTML=PM_MAT.map(function(x){
     var b=pmMaterialBalance(x),lowNow=b.balance<=b.reorder;
     if(lowNow)low++;
     return "<tr><td><strong>"+pmEsc(x.name)+"</strong></td><td>"+pmEsc(x.unit)+"</td><td>"+b.opening.toLocaleString("en-IN",{maximumFractionDigits:3})+"</td><td>"+b.received.toLocaleString("en-IN",{maximumFractionDigits:3})+"</td><td>"+b.consumed.toLocaleString("en-IN",{maximumFractionDigits:3})+"</td><td><strong>"+b.balance.toLocaleString("en-IN",{maximumFractionDigits:3})+"</strong></td><td>"+b.reorder.toLocaleString("en-IN",{maximumFractionDigits:3})+"</td><td><span class='pm-pill "+(lowNow?"pm-warn":"pm-ok")+"'>"+(lowNow?"Reorder":"Healthy")+"</span></td><td><button class='ib' onclick='pmOpenMaterial("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"m\","+x.id+")'>&#128465;</button></td></tr>";
   }).join("")||"<tr><td colspan='9' class='pm-empty'>No materials.</td></tr>";
-  document.getElementById("pmMatKpi").textContent=low+" low-stock";
+  var k=document.getElementById("pmMatKpi");if(k)k.textContent=low+" low-stock";
 }
 function pmOpenMaterial(id){
   pmNormalizeMaterials();
@@ -2074,27 +2074,39 @@ function pmOpenMaterial(id){
   var body=pmForm([
     pmField("Material *","mn",x.name||""),
     pmField("Unit","mu",x.unit||"MT"),
-    pmField("Opening Stock","mopen",b.opening,"number"),
+    pmField("Opening Stock *","mopen",b.opening,"number"),
     pmField("Received","mr",b.received,"number"),
     pmField("Consumed","mc",b.consumed,"number"),
     pmField("Reorder Level","mre",b.reorder,"number"),
     "<div class='fi full'><label>Current Stock (Opening + Received − Consumed)</label><div id='matCurrentPreview' style='padding:10px 12px;border:1.5px solid #bbf7d0;border-radius:10px;background:#f0fdf4;color:#166534;font-weight:800;font-size:.95rem'>"+b.balance.toLocaleString("en-IN",{maximumFractionDigits:3})+"</div></div>"
   ]);
   pmModal(id?"Edit Material":"Add / Update Material",body,"Save Material","pmSaveMaterial");
-  window.pmEditId=id||0;
-  ["mopen","mr","mc"].forEach(function(k){var el=document.getElementById(k);if(el)el.addEventListener("input",pmUpdateMaterialPreview);});
+  window.pmEditId=id?Number(id):0;
+  window.pmMaterialFormEls={
+    name:document.getElementById("mn"),
+    unit:document.getElementById("mu"),
+    opening:document.getElementById("mopen"),
+    received:document.getElementById("mr"),
+    consumed:document.getElementById("mc"),
+    reorder:document.getElementById("mre")
+  };
+  [window.pmMaterialFormEls.opening,window.pmMaterialFormEls.received,window.pmMaterialFormEls.consumed].forEach(function(el){
+    if(el)el.addEventListener("input",pmUpdateMaterialPreview);
+  });
   pmUpdateMaterialPreview();
 }
 function pmSaveMaterial(){
   pmNormalizeMaterials();
+  var f=window.pmMaterialFormEls||{};
   var d={
-    name:(document.getElementById("mn").value||"").trim(),
-    unit:(document.getElementById("mu").value||"MT").trim()||"MT",
-    opening:pmNum((document.getElementById("mopen")||{}).value),
-    received:pmNum((document.getElementById("mr")||{}).value),
-    consumed:pmNum((document.getElementById("mc")||{}).value),
-    reorder:pmNum((document.getElementById("mre")||{}).value)
+    name:(f.name?f.name.value:"").trim(),
+    unit:(f.unit?f.unit.value:"MT").trim()||"MT",
+    opening:pmNum(f.opening?f.opening.value:0),
+    received:pmNum(f.received?f.received.value:0),
+    consumed:pmNum(f.consumed?f.consumed.value:0),
+    reorder:pmNum(f.reorder?f.reorder.value:0)
   };
+  d.balance=d.opening+d.received-d.consumed;
   if(!d.name){toast("Material name required","error");return;}
   if(window.pmEditId){
     var i=PM_MAT.findIndex(function(x){return Number(x.id)===Number(window.pmEditId);});
@@ -2102,7 +2114,13 @@ function pmSaveMaterial(){
     PM_MAT[i]=Object.assign({},PM_MAT[i],d);
   }else{d.id=pmIds.m++;PM_MAT.push(d);}
   pmNormalizeMaterials();
-  pmSave();closeModal();pmRenderAll();toast("Material saved. Stock balance updated.","success");
+  pmSave();
+  pmRenderMat();
+  pmRenderDashboard();
+  closeModal();
+  window.pmMaterialFormEls=null;
+  window.pmEditId=0;
+  toast("Material saved. Current Stock: "+d.balance.toLocaleString("en-IN",{maximumFractionDigits:3})+" "+d.unit,"success");
 }
 function pmRenderBill(){
   var out=PM_BILL.reduce((s,x)=>s+(Number(x.outstanding)||0),0);
