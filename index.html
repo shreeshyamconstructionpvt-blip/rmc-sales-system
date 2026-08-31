@@ -1513,7 +1513,7 @@ body{--gold:#c91435}
     
 <div class="command-strip">
   <span class="cs-title">EXECUTIVE QUICK ACTIONS</span>
-<button class="btn ba" onclick="askFreshStartPassword()">🔐 Ask Password · Fresh Start Reset</button>
+<button class="btn ba" onclick="askFreshStartPassword()">🔐 Fresh Start Reset</button>
 
   <button onclick="phase3Refresh()">↻ Refresh MIS</button>
   <button onclick="downloadMasterDailyPDF()">📄 Master Daily PDF</button>
@@ -3677,56 +3677,108 @@ function downloadMasterDailyPDF(){
 })();
 
 
+function ssMasterSessionForReset(){
+  /* Master Control is the only place where the Fresh Start button is rendered.
+     Accept both a correctly classified master account and the active Master tab,
+     preventing the erroneous "Admin access required" message on the Master login. */
+  var masterPanel=document.getElementById("tp-master");
+  var masterTabActive=!!(masterPanel && masterPanel.classList.contains("act"));
+  return !!(CU && (CU.accountKind==="master" || masterTabActive));
+}
+
 function askFreshStartPassword(){
-  if(!CU || (CU.accountKind!=="master" && CU.accountKind!=="admin")){
-    alert("Master/Admin access required.");
+  if(!ssMasterSessionForReset()){
+    alert("Please open Master Control and use Fresh Start Reset from the Master login.");
     return;
   }
-  var entered=window.prompt("Master Password Required\n\nEnter the authorized password to continue Fresh Start Reset:");
+
+  var entered=window.prompt(
+    "MASTER FRESH START\n\nEnter the authorized password to continue:"
+  );
   if(entered===null)return;
+
   if(entered!=="Indiahsr@786"){
-    alert("Incorrect password. Fresh Start Reset was not performed.");
+    alert("Incorrect password.\n\nFresh Start was NOT performed.");
     return;
   }
+
   runFreshStartReset(true,true);
 }
 
 function runFreshStartReset(manual,authorized){
-  if(manual && !(CU && (CU.accountKind==="master" || CU.accountKind==="admin"))){
-    alert("Master/Admin access required.");return;
+  if(manual && !ssMasterSessionForReset()){
+    alert("Master Control access required.");
+    return;
   }
   if(manual && !authorized){
-    askFreshStartPassword();return;
+    askFreshStartPassword();
+    return;
   }
+
   var ok=manual ? confirm(
-    "FINAL CONFIRMATION\n\nFresh Start will clear historical visits, quotations, office work, plant orders, fleet, QC, billing, maintenance, workflows, old management activity and HR employee profiles. User login accounts and master definitions will remain.\n\nContinue?"
+    "FINAL CONFIRMATION\n\n"+
+    "Fresh Start will clear the existing transactional/demo data so the system can be used fresh from 01/09/2026.\n\n"+
+    "This includes Visits, Quotations, Office Work, Plant Orders, Fleet, QC, Billing, Maintenance, Workflows, Master ERP records, HR employee records and old activity.\n\n"+
+    "Your Master/Admin login accounts will NOT be deleted.\n\nContinue?"
   ) : true;
   if(!ok)return;
 
-  [
-    "RMC_SL","RMC_FQ","RMC_WL","RMC_PM_ORDERS","RMC_PM_FLEET","RMC_PM_QC",
-    "RMC_PM_BILL","RMC_PM_MAINT","RMC_PHASE1_ACTIVITY","RMC_ERP_WORKFLOWS",
-    "RMC_MASTER_RECORDS","RMC_HR_EMPLOYEES"
-  ].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+  /* Clear application data, but NEVER remove RMC_USERS so the same Master login
+     remains available after the reset. */
+  var resetKeys=[
+    "RMC_SL",
+    "RMC_FQ",
+    "RMC_WL",
+    "RMC_PM_ORDERS",
+    "RMC_PM_FLEET",
+    "RMC_PM_QC",
+    "RMC_PM_BILL",
+    "RMC_PM_MAINT",
+    "RMC_PHASE1_ACTIVITY",
+    "RMC_ERP_WORKFLOWS",
+    "RMC_MASTER_RECORDS",
+    "RMC_HR_EMPLOYEES",
+    "RMC_PM_SETTINGS",
+    "RMC_PM_ATTENDANCE",
+    "RMC_ATTENDANCE",
+    "RMC_PHASE2",
+    "RMC_PHASE3",
+    "RMC_MIS",
+    "RMC_REPORTS",
+    "RMC_NOTIFICATIONS"
+  ];
+  resetKeys.forEach(function(k){
+    try{localStorage.removeItem(k)}catch(e){}
+  });
 
+  /* Keep the material definitions, but reset every stock quantity to zero. */
   try{
-    var mats=JSON.parse(localStorage.getItem("RMC_PM_MAT")||"[]");
-    if(Array.isArray(mats) && mats.length){
-      mats=mats.map(function(m){
-        return Object.assign({},m,{
-          opening:0,openingStock:0,received:0,consumed:0,balance:0,current:0
+    var raw=localStorage.getItem("RMC_PM_MAT");
+    if(raw){
+      var mats=JSON.parse(raw);
+      if(Array.isArray(mats)){
+        mats=mats.map(function(m){
+          return Object.assign({},m,{
+            opening:0,openingStock:0,received:0,consumed:0,
+            balance:0,current:0,currentStock:0
+          });
         });
-      });
-      localStorage.setItem("RMC_PM_MAT",JSON.stringify(mats));
+        localStorage.setItem("RMC_PM_MAT",JSON.stringify(mats));
+      }
     }
   }catch(e){}
 
   localStorage.setItem("SS_RMC_FRESH_START_DATE","2026-09-01");
   localStorage.setItem("SS_RMC_FRESH_START_MANUAL","DONE");
-  alert("Fresh Start completed successfully.\n\nAll selected historical transaction data is now cleared.");
+
+  alert(
+    "Fresh Start completed successfully.\n\n"+
+    "All selected old transactional data has been cleared.\n"+
+    "Master/Admin login accounts remain active.\n\n"+
+    "The system is ready for fresh use from 01/09/2026."
+  );
   location.reload();
 }
-
 
 // =========================================================
 // HR & PAYROLL — EMPLOYEE REGISTRATION / DOCUMENT VAULT
