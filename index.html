@@ -3890,6 +3890,79 @@ function ssLoginSmile(name){
   setTimeout(function(){el.classList.remove("show");el.classList.add("hide");setTimeout(function(){el.remove();},500);},2600);
 }
 
+
+/* =========================================================
+   MASTER MODULE OPEN FIX — DIRECT, ROBUST WORKSPACES
+   ========================================================= */
+function ssMasterModuleFallback(id){
+  if(!masterCan()){toast("Master/Admin access required","error");return;}
+  var data={
+    finance:{title:"Finance & Accounts",icon:"💰",help:"Invoices, receipts, payments, receivables and cash-flow control.",fields:["Invoice / Voucher No.","Party / Account","Amount","Transaction Date","Transaction Type","Payment Mode","Status","Notes"]},
+    purchase:{title:"Purchase Management",icon:"🛒",help:"Purchase requests, vendors, quotations, POs, approvals and GRN workflow.",fields:["PR / PO No.","Vendor Name","Item / Material","Quantity","Rate / Amount","Expected Delivery","Approval Status","GRN / Reference","Notes"]},
+    inventory:{title:"Store & Inventory",icon:"📦",help:"Opening stock, receipts, consumption, transfers and reorder control.",fields:["Material / Item","Store / Plant","Quantity","Unit","Movement Type","Opening / Reference","Date","Reorder Level","Supplier","Notes"]},
+    production:{title:"Plant & Production",icon:"🏭",help:"Batching, production planning, plant status, output and dispatch.",fields:["Batch / Plan No.","Plant","Mix Grade","Quantity m³","Production Date","Shift","Plant Status","Dispatch Reference","Operator","Output / Remarks"]},
+    machinery:{title:"Machinery & Vehicles",icon:"🔧",help:"Fleet, machinery, service schedules, breakdowns and maintenance.",fields:["Vehicle / Machine","Registration / Asset ID","Operator / Driver","Location","Service Type","Service Date","Next Service","Status","Breakdown / Job Card","Cost","Notes"]},
+    labour:{title:"Labour Management",icon:"👷",help:"Labour deployment, attendance, productivity and wage-ready records.",fields:["Labour / Team","Work Site","Trade / Role","Headcount","Period / Date","Attendance / Days","Wage Amount","Status","Supervisor","Productivity","Notes"]},
+    contractor:{title:"Contractor Management",icon:"🤝",help:"Contractors, work orders, progress, certification and payments.",fields:["Contractor Name","Work Order","Site / Project","Contract Value","Progress %","Start Date","Target Date","Payment Status","Contact","Certification","Retention / Due","Notes"]},
+    planning:{title:"Planning & Estimation",icon:"📋",help:"Budgets, resource plans, estimates, targets and variance control.",fields:["Plan / Estimate No.","Project / Site","Budget","Target Date","Material Plan","Manpower Plan","Equipment Plan","Variance","Prepared By","Revision","Approval Status","Notes"]},
+    projects:{title:"Project Management",icon:"🏗️",help:"Sites, milestones, tasks, progress, resources and project health.",fields:["Project / Site Name","Project Code","Client","Budget","Start Date","Target Date","Progress %","Health","Project Manager","Milestone / Task","Risk","Notes"]},
+    mis:{title:"Management Information System",icon:"📊",help:"Executive KPIs and management reporting across every department.",fields:["Report Name","Reporting Period","Department / Plant","KPI / Value","Report Date","Prepared By","Status","Variance","Management Comment","Action Owner","Due Date","Notes"]},
+    approvals:{title:"Approvals & Compliance",icon:"✅",help:"Central approval desk for purchases, quotations, invoices and inspections.",fields:["Request No.","Requested By","Approval Type","Amount","Due Date","Approval Level","Decision","Status","Compliance / Reference","Reviewer","Decision Date","Notes"]}
+  };
+  var c=data[id]||data.finance;
+  var body='<div class="ss-module-head"><div class="ss-module-icon">'+c.icon+'</div><div><b>'+pmEsc(c.title)+'</b><small>'+pmEsc(c.help)+'</small></div></div><div class="master-workspace-grid">';
+  c.fields.forEach(function(label,i){
+    var fid="ssmw_"+id+"_"+i, type="text";
+    if(/Amount|Budget|Cost|Quantity|Headcount|Days|Progress %|KPI|Variance|Rate|Wage|Value|Retention/.test(label))type="number";
+    else if(/Date|Month|Period/.test(label))type="date";
+    body+=pmField(label,fid,"",type,/Notes|Comment|Risk|Plan|Reference|Certification|Breakdown/.test(label));
+  });
+  body+='</div><div class="ss-module-foot">Module: '+pmEsc(c.title)+' · Access: Master / Admin</div>';
+  window.ssMasterModuleId=id;
+  pmModal(c.icon+" "+c.title,body,"Save "+c.title,"ssSaveMasterModule");
+}
+function ssSaveMasterModule(){
+  if(!masterCan())return;
+  var id=window.ssMasterModuleId||"finance";
+  var c=MASTER_MODULES.find(function(x){return x.id===id;})||{name:id};
+  var inputs=document.querySelectorAll('[id^="ssmw_'+id+'_"]'), vals=[];
+  inputs.forEach(function(x){if(String(x.value||"").trim())vals.push(String(x.value).trim());});
+  var ref=vals[0]||("ERP-"+String(MASTER_RECORDS.length+1).padStart(4,"0"));
+  var name=vals[1]||c.name;
+  var amount=0;vals.forEach(function(v){var n=Number(v);if(Number.isFinite(n)&&n>amount)amount=n;});
+  MASTER_RECORDS.push({
+    id:MASTER_RECORDS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1,
+    module:id,ref:ref,name:name,status:"Pending",amount:amount,
+    notes:vals.slice(-2).join(" | ")||"—",
+    meta:{fields:{},createdBy:CU?CU.uname:"master",createdAt:new Date().toISOString()}
+  });
+  inputs.forEach(function(x){MASTER_RECORDS[MASTER_RECORDS.length-1].meta.fields[x.id]=x.value||"";});
+  masterSave();closeModal();masterRenderAll();phase1Render();
+  toast(c.name+" record saved successfully","success");
+}
+function ssBindMasterModuleClicks(){
+  var box=document.getElementById("masterModules");
+  if(!box)return;
+  box.querySelectorAll(".master-module").forEach(function(card){
+    card.style.cursor="pointer";
+    card.setAttribute("role","button");
+    card.setAttribute("tabindex","0");
+    card.onclick=function(e){
+      if(e.target.closest && e.target.closest("button,a,input,select"))return;
+      var id=(card.className.match(/\b(finance|hr|purchase|inventory|production|machinery|labour|contractor|planning|projects|mis|approvals)\b/)||[])[1];
+      if(!id)return;
+      if(id==="hr"){ssHROpenWorkspace();return;}
+      ssMasterModuleFallback(id);
+    };
+    card.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();card.click();}};
+  });
+}
+var ssOldMasterRenderModules=masterRenderModules;
+masterRenderModules=function(){
+  ssOldMasterRenderModules();
+  ssBindMasterModuleClicks();
+};
+
 </script>
 </body>
 </html>
