@@ -2174,7 +2174,7 @@ var QT=[
   {id:2,dt:"2026-08-23",cu:"RAMBIR RATHI",cn:"9811960900",co:"YOGESH",si:"PLOT NO. 344 IMT",gr:"M10/M30",qty:500,rate:4500,total:2250000,sts:"Follow-up",vt:"2026-09-30",nt:"PCC and RCC both required"},
   {id:3,dt:"2026-08-24",cu:"KEC/Maruti",cn:"7499922442",co:"Mr. Ravi",si:"IMT Kharkhoda",gr:"Multiple",qty:1000,rate:5200,total:5200000,sts:"Draft",vt:"2026-10-15",nt:"Multiple grades required"}
 ];
-var nQid=4,FQ=[].concat(QT),sqf="dt",sqd=-1;
+var nQid=4,FQ=[],sqf="dt",sqd=-1;
 var SL=[
   {id:1,nm:"Parvinder Kumar",rl:"Sales Executive",dp:"Sales",ph:"9999000001",em:"parvinder@rmc.com",jd:"2025-01-01",st:"Active",cl:"#1a56db"},
   {id:2,nm:"Pawan Kumar",    rl:"Sales Executive",dp:"Sales",ph:"9999000002",em:"pawan@rmc.com",    jd:"2025-01-01",st:"Active",cl:"#057a55"}
@@ -2407,8 +2407,8 @@ function visitHTML(r){r=r||{};
 return "<div class='fg'><div class='fi'><label>Salesperson *</label><select id='vsp'>"+(sps.length?sps.map(function(s){return"<option "+(r.sp===s?"selected":"")+">"+s+"</option>";}).join(""):"<option>Parvinder Kumar</option><option>Pawan Kumar</option>")+"</select></div><div class='fi'><label>Visit Date *</label><input id='vvd' type='date' value='"+(r.vd||new Date().toISOString().slice(0,10))+"'></div><div class='fi'><label>Customer/Company</label><input id='vcu' value='"+(r.cu||"")+"' placeholder='Customer name'></div><div class='fi'><label>Customer Contact</label><input id='vcc' value='"+(r.cc||"")+"' placeholder='Phone number'></div><div class='fi'><label>Contractor Name *</label><input id='vco' value='"+(r.co||"")+"' placeholder='Contractor name'></div><div class='fi'><label>Contractor No.</label><input id='vcc2' value='"+(r.cc2||"")+"' placeholder='Phone number'></div><div class='fi'><label>Site / Project *</label><input id='vsi' value='"+(r.si||"")+"' placeholder='Site or project name'></div><div class='fi full'><label>Site Address</label><input id='vsa' value='"+(r.sa||"")+"' placeholder='Full address'></div><div class='fi'><label>Area (sqft)</label><input id='var' type='number' value='"+(r.ar||"")+"' placeholder='e.g. 1000'></div><div class='fi'><label>Concrete Grade</label><select id='vgr'><option value=''>-- Select --</option>"+(grs.map(function(g){return"<option "+(r.gr===g?"selected":"")+">"+g+"</option>";})).join("")+"</select></div><div class='fi'><label>Required Date</label><input id='vrd' type='date' value='"+(r.rd||"")+"'></div><div class='fi full'><label>Remarks</label><textarea id='vrm'>"+(r.rm||"")+"</textarea></div></div>";}
 function openAddVisitModal(){if(!canAddVisit()){toast("Please login first","error");return;}eid=null;document.getElementById("mt").textContent="Add Visit";document.getElementById("mb2").innerHTML=visitHTML();document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveVisit()'>Save</button>";openModal();}
 function openEditVisitModal(id){if(!canEdit()){toast("Admin only","error");return;}var r=R.filter(function(x){return x.id===id;})[0];if(!r)return;eid=id;document.getElementById("mt").textContent="Edit Visit";document.getElementById("mb2").innerHTML=visitHTML(r);document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveVisit()'>Update</button>";openModal();}
-function saveVisit(){if(!canAddVisit()){toast("Please login first","error");return;}var co=document.getElementById("vco").value.trim(),vd=document.getElementById("vvd").value;if(!co||!vd){toast("Contractor & Date required","error");return;}var d={sp:(CU&&CU.accountKind==="staff"?CU.name:document.getElementById("vsp").value),vd:vd,cu:document.getElementById("vcu").value.trim(),cc:document.getElementById("vcc").value.trim(),co:co,cc2:document.getElementById("vcc2").value.trim(),si:document.getElementById("vsi").value.trim(),sa:document.getElementById("vsa").value.trim(),ar:document.getElementById("var").value,gr:document.getElementById("vgr").value,rd:document.getElementById("vrd").value,rm:document.getElementById("vrm").value.trim()};if(eid){var ix=R.map(function(x){return x.id;}).indexOf(eid);R[ix]=Object.assign({},R[ix],d);toast("Updated!","success");}else{d.id=nRid++;R.push(d);toast("Visit added!","success");}closeModal();applyF();rStats();}
-function delR(id){if(!canEdit()){toast("Admin only","error");return;}if(!confirm("Delete this visit?"))return;R=R.filter(function(x){return x.id!==id;});applyF();rStats();toast("Deleted","error");}
+function saveVisit(){if(!canAddVisit()){toast("Please login first","error");return;}var co=document.getElementById("vco").value.trim(),vd=document.getElementById("vvd").value;if(!co||!vd){toast("Contractor & Date required","error");return;}var d={sp:(CU&&CU.accountKind==="staff"?CU.name:document.getElementById("vsp").value),vd:vd,cu:document.getElementById("vcu").value.trim(),cc:document.getElementById("vcc").value.trim(),co:co,cc2:document.getElementById("vcc2").value.trim(),si:document.getElementById("vsi").value.trim(),sa:document.getElementById("vsa").value.trim(),ar:document.getElementById("var").value,gr:document.getElementById("vgr").value,rd:document.getElementById("vrd").value,rm:document.getElementById("vrm").value.trim()};if(eid){var ix=R.map(function(x){return x.id;}).indexOf(eid);if(ix<0){toast("Visit record not found","error");return;}R[ix]=Object.assign({},R[ix],d);toast("Updated!","success");}else{d.id=nRid++;R.push(d);toast("Visit added!","success");}ssSaveCore();closeModal();popDD();applyF();rStats();}
+function delR(id){if(!canEdit()){toast("Admin only","error");return;}if(!confirm("Delete this visit?"))return;R=R.filter(function(x){return x.id!==id;});ssSaveCore();applyF();popDD();rStats();toast("Deleted","error");}
 // ===== STAFF FORMS =====
 function staffHTML(s){
   s=s||{};
@@ -2720,6 +2720,7 @@ function saveWL(){
     WL.push({id:nWid++,nm:nm,dt:dt,tk:tk,sts:sts,pr:pr,nt:nt});
     toast("Work entry added","success");
   }
+  ssSaveCore();
   closeModal();rWL();rStats();
 }
 function delWL(id){
@@ -2727,7 +2728,7 @@ function delWL(id){
   var row=WL.filter(function(x){return x.id===id;})[0];if(!row)return;
   if(CU.accountKind!=='admin' && row.nm!==CU.name){toast("You cannot delete another employee's work","error");return;}
   if(!confirm("Delete this work entry?"))return;
-  WL=WL.filter(function(x){return x.id!==id;});rWL();rStats();
+  WL=WL.filter(function(x){return x.id!==id;});ssSaveCore();rWL();rStats();
 }
 function rWL(){
   var tb=document.getElementById("wlb");if(!tb)return;
@@ -2741,7 +2742,11 @@ function rWL(){
 // ===== ATTENDANCE =====
 function rAtt(){if(!canEdit())return;var dt=document.getElementById("attDate").value;var allS=SL.concat(OS).filter(function(s){return s.st==="Active";});var g=document.getElementById("attGrid");if(!g)return;if(!allS.length){g.innerHTML="<div class='nd'>No active staff.</div>";return;}var ac=["#1a56db","#057a55","#7c3aed","#e02424","#f59e0b","#0891b2"];g.innerHTML=allS.map(function(s,i){var cur=attState[s.nm+"|"+dt]||"";var clr=s.cl||ac[i%ac.length];return "<div class='att-card'><div class='att-name'><div style='width:30px;height:30px;border-radius:50%;background:"+clr+";color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem'>"+s.nm.charAt(0)+"</div><div><div style='font-weight:700;font-size:.87rem'>"+s.nm+"</div><div style='font-size:.72rem;color:var(--m)'>"+s.rl+" &middot; "+s.dp+"</div></div></div><div class='att-btns'><button class='att-btn P "+(cur==="Present"?"sel":"")+"' onclick='setAtt(\""+s.nm+"\",\""+s.dp+"\",\""+dt+"\",\"Present\",this)'>&#9989; Present</button><button class='att-btn A "+(cur==="Absent"?"sel":"")+"' onclick='setAtt(\""+s.nm+"\",\""+s.dp+"\",\""+dt+"\",\"Absent\",this)'>&#10060; Absent</button><button class='att-btn H "+(cur==="Half Day"?"sel":"")+"' onclick='setAtt(\""+s.nm+"\",\""+s.dp+"\",\""+dt+"\",\"Half Day\",this)'>&#127780; Half</button><button class='att-btn L "+(cur==="Leave"?"sel":"")+"' onclick='setAtt(\""+s.nm+"\",\""+s.dp+"\",\""+dt+"\",\"Leave\",this)'>&#127958; Leave</button></div></div>";}).join("");}
 function setAtt(nm,dp,dt,sts,btn){attState[nm+"|"+dt]=sts;btn.closest(".att-card").querySelectorAll(".att-btn").forEach(function(b){b.classList.remove("sel");});btn.classList.add("sel");}
-function saveAttendance(){if(!canEdit())return;var dt=document.getElementById("attDate").value;SL.concat(OS).filter(function(s){return s.st==="Active";}).forEach(function(s){var sts=attState[s.nm+"|"+dt];if(!sts)return;var ex=AT.filter(function(a){return a.nm===s.nm&&a.dt===dt;})[0];if(ex){ex.sts=sts;}else{AT.push({id:nAid++,nm:s.nm,dp:s.dp,dt:dt,sts:sts,nt:""});}});toast("Attendance saved!","success");rAttLog();popAttFilter();}
+function saveAttendance(){if(!canEdit())return;var dt=document.getElementById("attDate").value;SL.concat(OS).filter(function(s){return s.st==="Active";}).forEach(function(s){var sts=attState[s.nm+"|"+dt];if(!sts)return;var ex=AT.filter(function(a){return a.nm===s.nm&&a.dt===dt;})[0];if(ex){ex.sts=sts;}else{AT.push({id:nAid++,nm:s.nm,dp:s.dp,dt:dt,sts:sts,nt:""});}});
+  ssSaveCore();
+  try{localStorage.setItem("RMC_ATTENDANCE_STATE",JSON.stringify(attState));}catch(e){}
+  toast("Attendance saved!","success");rAttLog();popAttFilter();
+}
 function popAttFilter(){var el=document.getElementById("attFS");if(!el)return;el.innerHTML="<option value=''>All Staff</option>";SL.concat(OS).forEach(function(s){el.innerHTML+="<option>"+s.nm+"</option>";});}
 function rAttLog(){if(!canEdit())return;var tb=document.getElementById("attLB");if(!tb)return;var sn=(document.getElementById("attFS")||{}).value||"",ss=(document.getElementById("attST")||{}).value||"";var rows=AT.filter(function(a){return(!sn||a.nm===sn)&&(!ss||a.sts===ss);}).sort(function(a,b){return b.dt.localeCompare(a.dt);});if(!rows.length){tb.innerHTML="<tr><td colspan='7' class='nd'>No attendance records yet.</td></tr>";return;}var stc={Present:"bg",Absent:"br","Half Day":"by",Leave:"bpu"};tb.innerHTML=rows.map(function(a,i){return "<tr><td style='color:var(--m);font-size:.73rem'>"+(i+1)+"</td><td><strong>"+a.nm+"</strong></td><td>"+a.dp+"</td><td>"+fd(a.dt)+"</td><td><span class='badge "+(stc[a.sts]||"bgy")+"'>"+a.sts+"</span></td><td style='font-size:.76rem'>"+(a.nt||"-")+"</td><td><button class='ib' onclick='delAtt("+a.id+")'>&#128465;</button></td></tr>";}).join("");}
 function delAtt(id){if(!canEdit())return;AT=AT.filter(function(a){return a.id!==id;});rAttLog();toast("Deleted","error");}
@@ -2754,8 +2759,8 @@ function qtHTML(q){q=q||{};var gr=["M10","M15","M20","M25","M30","M35","M40","M4
 function calcTotal(){var q=parseFloat((document.getElementById("qqty")||{}).value)||0,r=parseFloat((document.getElementById("qrate")||{}).value)||0;if(document.getElementById("qtotal"))document.getElementById("qtotal").value=q*r||"";}
 function openAddQtModal(){if(!canEdit())return;eid=null;document.getElementById("mt").textContent="Add Quotation";document.getElementById("mb2").innerHTML=qtHTML();document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveQt()'>Save</button>";openModal();}
 function edQt(id){if(!canEdit())return;var q=QT.filter(function(x){return x.id===id;})[0];if(!q)return;eid=id;document.getElementById("mt").textContent="Edit Quotation";document.getElementById("mb2").innerHTML=qtHTML(q);document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveQt()'>Update</button>";openModal();}
-function saveQt(){var cu=(document.getElementById("qcu")||{}).value||"";cu=cu.trim();var dt=(document.getElementById("qdt")||{}).value||"";if(!cu||!dt){toast("Customer and Date required","error");return;}var d={cu:cu,dt:dt,cn:document.getElementById("qcn").value.trim(),co:document.getElementById("qco").value.trim(),si:document.getElementById("qsi").value.trim(),gr:document.getElementById("qgr").value,qty:parseFloat(document.getElementById("qqty").value)||0,rate:parseFloat(document.getElementById("qrate").value)||0,total:parseFloat(document.getElementById("qtotal").value)||0,sts:document.getElementById("qsts").value,vt:document.getElementById("qvt").value,nt:document.getElementById("qnt").value.trim()};if(eid){var ix=QT.map(function(x){return x.id;}).indexOf(eid);QT[ix]=Object.assign({},QT[ix],d);toast("Updated!","success");}else{d.id=nQid++;QT.push(d);toast("Added!","success");}closeModal();rQt();rStats();}
-function delQt(id){if(!canEdit())return;if(!confirm("Delete?"))return;QT=QT.filter(function(q){return q.id!==id;});rQt();rStats();toast("Deleted","error");}
+function saveQt(){var cu=(document.getElementById("qcu")||{}).value||"";cu=cu.trim();var dt=(document.getElementById("qdt")||{}).value||"";if(!cu||!dt){toast("Customer and Date required","error");return;}var d={cu:cu,dt:dt,cn:document.getElementById("qcn").value.trim(),co:document.getElementById("qco").value.trim(),si:document.getElementById("qsi").value.trim(),gr:document.getElementById("qgr").value,qty:parseFloat(document.getElementById("qqty").value)||0,rate:parseFloat(document.getElementById("qrate").value)||0,total:parseFloat(document.getElementById("qtotal").value)||0,sts:document.getElementById("qsts").value,vt:document.getElementById("qvt").value,nt:document.getElementById("qnt").value.trim()};if(eid){var ix=QT.map(function(x){return x.id;}).indexOf(eid);if(ix<0){toast("Quotation record not found","error");return;}QT[ix]=Object.assign({},QT[ix],d);toast("Updated!","success");}else{d.id=nQid++;QT.push(d);toast("Added!","success");}ssSaveCore();closeModal();rQt();rStats();}
+function delQt(id){if(!canEdit())return;if(!confirm("Delete?"))return;QT=QT.filter(function(q){return q.id!==id;});ssSaveCore();rQt();rStats();toast("Deleted","error");}
 function exportQtPDF(){try{var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});doc.setFillColor(5,122,85);doc.rect(0,0,297,20,"F");doc.setTextColor(255,255,255);doc.setFontSize(12);doc.setFont("helvetica","bold");doc.text("Quotation Report - Shree Shyam Construction",14,13);doc.setFontSize(8);doc.text("Generated: "+new Date().toLocaleString("en-IN"),200,13);doc.setTextColor(0,0,0);doc.autoTable({head:[["#","Date","Customer","Site","Grade","Qty","Rate","Total","Status","Valid"]],body:FQ.map(function(q,i){return[i+1,fd(q.dt),q.cu,q.si,q.gr,q.qty,"Rs."+Number(q.rate).toLocaleString(),"Rs."+Number(q.total).toLocaleString(),q.sts,fd(q.vt)];}),startY:23,styles:{fontSize:7.5,cellPadding:2},headStyles:{fillColor:[5,122,85],textColor:255,fontStyle:"bold"},margin:{left:12,right:12}});doc.save("Quotations.pdf");toast("PDF saved!","success");}catch(e){toast("PDF error","error");}}
 // ===== ANALYTICS =====
 function rAn(){renderAdminReportCentre();if(!canEdit())return;
@@ -2806,7 +2811,7 @@ function pmLoad(){
       {id:pmIds.s++,name:"Mechanic",role:"Plant Mechanic",dept:"Maintenance",phone:"",shift:"Day",status:"Active"}
     ];
   }
-  if(!PM_FLEET.length){
+  if(!PM_FLEET.length && !ssFreshMode()){
     PM_FLEET=[
       {id:pmIds.f++,vehicle:"RMC-01",driver:"Driver 01",cap:7,trips:0,status:"Available",last:"—"},
       {id:pmIds.f++,vehicle:"RMC-02",driver:"Driver 02",cap:7,trips:0,status:"Available",last:"—"}
@@ -3316,9 +3321,58 @@ function masterDeleteRecord(id){if(!masterCan())return;if(!confirm('Delete this 
 function ssFreshMode(){
   return localStorage.getItem("SS_RMC_FRESH_START_MANUAL")==="DONE";
 }
+
+/* Core transactional persistence.
+   IMPORTANT: RMC_SL is reserved for Sales Staff profiles and is never touched. */
+function ssCoreStorageHealthy(){
+  try{
+    return localStorage.getItem("RMC_VISITS")!==null &&
+           localStorage.getItem("RMC_QUOTATIONS")!==null &&
+           localStorage.getItem("RMC_OFFICE_WORK")!==null &&
+           localStorage.getItem("RMC_ATTENDANCE")!==null;
+  }catch(e){return false;}
+}
+function ssSaveCore(){
+  try{localStorage.setItem("RMC_VISITS",JSON.stringify(R));}catch(e){}
+  try{localStorage.setItem("RMC_QUOTATIONS",JSON.stringify(QT));}catch(e){}
+  try{localStorage.setItem("RMC_OFFICE_WORK",JSON.stringify(WL));}catch(e){}
+  try{localStorage.setItem("RMC_ATTENDANCE",JSON.stringify(AT));}catch(e){}
+}
+
+/* Load only data that belongs to the transactional modules.
+   Old hard-coded/demo data is discarded after Fresh Start. */
+function ssLoadCore(){
+  try{
+    var v=localStorage.getItem("RMC_VISITS");
+    if(v){var a=JSON.parse(v);if(Array.isArray(a))R=a;}
+  }catch(e){}
+  try{
+    var q=localStorage.getItem("RMC_QUOTATIONS");
+    if(q){var b=JSON.parse(q);if(Array.isArray(b))QT=b;}
+  }catch(e){}
+  try{
+    var w=localStorage.getItem("RMC_OFFICE_WORK");
+    if(w){var c=JSON.parse(w);if(Array.isArray(c))WL=c;}
+  }catch(e){}
+  try{
+    var at=localStorage.getItem("RMC_ATTENDANCE");
+    if(at){
+      var d=JSON.parse(at);
+      if(Array.isArray(d)){AT=d;}
+    }
+  }catch(e){}
+  try{
+    var maxR=R.reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0);
+    var maxQ=QT.reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0);
+    var maxW=WL.reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0);
+    var maxA=AT.reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0);
+    nRid=maxR+1;nQid=maxQ+1;nWid=maxW+1;nAid=maxA+1;
+  }catch(e){}
+}
+
 function ssApplyFreshState(){
   if(!ssFreshMode())return;
-  /* Transactional data becomes genuinely empty. Staff master profiles remain. */
+  /* Clear transactional data in memory. Staff/user master data is preserved. */
   R.length=0;
   QT.length=0;
   FQ.length=0;
@@ -3332,9 +3386,7 @@ function ssApplyFreshState(){
   PM_BILL.length=0;
   PM_MAINT.length=0;
   PM_MAT.length=0;
-  try{localStorage.setItem("RMC_SL",JSON.stringify(R));}catch(e){}
-  try{localStorage.setItem("RMC_FQ",JSON.stringify(FQ));}catch(e){}
-  try{localStorage.setItem("RMC_WL",JSON.stringify(WL));}catch(e){}
+  ssSaveCore();
   try{localStorage.setItem("RMC_PM_ORDERS","[]");}catch(e){}
   try{localStorage.setItem("RMC_PM_FLEET","[]");}catch(e){}
   try{localStorage.setItem("RMC_PM_QC","[]");}catch(e){}
@@ -3344,9 +3396,23 @@ function ssApplyFreshState(){
   try{localStorage.setItem("RMC_MASTER_RECORDS","[]");}catch(e){}
   try{localStorage.setItem("RMC_ERP_WORKFLOWS","[]");}catch(e){}
 }
-ssApplyFreshState();
 
+/* Must run AFTER every data array has been declared. */
+ssLoadCore();
+try{
+  var ats=localStorage.getItem("RMC_ATTENDANCE_STATE");
+  if(ats){var ap=JSON.parse(ats);if(ap&&typeof ap==="object")attState=ap;}
+}catch(e){}
+ssApplyFreshState();
 pmLoad();
+
+// ===== FINAL DATA INITIALIZATION =====
+/* All data arrays now exist, so Fresh Start can safely zero them without
+   breaking any Add/Edit/Save handler. */
+ssLoadCore();
+ssApplyFreshState();
+pmLoad();
+if(typeof masterLoad==="function")masterLoad();
 
 // ===== INIT =====
 function initApp(){
@@ -3678,9 +3744,12 @@ function downloadMasterDailyPDF(){
   // This runs automatically only from the requested fresh-start date.
   if(iso>=FRESH_START_DATE && localStorage.getItem(FRESH_START_KEY)!=="DONE"){
     var clearKeys=[
-      "RMC_SL",                 // Sales visits
-      "RMC_FQ",                 // Quotations
-      "RMC_WL",                 // Office work
+      "RMC_VISITS",             // Sales visit records
+      "RMC_FQ",                 // Legacy quotation cache
+      "RMC_QUOTATIONS",         // Quotations
+      "RMC_WL",                 // Legacy office-work cache
+      "RMC_OFFICE_WORK",        // Office work
+      "RMC_ATTENDANCE",         // Attendance
       "RMC_PM_ORDERS",          // Plant orders / dispatch
       "RMC_PM_FLEET",           // Fleet/trip history
       "RMC_PM_QC",              // QC history
@@ -3692,12 +3761,8 @@ function downloadMasterDailyPDF(){
       "RMC_HR_EMPLOYEES"          // Old HR employee profiles
     ];
     clearKeys.forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
-      /* Clear in-memory hard-coded demo/old data too, otherwise the page can
-         immediately render the old arrays even though localStorage is empty. */
-      R.length=0; QT.length=0; FQ.length=0; WL.length=0; AT.length=0;
-      ERP_WORKFLOWS.length=0; MASTER_RECORDS.length=0;
-      PM_ORDERS.length=0; PM_FLEET.length=0; PM_QC.length=0;
-      PM_BILL.length=0; PM_MAINT.length=0; PM_MAT.length=0;
+      /* In-memory arrays are cleared later by ssApplyFreshState(), after
+         all module arrays have been declared. */
 
 
     // Reset raw materials to zero while keeping the material names/units.
@@ -3716,6 +3781,7 @@ function downloadMasterDailyPDF(){
     }catch(e){}
 
     localStorage.setItem(FRESH_START_KEY,"DONE");
+    localStorage.setItem("SS_RMC_FRESH_START_MANUAL","DONE");
     localStorage.setItem("SS_RMC_FRESH_START_DATE",FRESH_START_DATE);
   }
 })();
@@ -3769,10 +3835,10 @@ function runFreshStartReset(manual,authorized){
 
   /* Clear application data, but NEVER remove RMC_USERS so the same Master login
      remains available after the reset. */
-  var resetKeys=[
-    "RMC_SL",
-    "RMC_FQ",
-    "RMC_WL",
+  var resetKeys=["RMC_VISITS",
+    
+    "RMC_FQ","RMC_QUOTATIONS",
+    "RMC_WL","RMC_OFFICE_WORK",
     "RMC_PM_ORDERS",
     "RMC_PM_FLEET",
     "RMC_PM_QC",
