@@ -704,6 +704,69 @@ td{padding:9px 10px}
 .master-module:hover{border-color:var(--mw,#fecaca)}
 @media(max-width:650px){.master-workspace-grid{grid-template-columns:1fr}.master-workspace-card.full{grid-column:auto}}
 
+
+/* ===== PHASE 1 — ERP FOUNDATION / COMMAND CENTRE ===== */
+.phase1-shell{margin:0 0 18px;padding:18px;border:1px solid #e6e8ef;border-radius:18px;background:linear-gradient(145deg,#ffffff,#fbfcff);box-shadow:0 12px 32px rgba(15,23,42,.07)}
+.phase1-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.phase1-title{font-size:1.05rem;font-weight:900;color:#111827}.phase1-sub{font-size:.7rem;color:#64748b;margin-top:4px;line-height:1.5}.phase1-actions{display:flex;gap:7px;flex-wrap:wrap}
+.p1-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}.p1-card{padding:13px;border:1px solid #e7eaf0;border-radius:14px;background:#fff;box-shadow:0 6px 18px rgba(15,23,42,.05);min-height:88px}.p1-card .p1-label{font-size:.62rem;font-weight:850;text-transform:uppercase;letter-spacing:.55px;color:#64748b}.p1-card .p1-value{font-size:1.3rem;font-weight:900;margin-top:5px;color:#111827}.p1-card .p1-note{font-size:.64rem;color:#94a3b8;margin-top:3px}.p1-two{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:12px;margin-top:12px}.p1-panel{border:1px solid #e7eaf0;border-radius:14px;background:#fff;overflow:hidden}.p1-panel-head{padding:11px 13px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;align-items:center;gap:8px}.p1-panel-head strong{font-size:.76rem}.p1-list{max-height:235px;overflow:auto}.p1-row{display:flex;justify-content:space-between;gap:10px;padding:10px 13px;border-bottom:1px solid #f1f5f9;font-size:.69rem}.p1-row:last-child{border-bottom:0}.p1-row strong{font-size:.7rem}.p1-row small{display:block;color:#64748b;margin-top:2px}.p1-badge{padding:4px 7px;border-radius:999px;background:#f1f5f9;color:#475569;font-weight:850;font-size:.61rem;white-space:nowrap}.p1-badge.red{background:#fee2e2;color:#991b1b}.p1-badge.green{background:#dcfce7;color:#166534}.p1-badge.amber{background:#fef3c7;color:#92400e}.p1-perms{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:12px}.p1-perm{padding:9px;border:1px solid #edf0f4;border-radius:10px;background:#fafbfc}.p1-perm b{display:block;font-size:.68rem}.p1-perm span{font-size:.61rem;color:#64748b;line-height:1.45}.p1-health{padding:12px}.p1-health-item{display:grid;grid-template-columns:110px 1fr 48px;gap:8px;align-items:center;font-size:.64rem;margin-bottom:9px}.p1-bar{height:7px;background:#eef2f7;border-radius:999px;overflow:hidden}.p1-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#c8102e,#f59e0b)}
+@media(max-width:1000px){.p1-grid{grid-template-columns:repeat(2,1fr)}.p1-two{grid-template-columns:1fr}}@media(max-width:560px){.p1-grid{grid-template-columns:1fr}.p1-perms{grid-template-columns:1fr}.p1-health-item{grid-template-columns:90px 1fr 42px}}
+
+/* =========================================================
+   SHREE SHYAM RMC ERP — PHASE 2 + PHASE 3
+   Connected workflows + intelligence / MIS layer
+   ========================================================= */
+.erp-phase-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.erp-phase-btn{border:1px solid #e5e7eb;background:#fff;color:#475569;border-radius:12px;padding:9px 13px;font-size:.72rem;font-weight:850;cursor:pointer;box-shadow:0 5px 16px rgba(15,23,42,.05);transition:.18s}
+.erp-phase-btn:hover{transform:translateY(-1px);box-shadow:0 9px 22px rgba(15,23,42,.09)}
+.erp-phase-btn.active{background:linear-gradient(135deg,#991b1b,#dc2626);color:#fff;border-color:#991b1b}
+.erp-phase-panel{display:none}
+.erp-phase-panel.active{display:block;animation:erpFade .22s ease}
+@keyframes erpFade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.erp-phase-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.erp-phase-head h2{font-size:1rem;font-weight:900}
+.erp-phase-head p{font-size:.7rem;color:#64748b;margin-top:4px;line-height:1.5;max-width:900px}
+.erp-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.erp-stat{background:#fff;border:1px solid #e5e7eb;border-radius:15px;padding:14px;box-shadow:0 6px 20px rgba(15,23,42,.055);position:relative;overflow:hidden}
+.erp-stat:after{content:"";position:absolute;width:80px;height:80px;border-radius:50%;right:-30px;top:-30px;background:rgba(185,28,47,.05)}
+.erp-stat .e-label{font-size:.61rem;text-transform:uppercase;letter-spacing:.55px;font-weight:850;color:#64748b}
+.erp-stat .e-value{font-size:1.4rem;font-weight:900;margin-top:5px;color:#111827}
+.erp-stat .e-note{font-size:.63rem;color:#94a3b8;margin-top:3px}
+.erp-two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(280px,.7fr);gap:12px;margin-bottom:12px}
+.erp-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(15,23,42,.055)}
+.erp-card-head{padding:13px 15px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.erp-card-head strong{font-size:.8rem}
+.erp-card-body{padding:12px}
+.erp-pipeline{display:grid;grid-template-columns:repeat(7,minmax(115px,1fr));gap:7px;overflow:auto;padding-bottom:2px}
+.erp-stage{min-width:115px;border:1px solid #e5e7eb;border-radius:12px;background:linear-gradient(145deg,#fff,#fafafa);padding:10px;text-align:center}
+.erp-stage .num{font-size:1.35rem;font-weight:900;color:#111827}
+.erp-stage .name{font-size:.63rem;font-weight:800;color:#64748b;margin-top:3px;line-height:1.35}
+.erp-stage .hint{font-size:.58rem;color:#94a3b8;margin-top:4px}
+.erp-flow{display:flex;align-items:center;gap:5px;overflow:auto;padding:6px 0 10px}
+.erp-flow-step{min-width:135px;padding:10px;border:1px solid #e5e7eb;border-radius:12px;background:#f8fafc}
+.erp-flow-step b{display:block;font-size:.68rem}
+.erp-flow-step span{display:block;font-size:.61rem;color:#64748b;margin-top:3px;line-height:1.4}
+.erp-flow-arrow{font-size:1.1rem;color:#b91c2f;font-weight:900}
+.erp-alert-list{display:flex;flex-direction:column;gap:7px}
+.erp-alert{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 10px;border-radius:10px;background:#fafafa;border:1px solid #eef2f7}
+.erp-alert b{font-size:.68rem}.erp-alert small{display:block;font-size:.6rem;color:#64748b;margin-top:2px}
+.erp-alert .tag{padding:4px 7px;border-radius:999px;font-size:.58rem;font-weight:900;white-space:nowrap}
+.erp-alert.red .tag{background:#fee2e2;color:#991b1b}.erp-alert.amber .tag{background:#fef3c7;color:#92400e}.erp-alert.green .tag{background:#dcfce7;color:#166534}.erp-alert.blue .tag{background:#dbeafe;color:#1d4ed8}
+.erp-workflow-table{width:100%;border-collapse:collapse;font-size:.7rem}.erp-workflow-table th{padding:9px 10px;background:#f8fafc;text-align:left;font-size:.62rem;text-transform:uppercase;color:#64748b}.erp-workflow-table td{padding:9px 10px;border-top:1px solid #f1f5f9}.erp-workflow-table tr:hover td{background:#fff7f7}
+.erp-chip{display:inline-flex;align-items:center;padding:4px 7px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:.58rem;font-weight:850}
+.erp-chip.ok{background:#dcfce7;color:#166534}.erp-chip.warn{background:#fef3c7;color:#92400e}.erp-chip.bad{background:#fee2e2;color:#991b1b}.erp-chip.info{background:#dbeafe;color:#1d4ed8}
+.erp-actionbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.erp-filter{padding:8px 10px;border:1px solid #e2e8f0;border-radius:9px;background:#fff;font-size:.7rem;outline:none}
+.erp-report-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.erp-report-card{padding:14px;border:1px solid #e5e7eb;border-radius:15px;background:linear-gradient(145deg,#fff,#fafafa);box-shadow:0 6px 20px rgba(15,23,42,.05)}
+.erp-report-card .icon{font-size:1.35rem}.erp-report-card b{display:block;font-size:.78rem;margin-top:7px}.erp-report-card p{font-size:.63rem;color:#64748b;line-height:1.45;margin:4px 0 10px}
+.erp-health-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.erp-health{padding:10px;border:1px solid #edf0f4;border-radius:11px;background:#fafbfc}
+.erp-health .top{display:flex;justify-content:space-between;font-size:.64rem;font-weight:800}.erp-health .bar{height:7px;border-radius:99px;background:#eef2f7;margin-top:7px;overflow:hidden}.erp-health .bar i{display:block;height:100%;background:linear-gradient(90deg,#b91c2f,#f59e0b);border-radius:99px}
+.erp-fin-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.erp-mini-note{font-size:.61rem;color:#64748b;line-height:1.5}
+@media(max-width:1100px){.erp-grid-4{grid-template-columns:repeat(2,1fr)}.erp-report-grid{grid-template-columns:repeat(2,1fr)}.erp-fin-grid{grid-template-columns:1fr 1fr}.erp-pipeline{grid-template-columns:repeat(7,115px)}}
+@media(max-width:650px){.erp-grid-4,.erp-report-grid,.erp-fin-grid,.erp-health-grid{grid-template-columns:1fr}.erp-two{grid-template-columns:1fr}.erp-phase-btn{flex:1}.erp-pipeline{grid-template-columns:repeat(7,110px)}}
+
 </style>
 </head>
 <body>
@@ -810,7 +873,154 @@ td{padding:9px 10px}
       <div class="master-chips"><span class="master-chip">&#128273; MASTER ACCESS</span><span class="master-chip">&#128274; ALL MODULES</span><span class="master-chip">&#127981; ALL PLANTS</span><span class="master-chip">&#128202; LIVE MIS</span><button class="btn bw bsm" onclick="openMasterReports()">&#128196; Reports Centre</button></div>
     </div>
     <div class="master-kpis" id="masterKpis"></div>
+
+    <!-- ===== PHASE 1 FOUNDATION ===== -->
+    <div class="phase1-shell">
+      <div class="phase1-head">
+        <div><div class="phase1-title">⚡ Phase 1 · Enterprise Control Foundation</div><div class="phase1-sub">Central command layer for users, plants, operational data, approvals, alerts and management visibility. Existing records remain untouched.</div></div>
+        <div class="phase1-actions"><button class="btn bw bsm" onclick="phase1Refresh()">↻ Refresh</button><button class="btn ba bsm" onclick="phase1ExportSnapshot()">⬇ Export Snapshot</button></div>
+      </div>
+      <div class="p1-grid" id="phase1Kpis"></div>
+      <div class="p1-two">
+        <div class="p1-panel"><div class="p1-panel-head"><strong>🔔 Live Alerts & Attention Queue</strong><span class="p1-badge" id="phase1AlertCount">0</span></div><div class="p1-list" id="phase1Alerts"></div></div>
+        <div class="p1-panel"><div class="p1-panel-head"><strong>🔐 Role Access Matrix</strong><span class="p1-badge green">ACTIVE</span></div><div class="p1-perms" id="phase1Perms"></div></div>
+      </div>
+      <div class="p1-two">
+        <div class="p1-panel"><div class="p1-panel-head"><strong>🕘 Recent ERP Activity</strong><span class="p1-badge" id="phase1ActivityCount">0</span></div><div class="p1-list" id="phase1Activity"></div></div>
+        <div class="p1-panel"><div class="p1-panel-head"><strong>🩺 System Data Health</strong><span class="p1-badge green">LIVE</span></div><div class="p1-health" id="phase1Health"></div></div>
+      </div>
+    </div>
+
     <div id="masterReportsInline"></div>
+
+    <!-- ===== PHASE 2 + PHASE 3 ===== -->
+    <div class="erp-phase-nav">
+      <button class="erp-phase-btn active" onclick="switchERPPhase('p2',this)">🔗 Phase 2 · Connected Workflows</button>
+      <button class="erp-phase-btn" onclick="switchERPPhase('p3',this)">🧠 Phase 3 · Intelligence & MIS</button>
+    </div>
+
+    <section class="erp-phase-panel active" id="erpPhase2Panel">
+      <div class="erp-phase-head">
+        <div>
+          <h2>🔗 Phase 2 · Connected Business Workflows</h2>
+          <p>Connect existing Sales, Visits, Quotations, Plant Orders, Materials, Fleet, QC, Billing and Maintenance into operational workflows. Existing records are read-only source data unless a new workflow record is created.</p>
+        </div>
+        <div class="erp-actionbar">
+          <button class="btn bo bsm" onclick="phase2Sync()">↻ Sync Existing Data</button>
+          <button class="btn bs bsm" onclick="phase2NewWorkflow()">＋ New Workflow Record</button>
+        </div>
+      </div>
+
+      <div class="erp-grid-4" id="phase2Kpis"></div>
+
+      <div class="erp-card" style="margin-bottom:12px">
+        <div class="erp-card-head"><strong>RMC End-to-End Commercial → Operations Flow</strong><span class="erp-chip info">LIVE CONNECTION MAP</span></div>
+        <div class="erp-card-body">
+          <div class="erp-flow">
+            <div class="erp-flow-step"><b>1 · Lead / Visit</b><span>Customer requirement, contact, site and expected date.</span></div>
+            <div class="erp-flow-arrow">→</div>
+            <div class="erp-flow-step"><b>2 · Quotation</b><span>Grade, quantity, rate, validity and commercial status.</span></div>
+            <div class="erp-flow-arrow">→</div>
+            <div class="erp-flow-step"><b>3 · Sales Order</b><span>Order confirmation and delivery requirement.</span></div>
+            <div class="erp-flow-arrow">→</div>
+            <div class="erp-flow-step"><b>4 · Production</b><span>Plant plan, batch and quantity.</span></div>
+            <div class="erp-flow-arrow">→</div>
+            <div class="erp-flow-step"><b>5 · QC</b><span>Slump, cube tests and release status.</span></div>
+            <div class="erp-flow-arrow">→</div>
+            <div class="erp-flow-step"><b>6 · Dispatch</b><span>Vehicle, driver, trip and delivery status.</span></div>
+            <div class="erp-flow-arrow">→</div>
+            <div class="erp-flow-step"><b>7 · Invoice / Collection</b><span>Invoice, payment and outstanding balance.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="erp-two">
+        <div class="erp-card">
+          <div class="erp-card-head"><strong>📌 Live Workflow Pipeline</strong><div class="erp-actionbar"><select class="erp-filter" id="phase2Filter" onchange="phase2Render()"><option value="">All Workflows</option><option value="Commercial">Commercial</option><option value="Procure-to-Stock">Procure-to-Stock</option><option value="Produce-to-Dispatch">Produce-to-Dispatch</option><option value="Fleet-to-Maintenance">Fleet-to-Maintenance</option></select></div></div>
+          <div class="erp-card-body">
+            <div class="erp-pipeline" id="phase2Pipeline"></div>
+          </div>
+          <div style="overflow:auto"><table class="erp-workflow-table"><thead><tr><th>Workflow</th><th>Reference</th><th>Party / Item</th><th>Current Stage</th><th>Amount / Qty</th><th>Owner</th><th>Action</th></tr></thead><tbody id="phase2WorkflowBody"></tbody></table></div>
+        </div>
+        <div class="erp-card">
+          <div class="erp-card-head"><strong>🚨 Workflow Exceptions</strong><span class="erp-chip warn" id="phase2ExceptionCount">0</span></div>
+          <div class="erp-card-body"><div class="erp-alert-list" id="phase2Exceptions"></div></div>
+        </div>
+      </div>
+
+      <div class="erp-two">
+        <div class="erp-card">
+          <div class="erp-card-head"><strong>📦 Procure → GRN → Stock → Consumption</strong><button class="btn bw bsm" onclick="phase2NewWorkflow('Procure-to-Stock')">＋ Add</button></div>
+          <div class="erp-card-body"><div class="erp-mini-note">Use this workflow for material indent, purchase, receipt, QC, stock and production consumption. It supplements the existing Raw Material module without deleting or replacing its data.</div></div>
+          <div style="overflow:auto"><table class="erp-workflow-table"><thead><tr><th>Reference</th><th>Material</th><th>Supplier</th><th>Qty</th><th>Stage</th><th>Status</th></tr></thead><tbody id="phase2ProcBody"></tbody></table></div>
+        </div>
+        <div class="erp-card">
+          <div class="erp-card-head"><strong>🏭 Production → QC → Dispatch</strong><button class="btn bw bsm" onclick="phase2NewWorkflow('Produce-to-Dispatch')">＋ Add</button></div>
+          <div class="erp-card-body"><div class="erp-mini-note">Connect production planning with QC release and dispatch assignment so the Master can identify orders waiting for a plant action.</div></div>
+          <div style="overflow:auto"><table class="erp-workflow-table"><thead><tr><th>Reference</th><th>Order</th><th>Grade</th><th>Qty</th><th>Stage</th><th>Status</th></tr></thead><tbody id="phase2ProdBody"></tbody></table></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="erp-phase-panel" id="erpPhase3Panel">
+      <div class="erp-phase-head">
+        <div>
+          <h2>🧠 Phase 3 · Intelligence, MIS & Management Control</h2>
+          <p>Executive dashboards, exception monitoring, profitability indicators, plant performance, receivable risk, stock health and downloadable management reports.</p>
+        </div>
+        <div class="erp-actionbar">
+          <button class="btn bo bsm" onclick="phase3Refresh()">↻ Refresh MIS</button>
+          <button class="btn ba bsm" onclick="phase3ExportExecutivePDF()">📄 Executive PDF</button>
+        </div>
+      </div>
+
+      <div class="erp-grid-4" id="phase3Kpis"></div>
+
+      <div class="erp-two">
+        <div class="erp-card">
+          <div class="erp-card-head"><strong>📊 Executive Performance</strong><span class="erp-chip ok">LIVE FROM EXISTING DATA</span></div>
+          <div class="erp-card-body"><div class="erp-fin-grid" id="phase3Performance"></div></div>
+        </div>
+        <div class="erp-card">
+          <div class="erp-card-head"><strong>⚠️ Management Attention</strong><span class="erp-chip bad" id="phase3AlertCount">0</span></div>
+          <div class="erp-card-body"><div class="erp-alert-list" id="phase3Alerts"></div></div>
+        </div>
+      </div>
+
+      <div class="erp-two">
+        <div class="erp-card">
+          <div class="erp-card-head"><strong>🏭 Plant / Operations Health</strong></div>
+          <div class="erp-card-body"><div class="erp-health-grid" id="phase3PlantHealth"></div></div>
+        </div>
+        <div class="erp-card">
+          <div class="erp-card-head"><strong>💰 Receivables & Cash Risk</strong></div>
+          <div class="erp-card-body"><div class="erp-health-grid" id="phase3FinanceHealth"></div></div>
+        </div>
+      </div>
+
+      <div class="erp-card" style="margin-bottom:12px">
+        <div class="erp-card-head"><strong>📄 Management Reports</strong><span class="erp-chip info">SEPARATE PDF DOWNLOADS</span></div>
+        <div class="erp-report-grid" style="padding:12px">
+          <div class="erp-report-card"><div class="icon">📈</div><b>Executive MIS</b><p>Company-wide KPIs, operational exceptions and financial indicators.</p><button class="btn ba bsm" onclick="phase3ExportExecutivePDF()">Download PDF</button></div>
+          <div class="erp-report-card"><div class="icon">🏭</div><b>Plant Performance</b><p>Orders, production-ready records, fleet, QC, materials and maintenance.</p><button class="btn ba bsm" onclick="exportAdminPlantPDF()">Download PDF</button></div>
+          <div class="erp-report-card"><div class="icon">💰</div><b>Commercial & Receivables</b><p>Quotations, billing records, paid and outstanding amounts.</p><button class="btn ba bsm" onclick="phase3ExportCommercialPDF()">Download PDF</button></div>
+          <div class="erp-report-card"><div class="icon">📦</div><b>Stock Health</b><p>Opening, received, consumed, current balance and reorder exposure.</p><button class="btn ba bsm" onclick="phase3ExportStockPDF()">Download PDF</button></div>
+          <div class="erp-report-card"><div class="icon">👥</div><b>People & Attendance</b><p>Staff directory, attendance status and office work summary.</p><button class="btn ba bsm" onclick="phase3ExportPeoplePDF()">Download PDF</button></div>
+          <div class="erp-report-card"><div class="icon">🔧</div><b>Fleet & Maintenance</b><p>Vehicles, trips, maintenance, service status and open issues.</p><button class="btn ba bsm" onclick="phase3ExportFleetPDF()">Download PDF</button></div>
+        </div>
+      </div>
+
+      <div class="erp-two">
+        <div class="erp-card">
+          <div class="erp-card-head"><strong>🩺 ERP Data Health</strong></div>
+          <div class="erp-card-body"><div class="erp-health-grid" id="phase3DataHealth"></div></div>
+        </div>
+        <div class="erp-card">
+          <div class="erp-card-head"><strong>🕘 Phase Activity</strong><span class="erp-chip" id="phase3ActivityCount">0</span></div>
+          <div class="erp-card-body"><div class="erp-alert-list" id="phase3Activity"></div></div>
+        </div>
+      </div>
+    </section>
     <div class="master-grid" id="masterModules"></div>
     <div class="master-layout">
       <div class="master-panel">
@@ -2297,6 +2507,59 @@ function exportMasterERPPDF(){var rows=MASTER_RECORDS.map(function(x,i){var m=MA
 function openMasterReports(){if(!masterCan())return;var el=document.getElementById('masterReportsInline');if(!el)return;el.innerHTML='<div class="master-panel" style="margin:0 0 16px"><div class="mph"><div><h3>&#128196; Master Reports Centre</h3><small style="color:#64748b">Download separate management reports without changing existing records.</small></div><button class="btn bo bsm" onclick="document.getElementById(\'masterReportsInline\').innerHTML=\'\'">Close</button></div><div class="master-report-grid" style="padding:14px"><div class="master-report-card"><strong>&#128273; Users</strong><span>All credentials and account roles.</span><button class="btn ba bsm" onclick="exportAdminUsersPDF()">Users PDF</button></div><div class="master-report-card"><strong>&#128221; Office Work</strong><span>All office work entries.</span><button class="btn ba bsm" onclick="exportAdminOfficeWorkPDF()">Work PDF</button></div><div class="master-report-card"><strong>&#128203; Visits</strong><span>All sales visits.</span><button class="btn ba bsm" onclick="exportAdminVisitsPDF()">Visits PDF</button></div><div class="master-report-card"><strong>&#127981; Plant</strong><span>Orders, fleet, stock and maintenance.</span><button class="btn ba bsm" onclick="exportAdminPlantPDF()">Plant PDF</button></div><div class="master-report-card"><strong>&#9733; ERP</strong><span>Master records and approvals.</span><button class="btn ba bsm" onclick="exportMasterERPPDF()">ERP PDF</button></div></div></div>';
   el.scrollIntoView({behavior:'smooth',block:'start'});
 }
+
+// ===== PHASE 1 — ERP FOUNDATION =====
+var P1_ROLE_MATRIX=[
+  ['Master','All modules, users, plants, approvals, reports','Full'],
+  ['Admin','Company-wide operations, users, reports, approvals','Full'],
+  ['Plant Manager','Plant, production, dispatch, stock, QC, fleet, maintenance','Plant'],
+  ['Sales','Leads, visits, quotations, customer follow-up','Own'],
+  ['Office Staff','Office tasks, attendance, own work reports','Own'],
+  ['QC','Quality records, tests, NCR and lab reports','Quality'],
+  ['Dispatcher','Orders, dispatch, vehicles and trip status','Dispatch'],
+  ['Store','Stock, GRN, issues, transfers and consumption','Inventory'],
+  ['Purchase','Indent, RFQ, vendor, PO and GRN workflow','Purchase'],
+  ['Accounts','Invoices, receipts, ledger, outstanding and payments','Finance'],
+  ['HR','Employee, attendance, leave and payroll records','HR']
+];
+var P1_ACTIVITY=[];
+function phase1Log(action,detail,kind){
+  P1_ACTIVITY.unshift({id:Date.now()+Math.random(),at:new Date().toISOString(),by:CU?CU.name:'System',action:action,detail:detail||'',kind:kind||'info'});
+  P1_ACTIVITY=P1_ACTIVITY.slice(0,100);
+  try{localStorage.setItem('RMC_PHASE1_ACTIVITY',JSON.stringify(P1_ACTIVITY));}catch(e){}
+}
+function phase1Load(){try{var x=JSON.parse(localStorage.getItem('RMC_PHASE1_ACTIVITY')||'[]');if(Array.isArray(x))P1_ACTIVITY=x;}catch(e){P1_ACTIVITY=[];}}
+function phase1FmtAgo(iso){var t=new Date(iso).getTime(),d=Math.max(0,Date.now()-t),m=Math.floor(d/60000);if(m<1)return 'just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
+function phase1Render(){
+  if(!masterCan())return;
+  var users=Object.keys(USERS||{}).length,visits=Array.isArray(R)?R.length:0,quotes=Array.isArray(FQ)?FQ.length:0,office=Array.isArray(OS)?OS.length:0,plantOrders=Array.isArray(PM_ORDERS)?PM_ORDERS.length:0,mat=Array.isArray(PM_MAT)?PM_MAT.length:0;
+  var pending=(MASTER_RECORDS||[]).filter(function(x){return x.status==='Pending'||x.status==='For Approval';}).length;
+  var low=0; (PM_MAT||[]).forEach(function(x){var b=pmMaterialBalance(x);if(b.balance<=Number(x.reorder||0))low++;});
+  var openMaint=(PM_MAINT||[]).filter(function(x){return x.status!=='Completed';}).length;
+  var k=[['👥','Users',users,'All login accounts'],['📍','Visits',visits,'Sales activity'],['💰','Quotations',quotes,'Commercial pipeline'],['🏭','Plant Orders',plantOrders,'RMC operations'],['📦','Materials',mat,'Stock master'],['⚠️','Low Stock',low,'Reorder attention'],['📝','Approvals',pending,'Pending decisions'],['🔧','Open Maintenance',openMaint,'Service attention']];
+  var ke=document.getElementById('phase1Kpis');if(ke)ke.innerHTML=k.map(function(x){return '<div class="p1-card"><div class="p1-label">'+x[0]+' '+x[1]+'</div><div class="p1-value">'+x[2]+'</div><div class="p1-note">'+x[3]+'</div></div>';}).join('');
+  var alerts=[];
+  if(low)alerts.push(['red','📦 '+low+' material item(s) below reorder level','Open Plant → Materials']);
+  if(pending)alerts.push(['amber','📝 '+pending+' Master approval(s) pending','Review Approval Desk']);
+  if(openMaint)alerts.push(['amber','🔧 '+openMaint+' maintenance item(s) still open','Review Maintenance']);
+  var overdue=Array.isArray(PM_BILL)?PM_BILL.filter(function(x){return Number(x.outstanding)>0;}).length:0;
+  if(overdue)alerts.push(['red','💳 '+overdue+' billing record(s) have outstanding balance','Review Billing']);
+  if(!alerts.length)alerts.push(['green','✓ No critical alerts detected','System health looks good']);
+  var ae=document.getElementById('phase1Alerts'),ac=document.getElementById('phase1AlertCount');if(ae)ae.innerHTML=alerts.map(function(a){return '<div class="p1-row"><div><strong>'+a[1]+'</strong><small>'+a[2]+'</small></div><span class="p1-badge '+a[0]+'">'+(a[0]==='red'?'ACTION':'WATCH')+'</span></div>';}).join('');if(ac)ac.textContent=alerts.filter(function(a){return a[0]!=='green';}).length+' active';
+  var pe=document.getElementById('phase1Perms');if(pe)pe.innerHTML=P1_ROLE_MATRIX.map(function(x){return '<div class="p1-perm"><b>'+x[0]+' · '+x[2]+'</b><span>'+x[1]+'</span></div>';}).join('');
+  var act=(P1_ACTIVITY||[]).slice(0,12),ae2=document.getElementById('phase1Activity'),ac2=document.getElementById('phase1ActivityCount');if(ae2)ae2.innerHTML=act.length?act.map(function(x){return '<div class="p1-row"><div><strong>'+pmEsc(x.action)+'</strong><small>'+pmEsc(x.by)+' · '+pmEsc(x.detail||'')+'</small></div><span class="p1-badge">'+phase1FmtAgo(x.at)+'</span></div>';}).join(''):'<div class="p1-row"><div><strong>No activity yet</strong><small>Actions taken in Phase 1 will appear here.</small></div></div>';if(ac2)ac2.textContent=act.length+' events';
+  var total=users+visits+quotes+office+plantOrders+mat,complete=0;if(users)complete++;if(visits)complete++;if(quotes)complete++;if(office)complete++;if(plantOrders)complete++;if(mat)complete++;var pct=Math.round(complete/6*100);
+  var health=[['Users',users?100:0],['Sales data',visits?100:0],['Quotations',quotes?100:0],['Office data',office?100:0],['Plant data',plantOrders||mat?100:0],['Master records',(MASTER_RECORDS||[]).length?100:0]];
+  var he=document.getElementById('phase1Health');if(he)he.innerHTML=health.map(function(x){return '<div class="p1-health-item"><span>'+x[0]+'</span><div class="p1-bar"><i style="width:'+x[1]+'%"></i></div><b>'+x[1]+'%</b></div>';}).join('')+'<div style="font-size:.61rem;color:#94a3b8;margin-top:3px">Foundation coverage: '+pct+'% of core data domains currently contain records.</div>';
+}
+function phase1Refresh(){masterRenderAll();phase1Render();toast('Phase 1 command centre refreshed','success');}
+function phase1ExportSnapshot(){
+  if(!masterCan())return;
+  var snapshot={generatedAt:new Date().toISOString(),generatedBy:CU?CU.name:'',users:USERS,masterRecords:MASTER_RECORDS,visits:R,quotations:FQ,officeStaff:OS,officeWork:WL,plantOrders:PM_ORDERS,materials:PM_MAT,fleet:PM_FLEET,qc:PM_QC,billing:PM_BILL,maintenance:PM_MAINT,activity:P1_ACTIVITY,connectedWorkflows:ERP_WORKFLOWS,phase:'3'};
+  var blob=new Blob([JSON.stringify(snapshot,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Shree_Shyam_RMC_Phase1_Snapshot_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);phase1Log('Exported Phase 1 snapshot','Full ERP data snapshot downloaded','export');phase1Render();toast('ERP snapshot downloaded','success');
+}
+phase1Load();
+
 // ===== MASTER ERP / INTEGRATED MODULES =====
 var MASTER_MODULES=[
   {id:"finance",icon:"&#128176;",name:"Finance & Accounts",desc:"Invoices, receipts, outstanding, cash flow and plant-linked commercial control."},
@@ -2321,8 +2584,8 @@ function masterEnsure(){masterLoad();if(!MASTER_RECORDS.length){MASTER_RECORDS=[
   {id:3,module:"approvals",ref:"APR-001",name:"Master Approval Desk",status:"Approved",amount:0,notes:"Centralized approvals"}
 ];masterSave();}}
 function masterCan(){return !!(CU&&(CU.accountKind==="master"||CU.accountKind==="admin"));}
-function masterInit(){if(!masterCan())return;masterEnsure();masterRenderAll();}
-function masterRenderAll(){masterRenderKpis();masterRenderModules();masterRenderRecords();masterRenderApprovals();}
+function masterInit(){if(!masterCan())return;masterEnsure();phase2Load();masterRenderAll();phase2Render();phase3Render();}
+function masterRenderAll(){masterRenderKpis();masterRenderModules();masterRenderRecords();masterRenderApprovals();phase1Render();if(typeof phase2Render==='function')phase2Render();if(typeof phase3Render==='function')phase3Render();}
 function masterRenderKpis(){
   var sales=R.length,quotes=FQ.length,office=OS.length,plantOrders=PM_ORDERS.length,stock=PM_MAT.reduce(function(s,x){return s+Math.max(0,pmMaterialBalance(x).balance);},0),out=PM_BILL.reduce(function(s,x){return s+(Number(x.outstanding)||0);},0);
   var k=[['&#128203;','Sales Visits',sales,'Existing sales data'],['&#128176;','Quotations',quotes,'Commercial pipeline'],['&#127970;','Office Staff',office,'People & office'],['&#127981;','Plant Orders',plantOrders,'RMC dispatch'],['&#128230;','Stock Units',stock.toLocaleString('en-IN',{maximumFractionDigits:2}),'Current plant stock'],['&#8377;','Outstanding',pmMoney(out),'Plant receivables']];
@@ -2412,20 +2675,274 @@ function masterSaveRecord(){
   if(!masterCan())return;var d={module:document.getElementById('mrm').value,ref:document.getElementById('mrr').value.trim(),name:document.getElementById('mrn').value.trim(),status:document.getElementById('mrs').value,amount:Number(document.getElementById('mra').value)||0,notes:document.getElementById('mrnotes').value.trim()};if(!d.ref||!d.name){toast('Reference and name are required','error');return;}
   if(window.masterEditId){var i=MASTER_RECORDS.findIndex(function(x){return x.id===window.masterEditId;});if(i>=0)MASTER_RECORDS[i]=Object.assign({},MASTER_RECORDS[i],d);}else{d.id=MASTER_RECORDS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1;MASTER_RECORDS.push(d);}masterSave();closeModal();window.masterEditId=0;masterRenderAll();toast('ERP record saved','success');
 }
-function masterSetStatus(id,status){var i=MASTER_RECORDS.findIndex(function(x){return x.id===id;});if(i<0)return;MASTER_RECORDS[i].status=status;masterSave();masterRenderAll();toast('Request '+status.toLowerCase(),'success');}
-function masterDeleteRecord(id){if(!masterCan())return;if(!confirm('Delete this ERP record?'))return;MASTER_RECORDS=MASTER_RECORDS.filter(function(x){return x.id!==id;});masterSave();masterRenderAll();}
+function masterSetStatus(id,status){var i=MASTER_RECORDS.findIndex(function(x){return x.id===id;});if(i<0)return;MASTER_RECORDS[i].status=status;masterSave();phase1Log('Approval '+status.toLowerCase(),MASTER_RECORDS[i].ref+' · '+MASTER_RECORDS[i].name,'approval');masterRenderAll();phase1Render();toast('Request '+status.toLowerCase(),'success');}
+function masterDeleteRecord(id){if(!masterCan())return;if(!confirm('Delete this ERP record?'))return;var removed=MASTER_RECORDS.find(function(x){return x.id===id;});MASTER_RECORDS=MASTER_RECORDS.filter(function(x){return x.id!==id;});masterSave();phase1Log('Deleted ERP record',removed?removed.ref:'Record '+id,'erp');masterRenderAll();phase1Render();}
 
 pmLoad();
 
 // ===== INIT =====
 function initApp(){
   document.getElementById("attDate").value=new Date().toISOString().slice(0,10);
-  popDD();applyF();rStats();rStg();rOS();rWL();rQt();popAttFilter();showReminders();applyRoleAccess();applyPlantAccess();masterInit();renderAdminReportCentre();
+  popDD();applyF();rStats();rStg();rOS();rWL();rQt();popAttFilter();showReminders();applyRoleAccess();applyPlantAccess();masterInit();phase1Render();renderAdminReportCentre();
 }
 document.addEventListener("DOMContentLoaded",function(){
   var first=document.querySelector('.role-tab');if(first)setRole('admin',first);
   document.getElementById("lUser").focus();
 });
+// =========================================================
+// PHASE 2 — CONNECTED BUSINESS WORKFLOWS
+// =========================================================
+var ERP_WORKFLOWS=[];
+function phase2Load(){
+  try{
+    var x=JSON.parse(localStorage.getItem("RMC_ERP_WORKFLOWS")||"[]");
+    if(Array.isArray(x))ERP_WORKFLOWS=x;
+  }catch(e){ERP_WORKFLOWS=[];}
+}
+function phase2Save(){
+  try{localStorage.setItem("RMC_ERP_WORKFLOWS",JSON.stringify(ERP_WORKFLOWS));}catch(e){}
+}
+function phase2Log(action,detail){
+  phase1Log(action,detail,"workflow");
+}
+function phase2Sync(){
+  if(!masterCan())return;
+  var created=0, next=ERP_WORKFLOWS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1;
+  function add(w){
+    var exists=ERP_WORKFLOWS.some(function(x){return x.sourceType===w.sourceType&&String(x.sourceId)===String(w.sourceId);});
+    if(!exists){w.id=next++;ERP_WORKFLOWS.push(w);created++;}
+  }
+  (R||[]).slice(-100).forEach(function(v){
+    add({workflow:"Commercial",sourceType:"Visit",sourceId:v.id,ref:"VIS-"+String(v.id).padStart(4,"0"),party:v.cu&&v.cu!=="NA"?v.cu:v.co||"Customer",stage:"Visit",qty:pmNum(v.ar),amount:0,owner:v.sp,status:"Open",updatedAt:new Date().toISOString()});
+  });
+  (FQ||[]).forEach(function(q){
+    add({workflow:"Commercial",sourceType:"Quotation",sourceId:q.id,ref:"QT-"+String(q.id).padStart(4,"0"),party:q.cu||"-",stage:q.sts==="Accepted"?"Accepted":"Quotation",qty:pmNum(q.qty),amount:pmNum(q.total),owner:"Sales",status:q.sts||"Draft",updatedAt:new Date().toISOString()});
+  });
+  (PM_ORDERS||[]).forEach(function(o){
+    add({workflow:"Produce-to-Dispatch",sourceType:"Plant Order",sourceId:o.id,ref:o.order||("ORD-"+o.id),party:o.customer||"-",stage:o.status||"Pending",qty:pmNum(o.qty),amount:0,owner:"Plant",status:o.status||"Pending",updatedAt:new Date().toISOString()});
+  });
+  (PM_MAT||[]).forEach(function(m){
+    var b=pmMaterialBalance(m);
+    add({workflow:"Procure-to-Stock",sourceType:"Material",sourceId:m.id,ref:"MAT-"+String(m.id).padStart(4,"0"),party:m.name||"-",stage:b.balance<=b.reorder?"Reorder":"Stock",qty:b.balance,amount:0,owner:"Store",status:b.balance<=b.reorder?"Attention":"Healthy",updatedAt:new Date().toISOString()});
+  });
+  (PM_FLEET||[]).forEach(function(f){
+    add({workflow:"Fleet-to-Maintenance",sourceType:"Fleet",sourceId:f.id,ref:f.vehicle||("VEH-"+f.id),party:f.driver||"-",stage:f.status||"Available",qty:pmNum(f.trips),amount:0,owner:"Fleet",status:f.status||"Available",updatedAt:new Date().toISOString()});
+  });
+  phase2Save();
+  phase2Log("Phase 2 data sync","Created "+created+" connected workflow records from existing RMC data.");
+  phase2Render();phase3Render();
+  toast(created+" workflow records synchronized","success");
+}
+function phase2Stages(workflow){
+  if(workflow==="Commercial")return["Visit","Quotation","Accepted","Order","Invoice","Payment"];
+  if(workflow==="Procure-to-Stock")return["Indent","RFQ","PO","GRN","QC","Stock","Consumed"];
+  if(workflow==="Produce-to-Dispatch")return["Order","Plan","Batching","QC","Loading","Dispatched","Delivered"];
+  return["Vehicle","Trip","Service Due","Breakdown","Repair","Available"];
+}
+function phase2StageIndex(x){
+  var s=phase2Stages(x.workflow||"Commercial"),i=s.indexOf(x.stage);
+  return i<0?0:i;
+}
+function phase2StatusClass(s){
+  s=String(s||"").toLowerCase();
+  return s.indexOf("attention")>=0||s.indexOf("reorder")>=0||s.indexOf("overdue")>=0?"bad":s==="open"||s==="pending"||s==="draft"||s==="follow-up"?"warn":s==="healthy"||s==="completed"||s==="delivered"||s==="paid"||s==="accepted"?"ok":"info";
+}
+function phase2Render(){
+  if(!masterCan())return;
+  var filter=(document.getElementById("phase2Filter")||{}).value||"";
+  var rows=ERP_WORKFLOWS.filter(function(x){return !filter||x.workflow===filter;});
+  var counts={Visit:0,Quotation:0,Accepted:0,Order:0,Plan:0,Batching:0,QC:0,Dispatched:0,Delivered:0,Invoice:0,Payment:0};
+  rows.forEach(function(x){if(counts.hasOwnProperty(x.stage))counts[x.stage]++;});
+  var k=document.getElementById("phase2Kpis");
+  if(k)k.innerHTML=[
+    ["🔗","Connected Records",ERP_WORKFLOWS.length,"Cross-module workflow layer"],
+    ["📍","Commercial Leads",ERP_WORKFLOWS.filter(function(x){return x.workflow==="Commercial";}).length,"Visits + quotations"],
+    ["🏭","Plant Flow",ERP_WORKFLOWS.filter(function(x){return x.workflow==="Produce-to-Dispatch";}).length,"Order to delivery"],
+    ["📦","Stock Flow",ERP_WORKFLOWS.filter(function(x){return x.workflow==="Procure-to-Stock";}).length,"Procure to consumption"]
+  ].map(function(x){return"<div class='erp-stat'><div class='e-label'>"+x[0]+" "+x[1]+"</div><div class='e-value'>"+x[2]+"</div><div class='e-note'>"+x[3]+"</div></div>";}).join("");
+  var pipe=document.getElementById("phase2Pipeline");
+  if(pipe){
+    var stages=filter==="Commercial"?phase2Stages("Commercial"):filter==="Procure-to-Stock"?phase2Stages("Procure-to-Stock"):filter==="Produce-to-Dispatch"?phase2Stages("Produce-to-Dispatch"):["Visit","Quotation","Order","QC","Dispatched","Delivered","Payment"];
+    pipe.innerHTML=stages.map(function(s){return"<div class='erp-stage'><div class='num'>"+rows.filter(function(x){return x.stage===s;}).length+"</div><div class='name'>"+s+"</div><div class='hint'>workflow stage</div></div>";}).join("");
+  }
+  var body=document.getElementById("phase2WorkflowBody");
+  if(body){
+    body.innerHTML=rows.slice().reverse().slice(0,80).map(function(x){
+      return"<tr><td><span class='erp-chip info'>"+pmEsc(x.workflow)+"</span></td><td><strong>"+pmEsc(x.ref)+"</strong></td><td>"+pmEsc(x.party)+"</td><td><span class='erp-chip "+phase2StatusClass(x.status)+"'>"+pmEsc(x.stage)+"</span></td><td>"+(x.amount?pmMoney(x.amount):pmEsc(String(x.qty||0)))+"</td><td>"+pmEsc(x.owner||"-")+"</td><td><button class='ib' onclick='phase2Advance("+x.id+")' title='Advance workflow'>→</button><button class='ib' onclick='phase2Delete("+x.id+")' title='Delete workflow record'>🗑</button></td></tr>";
+    }).join("")||"<tr><td colspan='7' class='master-empty'>No connected workflows yet. Click Sync Existing Data.</td></tr>";
+  }
+  var ex=[];
+  ERP_WORKFLOWS.forEach(function(x){
+    if(x.status==="Attention"||x.status==="Rejected"||x.status==="Overdue"||x.status==="Reorder")ex.push([x.status==="Reorder"?"red":"amber",x.ref+" · "+x.party,x.workflow+" needs attention"]);
+  });
+  var ec=document.getElementById("phase2ExceptionCount");if(ec)ec.textContent=ex.length;
+  var ee=document.getElementById("phase2Exceptions");
+  if(ee)ee.innerHTML=ex.length?ex.slice(0,10).map(function(a){return"<div class='erp-alert "+a[0]+"'><div><b>"+pmEsc(a[1])+"</b><small>"+pmEsc(a[2])+"</small></div><span class='tag'>ACTION</span></div>";}).join(""):"<div class='erp-alert green'><div><b>No workflow exceptions</b><small>Connected workflow layer is healthy.</small></div><span class='tag'>OK</span></div>";
+  var pb=document.getElementById("phase2ProcBody");
+  if(pb)pb.innerHTML=ERP_WORKFLOWS.filter(function(x){return x.workflow==="Procure-to-Stock";}).slice().reverse().slice(0,12).map(function(x){return"<tr><td>"+pmEsc(x.ref)+"</td><td>"+pmEsc(x.party)+"</td><td>—</td><td>"+pmEsc(x.qty)+"</td><td>"+pmEsc(x.stage)+"</td><td><span class='erp-chip "+phase2StatusClass(x.status)+"'>"+pmEsc(x.status)+"</span></td></tr>";}).join("")||"<tr><td colspan='6' class='master-empty'>No procure-to-stock workflow records.</td></tr>";
+  var pr=document.getElementById("phase2ProdBody");
+  if(pr)pr.innerHTML=ERP_WORKFLOWS.filter(function(x){return x.workflow==="Produce-to-Dispatch";}).slice().reverse().slice(0,12).map(function(x){return"<tr><td>"+pmEsc(x.ref)+"</td><td>"+pmEsc(x.party)+"</td><td>—</td><td>"+pmEsc(x.qty)+"</td><td>"+pmEsc(x.stage)+"</td><td><span class='erp-chip "+phase2StatusClass(x.status)+"'>"+pmEsc(x.status)+"</span></td></tr>";}).join("")||"<tr><td colspan='6' class='master-empty'>No production-to-dispatch workflow records.</td></tr>";
+}
+function phase2Advance(id){
+  if(!masterCan())return;
+  var x=ERP_WORKFLOWS.find(function(a){return Number(a.id)===Number(id);});if(!x)return;
+  var s=phase2Stages(x.workflow),i=s.indexOf(x.stage);if(i<0)i=0;
+  if(i<s.length-1){x.stage=s[i+1];x.status=x.stage==="Delivered"||x.stage==="Payment"||x.stage==="Available"?"Completed":"In Progress";x.updatedAt=new Date().toISOString();phase2Log("Advanced workflow",x.ref+" → "+x.stage);}
+  else{x.status="Completed";phase2Log("Completed workflow",x.ref+" · "+x.party);}
+  phase2Save();phase2Render();phase3Render();masterRenderAll();toast(x.ref+" moved to "+x.stage,"success");
+}
+function phase2Delete(id){
+  if(!masterCan())return;
+  if(!confirm("Delete this connected workflow record?"))return;
+  var x=ERP_WORKFLOWS.find(function(a){return Number(a.id)===Number(id);});
+  ERP_WORKFLOWS=ERP_WORKFLOWS.filter(function(a){return Number(a.id)!==Number(id);});
+  phase2Save();phase2Log("Deleted workflow",x?x.ref:"Record "+id);phase2Render();phase3Render();toast("Workflow record deleted","error");
+}
+function phase2NewWorkflow(defaultWorkflow){
+  if(!masterCan())return;
+  var wf=defaultWorkflow||"Commercial";
+  var types=["Commercial","Procure-to-Stock","Produce-to-Dispatch","Fleet-to-Maintenance"];
+  var opts=types.map(function(x){return"<option "+(x===wf?"selected":"")+">"+x+"</option>";}).join("");
+  pmModal("New Connected Workflow",pmForm([
+    "<div class='fi'><label>Workflow Type *</label><select id='ewf'>"+opts+"</select></div>",
+    pmField("Reference *","ewr","WF-"+String(ERP_WORKFLOWS.length+1).padStart(4,"0")),
+    pmField("Party / Item *","ewparty",""),
+    pmField("Quantity","ewqty",0,"number"),
+    pmField("Amount","ewamt",0,"number"),
+    pmField("Owner","ewowner",CU?CU.name:"Master"),
+    pmField("Remarks","ewnotes","", "text",true)
+  ]),"Save Workflow","phase2SaveWorkflow");
+}
+function phase2SaveWorkflow(){
+  if(!masterCan())return;
+  var x={workflow:document.getElementById("ewf").value,ref:document.getElementById("ewr").value.trim(),party:document.getElementById("ewparty").value.trim(),qty:pmNum(document.getElementById("ewqty").value),amount:pmNum(document.getElementById("ewamt").value),owner:document.getElementById("ewowner").value.trim(),notes:document.getElementById("ewnotes").value.trim(),stage:phase2Stages(document.getElementById("ewf").value)[0],status:"Open",updatedAt:new Date().toISOString()};
+  if(!x.ref||!x.party){toast("Reference and Party / Item are required","error");return;}
+  x.id=ERP_WORKFLOWS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1;ERP_WORKFLOWS.push(x);phase2Save();phase2Log("Created workflow",x.ref+" · "+x.workflow);closeModal();phase2Render();phase3Render();toast("Workflow created","success");
+}
+function switchERPPhase(p,btn){
+  if(!masterCan())return;
+  document.querySelectorAll(".erp-phase-btn").forEach(function(b){b.classList.remove("active");});
+  if(btn)btn.classList.add("active");
+  document.getElementById("erpPhase2Panel").classList.toggle("active",p==="p2");
+  document.getElementById("erpPhase3Panel").classList.toggle("active",p==="p3");
+  if(p==="p2")phase2Render();else phase3Render();
+}
+
+// =========================================================
+// PHASE 3 — INTELLIGENCE / MIS
+// =========================================================
+function phase3Metrics(){
+  var visits=R||[],quotes=FQ||[],orders=PM_ORDERS||[],mats=PM_MAT||[],fleet=PM_FLEET||[],qc=PM_QC||[],bill=PM_BILL||[],maint=PM_MAINT||[];
+  var accepted=quotes.filter(function(q){return q.sts==="Accepted";});
+  var quoteValue=quotes.reduce(function(s,q){return s+pmNum(q.total);},0);
+  var acceptedValue=accepted.reduce(function(s,q){return s+pmNum(q.total);},0);
+  var billed=bill.reduce(function(s,x){return s+pmNum(x.amount);},0);
+  var paid=bill.reduce(function(s,x){return s+pmNum(x.paid);},0);
+  var outstanding=bill.reduce(function(s,x){return s+Math.max(0,pmNum(x.outstanding));},0);
+  var stock=mats.reduce(function(s,x){return s+Math.max(0,pmMaterialBalance(x).balance);},0);
+  var low=mats.filter(function(x){var b=pmMaterialBalance(x);return b.balance<=b.reorder;}).length;
+  var pendingOrders=orders.filter(function(x){return !["Delivered","Completed"].includes(x.status);}).length;
+  var dispatched=orders.filter(function(x){return x.status==="Dispatched"||x.status==="In Transit"||x.status==="Delivered";}).length;
+  var qcFail=qc.filter(function(x){return x.status==="Fail";}).length;
+  var openMaint=maint.filter(function(x){return x.status!=="Completed";}).length;
+  var totalTrips=fleet.reduce(function(s,x){return s+pmNum(x.trips);},0);
+  return {visits:visits.length,quotes:quotes.length,accepted:accepted.length,quoteValue:quoteValue,acceptedValue:acceptedValue,billed:billed,paid:paid,outstanding:outstanding,stock:stock,low:low,pendingOrders:pendingOrders,dispatched:dispatched,qc:qc.length,qcFail:qcFail,openMaint:openMaint,totalTrips:totalTrips,users:Object.keys(USERS||{}).length,office:OS.length,sales:SL.length,work:WL.length};
+}
+function phase3Render(){
+  if(!masterCan())return;
+  var m=phase3Metrics();
+  var k=document.getElementById("phase3Kpis");
+  if(k)k.innerHTML=[
+    ["💰","Quotation Value",pmMoney(m.quoteValue),"All quotations"],
+    ["🤝","Accepted Value",pmMoney(m.acceptedValue),"Accepted commercial value"],
+    ["🧾","Billed",pmMoney(m.billed),"Plant billing"],
+    ["💳","Outstanding",pmMoney(m.outstanding),"Receivables exposure"],
+    ["📦","Current Stock",m.stock.toLocaleString("en-IN"),"Combined material quantity"],
+    ["⚠️","Low Stock",m.low,"Reorder exposure"],
+    ["🏭","Pending Orders",m.pendingOrders,"Plant delivery pipeline"],
+    ["🧪","QC Failures",m.qcFail,"Quality attention"]
+  ].map(function(x){return"<div class='erp-stat'><div class='e-label'>"+x[0]+" "+x[1]+"</div><div class='e-value'>"+x[2]+"</div><div class='e-note'>"+x[3]+"</div></div>";}).join("");
+  var perf=document.getElementById("phase3Performance");
+  if(perf){
+    var conv=m.quotes?Math.round(m.accepted/m.quotes*100):0,collection=m.billed?Math.round(m.paid/m.billed*100):0,delivery=m.pendingOrders+m.dispatched?Math.round(m.dispatched/(m.pendingOrders+m.dispatched)*100):0;
+    perf.innerHTML=[
+      ["Quotation Conversion",conv+"%","Accepted quotations / total quotations"],
+      ["Collection Ratio",collection+"%","Paid / billed amount"],
+      ["Dispatch Coverage",delivery+"%","Dispatched or delivered vs open + moved orders"]
+    ].map(function(x){return"<div class='erp-stat'><div class='e-label'>"+x[0]+"</div><div class='e-value'>"+x[1]+"</div><div class='e-note'>"+x[2]+"</div></div>";}).join("");
+  }
+  var alerts=[];
+  if(m.low)alerts.push(["red",m.low+" material item(s) below reorder","Store / Inventory"]);
+  if(m.outstanding)alerts.push(["amber",pmMoney(m.outstanding)+" outstanding","Billing / Collections"]);
+  if(m.qcFail)alerts.push(["red",m.qcFail+" QC test(s) failed","Quality Control"]);
+  if(m.openMaint)alerts.push(["amber",m.openMaint+" maintenance item(s) open","Maintenance"]);
+  if(m.pendingOrders)alerts.push(["blue",m.pendingOrders+" plant order(s) still in pipeline","Production / Dispatch"]);
+  if(!alerts.length)alerts.push(["green","No major management exceptions","System is within current thresholds"]);
+  var ac=document.getElementById("phase3AlertCount");if(ac)ac.textContent=alerts.length;
+  var ae=document.getElementById("phase3Alerts");
+  if(ae)ae.innerHTML=alerts.map(function(a){return"<div class='erp-alert "+a[0]+"'><div><b>"+pmEsc(a[1])+"</b><small>"+pmEsc(a[2])+"</small></div><span class='tag'>"+(a[0]==="green"?"OK":"WATCH")+"</span></div>";}).join("");
+  function healthRow(name,val,max){
+    var pct=max?Math.max(0,Math.min(100,Math.round(val/max*100))):0;
+    return"<div class='erp-health'><div class='top'><span>"+name+"</span><b>"+val+"</b></div><div class='bar'><i style='width:"+pct+"%'></i></div></div>";
+  }
+  var ph=document.getElementById("phase3PlantHealth");
+  if(ph)ph.innerHTML=healthRow("Orders",PM_ORDERS.length,Math.max(PM_ORDERS.length,10))+healthRow("Fleet Trips",m.totalTrips,Math.max(m.totalTrips,10))+healthRow("QC Records",m.qc,Math.max(m.qc,10))+healthRow("Maintenance Open",m.openMaint,Math.max(m.openMaint,10));
+  var fh=document.getElementById("phase3FinanceHealth");
+  if(fh)fh.innerHTML=healthRow("Paid Amount",m.paid,Math.max(m.billed,1))+healthRow("Accepted Quote Value",m.acceptedValue,Math.max(m.quoteValue,1))+healthRow("Outstanding",m.outstanding,Math.max(m.billed,1))+healthRow("Quotations",m.quotes,Math.max(m.quotes,10));
+  var dh=document.getElementById("phase3DataHealth");
+  if(dh){
+    var domains=[["Users",m.users],["Sales Visits",m.visits],["Quotations",m.quotes],["Office Work",m.work],["Plant Orders",PM_ORDERS.length],["Materials",PM_MAT.length],["Fleet",PM_FLEET.length],["QC",m.qc],["Billing",PM_BILL.length],["Maintenance",PM_MAINT.length]];
+    dh.innerHTML=domains.map(function(x){var pct=x[1]?100:0;return"<div class='erp-health'><div class='top'><span>"+x[0]+"</span><b>"+(x[1]||0)+"</b></div><div class='bar'><i style='width:"+pct+"%'></i></div></div>";}).join("");
+  }
+  var act=document.getElementById("phase3Activity"),count=document.getElementById("phase3ActivityCount");
+  var logs=(P1_ACTIVITY||[]).slice(0,10);if(count)count.textContent=logs.length;
+  if(act)act.innerHTML=logs.length?logs.map(function(x){return"<div class='erp-alert blue'><div><b>"+pmEsc(x.action)+"</b><small>"+pmEsc(x.by)+" · "+pmEsc(x.detail||"")+"</small></div><span class='tag'>"+phase1FmtAgo(x.at)+"</span></div>";}).join(""):"<div class='erp-alert green'><div><b>No recent activity</b><small>Phase activity will appear here.</small></div><span class='tag'>OK</span></div>";
+}
+function phase3Refresh(){phase3Render();phase2Render();toast("Executive MIS refreshed","success");}
+function phase3ExportExecutivePDF(){
+  if(!reportCan())return;
+  var m=phase3Metrics(),body=[
+    ["Quotation Value",pmMoney(m.quoteValue)],
+    ["Accepted Quotation Value",pmMoney(m.acceptedValue)],
+    ["Billed",pmMoney(m.billed)],
+    ["Paid",pmMoney(m.paid)],
+    ["Outstanding",pmMoney(m.outstanding)],
+    ["Current Stock",m.stock.toLocaleString("en-IN")],
+    ["Low Stock Items",m.low],
+    ["Pending Plant Orders",m.pendingOrders],
+    ["Dispatched / In-Transit / Delivered",m.dispatched],
+    ["QC Tests",m.qc],
+    ["QC Failures",m.qcFail],
+    ["Open Maintenance",m.openMaint],
+    ["Fleet Trips",m.totalTrips],
+    ["Sales Visits",m.visits],
+    ["Office Work Entries",m.work]
+  ];
+  saveReportPDF("Shree Shyam Executive MIS","Executive_MIS_Report.pdf",["KPI","Value"],body,false);
+}
+function phase3ExportCommercialPDF(){
+  var rows=(FQ||[]).map(function(q,i){return[i+1,q.cu||"-",fd(q.dt),q.gr||"-",q.qty||0,rupee(q.rate||0),rupee(q.total||0),q.sts||"-"];});
+  saveReportPDF("Commercial & Receivables Report","Commercial_Receivables_Report.pdf",["#","Customer","Date","Grade","Qty","Rate","Total","Status"],rows,true);
+}
+function phase3ExportStockPDF(){
+  var rows=(PM_MAT||[]).map(function(x,i){var b=pmMaterialBalance(x);return[i+1,x.name||"-",x.unit||"-",b.opening,b.received,b.consumed,b.balance,b.reorder];});
+  saveReportPDF("Raw Material Stock Health","Raw_Material_Stock_Health.pdf",["#","Material","Unit","Opening","Received","Consumed","Current","Reorder"],rows,true);
+}
+function phase3ExportPeoplePDF(){
+  var rows=[];
+  (SL||[]).forEach(function(s){rows.push(["Sales",s.nm,s.rl||"-",s.dp||"-",s.st||"-",s.ph||"-"]);});
+  (OS||[]).forEach(function(s){rows.push(["Office",s.nm,s.rl||"-",s.dp||"-",s.st||"-",s.ph||"-"]);});
+  saveReportPDF("People & Attendance Summary","People_Attendance_Summary.pdf",["Type","Name","Role","Department","Status","Phone"],rows,true);
+}
+function phase3ExportFleetPDF(){
+  var rows=[];
+  (PM_FLEET||[]).forEach(function(x,i){rows.push([i+1,x.vehicle||"-",x.driver||"-",x.cap||0,x.trips||0,x.status||"-",x.last||"-"]);});
+  (PM_MAINT||[]).forEach(function(x){rows.push(["M",x.equipment||"-",x.by||"-","", "",x.status||"-",x.issue||"-"]);});
+  saveReportPDF("Fleet & Maintenance Report","Fleet_Maintenance_Report.pdf",["#","Vehicle / Equipment","Driver / Assigned","Capacity","Trips","Status","Last Trip / Issue"],rows,true);
+}
+phase2Load();
+
+
 </script>
 </body>
 </html>
