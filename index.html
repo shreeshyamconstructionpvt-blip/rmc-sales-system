@@ -1245,6 +1245,75 @@ body{--gold:#c91435}
   .master-module{min-height:142px!important}
 }
 
+
+/* =========================================================
+   FINAL UX PASS — CLEAN INTERNATIONAL ERP
+   ========================================================= */
+.executive-callout,.master-hero{display:none!important}
+
+/* Compact Master header after removing the large intro hero */
+#tp-master>.enterprise-ribbon{
+  margin-top:2px!important;margin-bottom:12px!important;
+}
+#tp-master>.master-kpis{margin-top:0!important}
+
+.ss-hr-shell{display:grid;grid-template-columns:1.35fr .9fr;gap:12px}
+.ss-hr-card{background:#fff;border:1px solid #e6e9ee;border-radius:16px;padding:15px;box-shadow:0 7px 24px rgba(15,23,42,.055)}
+.ss-hr-card h4{margin:0 0 4px;font-size:.92rem;color:#111827}
+.ss-hr-card p{margin:0 0 12px;color:#667085;font-size:.64rem;line-height:1.55}
+.ss-hr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ss-hr-grid .full{grid-column:1/-1}
+.ss-file{
+  border:1px dashed #d0d5dd!important;background:#fafbfc!important;padding:10px!important;
+}
+.ss-emp-list{display:flex;flex-direction:column;gap:8px;max-height:390px;overflow:auto}
+.ss-emp{
+  display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #eaecf0;border-radius:12px;
+  transition:.18s;background:#fff;
+}
+.ss-emp:hover{transform:translateY(-2px);border-color:#f1a9b7;box-shadow:0 8px 20px rgba(15,23,42,.07)}
+.ss-emp-photo{width:42px;height:42px;border-radius:12px;object-fit:cover;background:#fff1f3;display:grid;place-items:center;font-weight:900;color:#b4233d;overflow:hidden}
+.ss-emp-photo img{width:100%;height:100%;object-fit:cover}
+.ss-emp-main{min-width:0;flex:1}.ss-emp-main b{display:block;font-size:.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ss-emp-main span{display:block;color:#667085;font-size:.59rem;margin-top:2px}
+.ss-emp-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.ss-emp-actions button{border:1px solid #e4e7ec;background:#fff;border-radius:8px;padding:6px 8px;font-size:.56rem;font-weight:850;color:#475467;cursor:pointer}
+.ss-emp-actions button:hover{border-color:#f1a9b7;color:#b4233d;background:#fff7f8}
+.ss-profile-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.ss-profile-actions .btn{font-size:.64rem!important}
+.ss-file-note{font-size:.56rem;color:#98a2b3;margin-top:5px}
+.ss-warn{padding:9px 10px;border-radius:10px;background:#fff7f8;border:1px solid #fecdD6;color:#8f1230;font-size:.6rem;margin-bottom:10px}
+.ss-watch{
+  border:0!important;background:#fff1f3!important;color:#b4233d!important;cursor:pointer!important;
+  border-radius:999px!important;padding:7px 11px!important;font-weight:900!important;font-size:.61rem!important;
+  transition:.18s!important;
+}
+.ss-watch:hover{background:#b4233d!important;color:#fff!important;transform:translateY(-1px)!important}
+.erp-alert .tag.ss-watch{margin-left:auto}
+.p1-badge.ss-watch{cursor:pointer!important}
+
+.ss-smile{
+  position:fixed;left:50%;top:74px;transform:translate(-50%,-15px) scale(.94);
+  z-index:99999;display:flex;align-items:center;gap:11px;padding:11px 15px;
+  color:#fff;background:linear-gradient(110deg,#090b10,#181b22 55%,#b4233d);
+  border:1px solid rgba(255,255,255,.13);border-radius:14px;
+  box-shadow:0 20px 55px rgba(0,0,0,.28);opacity:0;pointer-events:none;
+}
+.ss-smile.show{animation:ssSmileIn .42s cubic-bezier(.2,.8,.25,1) forwards}
+.ss-smile.hide{animation:ssSmileOut .45s ease forwards}
+.ss-smile .face{font-size:25px;filter:drop-shadow(0 4px 10px rgba(255,255,255,.16))}
+.ss-smile b{display:block;font-size:.75rem}.ss-smile span{display:block;color:#d0d5dd;font-size:.59rem;margin-top:2px}
+@keyframes ssSmileIn{to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes ssSmileOut{to{opacity:0;transform:translate(-50%,-12px) scale(.96)}}
+
+@media(max-width:850px){
+  .ss-hr-shell{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .ss-hr-grid{grid-template-columns:1fr}.ss-hr-grid .full{grid-column:auto}
+  .ss-smile{width:calc(100% - 28px);justify-content:center}
+}
+
 </style>
 </head>
 <body>
@@ -3530,7 +3599,8 @@ function downloadMasterDailyPDF(){
       "RMC_PM_MAINT",           // Maintenance history
       "RMC_PHASE1_ACTIVITY",    // Old activity/audit records
       "RMC_ERP_WORKFLOWS",      // Old connected workflows
-      "RMC_MASTER_RECORDS"      // Old master/management records
+      "RMC_MASTER_RECORDS",      // Old master/management records
+      "RMC_HR_EMPLOYEES"          // Old HR employee profiles
     ];
     clearKeys.forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
 
@@ -3561,7 +3631,7 @@ function runFreshStartReset(manual){
   if(!ok)return;
   [
     "RMC_SL","RMC_FQ","RMC_WL","RMC_PM_ORDERS","RMC_PM_FLEET","RMC_PM_QC",
-    "RMC_PM_BILL","RMC_PM_MAINT","RMC_PHASE1_ACTIVITY","RMC_ERP_WORKFLOWS","RMC_MASTER_RECORDS"
+    "RMC_PM_BILL","RMC_PM_MAINT","RMC_PHASE1_ACTIVITY","RMC_ERP_WORKFLOWS","RMC_MASTER_RECORDS","RMC_HR_EMPLOYEES"
   ].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
   try{
     var mats=JSON.parse(localStorage.getItem("RMC_PM_MAT")||"[]");
@@ -3572,6 +3642,219 @@ function runFreshStartReset(manual){
   }catch(e){}
   alert("Fresh Start completed. Historical transaction data has been cleared.");
   location.reload();
+}
+
+
+// =========================================================
+// HR & PAYROLL — EMPLOYEE REGISTRATION / DOCUMENT VAULT
+// =========================================================
+var SS_HR_KEY="RMC_HR_EMPLOYEES";
+var SS_HR_EMPLOYEES=[];
+function ssHRLoad(){
+  try{
+    var x=JSON.parse(localStorage.getItem(SS_HR_KEY)||"[]");
+    SS_HR_EMPLOYEES=Array.isArray(x)?x:[];
+  }catch(e){SS_HR_EMPLOYEES=[];}
+}
+function ssHRSave(){try{localStorage.setItem(SS_HR_KEY,JSON.stringify(SS_HR_EMPLOYEES));}catch(e){toast("HR storage limit reached. Use smaller files.","error");}}
+ssHRLoad();
+
+function ssReadFile(file,maxBytes){
+  return new Promise(function(resolve,reject){
+    if(!file){resolve("");return;}
+    if(file.size>maxBytes){reject(new Error("File too large. Please choose a smaller file."));return;}
+    var r=new FileReader();
+    r.onload=function(){resolve(r.result||"")};
+    r.onerror=function(){reject(new Error("Unable to read file."))};
+    r.readAsDataURL(file);
+  });
+}
+function ssHRForm(emp){
+  emp=emp||{};
+  var html='<div class="ss-hr-shell">';
+  html+='<div class="ss-hr-card"><h4>👤 Employee Registration</h4><p>Create a complete employee master profile. Photo and document are stored with the employee record for Admin/Master access.</p>';
+  html+='<div class="ss-hr-grid">';
+  html+=pmField("Full Name *","hrFullName",emp.name||"","text");
+  html+=pmField("Employee ID *","hrEmpId",emp.empId||"","text");
+  html+=pmField("Department","hrDept",emp.dept||"","text");
+  html+=pmField("Designation / Role","hrRole",emp.role||"","text");
+  html+=pmField("Phone","hrPhone",emp.phone||"","tel");
+  html+=pmField("Email","hrEmail",emp.email||"","email");
+  html+=pmField("Joining Date","hrJoin",emp.join||"","date");
+  html+=pmField("Reporting Manager","hrManager",emp.manager||"","text");
+  html+=pmField("Basic Salary","hrSalary",emp.salary||0,"number");
+  html+=pmField("Employment Status","hrStatus",emp.status||"Active","select");
+  html+='<div class="fi full"><label>Employee Photo</label><input id="hrPhoto" class="ss-file" type="file" accept="image/jpeg,image/png,image/webp" /><div class="ss-file-note">JPG/PNG/WebP · max 1 MB</div></div>';
+  html+='<div class="fi full"><label>Employee Document</label><input id="hrDoc" class="ss-file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" /><div class="ss-file-note">Offer letter / ID / joining document · max 1.5 MB</div></div>';
+  html+=pmField("HR Notes","hrNotes",emp.notes||"","text",true);
+  html+='</div></div>';
+  html+='<div class="ss-hr-card"><h4>📁 Employee Profiles</h4><p>Admin/Master can open the complete profile and download a separate PDF. Stored documents can also be downloaded.</p>';
+  html+='<div class="ss-profile-actions"><button class="btn ba bsm" onclick="ssHRClearForm()">＋ New Employee</button><button class="btn bw bsm" onclick="ssHRExportAllPDF()">📄 All Employee Profiles PDF</button></div>';
+  html+='<div class="ss-emp-list" id="ssHrEmployeeList">'+ssHRListHTML()+'</div></div>';
+  html+='</div>';
+  return html;
+}
+function ssHRListHTML(){
+  ssHRLoad();
+  if(!SS_HR_EMPLOYEES.length)return '<div class="ss-warn">No employee profiles yet. Use the registration form to add your first employee.</div>';
+  return SS_HR_EMPLOYEES.slice().sort(function(a,b){return String(a.name).localeCompare(String(b.name));}).map(function(e){
+    var photo=e.photo?'<img src="'+e.photo+'" alt="">':(pmEsc((e.name||"?").slice(0,1).toUpperCase()));
+    return '<div class="ss-emp"><div class="ss-emp-photo">'+photo+'</div><div class="ss-emp-main"><b>'+pmEsc(e.name)+'</b><span>'+pmEsc(e.empId)+' · '+pmEsc(e.dept||"-")+' · '+pmEsc(e.role||"-")+'</span></div><div class="ss-emp-actions"><button onclick="ssHRViewProfile(\''+e.id+'\')">View</button><button onclick="ssHRDownloadPDF(\''+e.id+'\')">PDF</button>'+(e.doc?'<button onclick="ssHRDownloadDoc(\''+e.id+'\')">Document</button>':'')+'</div></div>';
+  }).join('');
+}
+function ssHRClearForm(){
+  var ids=["hrFullName","hrEmpId","hrDept","hrRole","hrPhone","hrEmail","hrJoin","hrManager","hrSalary","hrNotes"];
+  ids.forEach(function(id){var x=document.getElementById(id);if(x)x.value="";});
+  var s=document.getElementById("hrStatus");if(s)s.value="Active";
+  ["hrPhoto","hrDoc"].forEach(function(id){var x=document.getElementById(id);if(x)x.value="";});
+}
+function ssHRSaveEmployee(){
+  if(!masterCan())return;
+  var name=(document.getElementById("hrFullName")||{}).value||"";
+  var empId=(document.getElementById("hrEmpId")||{}).value||"";
+  if(!name.trim()||!empId.trim()){toast("Full Name and Employee ID are required.","error");return;}
+  var photoFile=(document.getElementById("hrPhoto")||{}).files;
+  var docFile=(document.getElementById("hrDoc")||{}).files;
+  Promise.all([
+    ssReadFile(photoFile&&photoFile[0],1024*1024),
+    ssReadFile(docFile&&docFile[0],1536*1024)
+  ]).then(function(files){
+    var emp={
+      id:"EMP-"+Date.now(),
+      name:name.trim(),empId:empId.trim(),
+      dept:(document.getElementById("hrDept")||{}).value||"",
+      role:(document.getElementById("hrRole")||{}).value||"",
+      phone:(document.getElementById("hrPhone")||{}).value||"",
+      email:(document.getElementById("hrEmail")||{}).value||"",
+      join:(document.getElementById("hrJoin")||{}).value||"",
+      manager:(document.getElementById("hrManager")||{}).value||"",
+      salary:Number((document.getElementById("hrSalary")||{}).value)||0,
+      status:(document.getElementById("hrStatus")||{}).value||"Active",
+      notes:(document.getElementById("hrNotes")||{}).value||"",
+      photo:files[0]||"",doc:files[1]||"",
+      docName:docFile&&docFile[0]?docFile[0].name:"",
+      createdAt:new Date().toISOString(),createdBy:CU?CU.uname:"master"
+    };
+    ssHRLoad();
+    var old=SS_HR_EMPLOYEES.findIndex(function(x){return String(x.empId).toLowerCase()===emp.empId.toLowerCase();});
+    if(old>=0){emp.id=SS_HR_EMPLOYEES[old].id;SS_HR_EMPLOYEES[old]=emp;}else SS_HR_EMPLOYEES.push(emp);
+    ssHRSave();closeModal();toast("Employee profile saved successfully","success");
+  }).catch(function(e){toast(e.message,"error");});
+}
+function ssHRViewProfile(id){
+  if(!masterCan())return;
+  ssHRLoad();var e=SS_HR_EMPLOYEES.find(function(x){return String(x.id)===String(id);});
+  if(!e)return;
+  var photo=e.photo?'<img src="'+e.photo+'" style="width:84px;height:84px;border-radius:16px;object-fit:cover;border:1px solid #eee">':'<div style="width:84px;height:84px;border-radius:16px;background:#fff1f3;display:grid;place-items:center;font-size:30px;font-weight:900;color:#b4233d">'+pmEsc((e.name||"?").slice(0,1).toUpperCase())+'</div>';
+  var body='<div style="display:flex;gap:14px;align-items:center;margin-bottom:14px">'+photo+'<div><div style="font-size:1rem;font-weight:900">'+pmEsc(e.name)+'</div><div style="color:#667085;font-size:.66rem;margin-top:3px">'+pmEsc(e.empId)+' · '+pmEsc(e.status)+'</div></div></div>';
+  body+='<div class="fg">';
+  [["Department",e.dept],["Designation",e.role],["Phone",e.phone],["Email",e.email],["Joining Date",e.join],["Reporting Manager",e.manager],["Basic Salary",e.salary?pmMoney(e.salary):"-"],["HR Notes",e.notes||"-"]].forEach(function(x){body+='<div class="fi"><label>'+x[0]+'</label><div style="padding:10px 11px;background:#f8fafc;border:1px solid #e4e7ec;border-radius:10px;font-size:.76rem">'+pmEsc(x[1])+'</div></div>';});
+  body+='</div><div class="ss-profile-actions"><button class="btn ba bsm" onclick="ssHRDownloadPDF(\''+e.id+'\')">📄 Download Full Employee Profile</button>'+(e.doc?'<button class="btn bw bsm" onclick="ssHRDownloadDoc(\''+e.id+'\')">📎 Download '+pmEsc(e.docName||"Document")+'</button>':'')+'</div>';
+  pmModal("Employee Profile — "+e.name,body,"Close","ssHRNoop");
+}
+function ssHRNoop(){}
+function ssHRDownloadDoc(id){
+  if(!masterCan())return;
+  ssHRLoad();var e=SS_HR_EMPLOYEES.find(function(x){return String(x.id)===String(id);});if(!e||!e.doc)return;
+  var a=document.createElement("a");a.href=e.doc;a.download=e.docName||("Employee_Document_"+e.empId);document.body.appendChild(a);a.click();a.remove();
+}
+function ssHRDownloadPDF(id){
+  if(!masterCan())return;
+  ssHRLoad();var e=SS_HR_EMPLOYEES.find(function(x){return String(x.id)===String(id);});if(!e)return;
+  try{
+    var d=pdfDoc("Employee Profile — "+e.name,false);
+    var y=29;
+    if(e.photo && d.addImage){try{d.addImage(e.photo,"JPEG",150,25,38,38);}catch(_){try{d.addImage(e.photo,"PNG",150,25,38,38);}catch(__){}}}
+    d.setFontSize(9);d.setFont("helvetica","bold");d.text("EMPLOYEE MASTER PROFILE",14,y);y+=9;
+    d.setFont("helvetica","normal");d.setFontSize(8);
+    [["Employee ID",e.empId],["Full Name",e.name],["Department",e.dept],["Designation",e.role],["Phone",e.phone],["Email",e.email],["Joining Date",e.join],["Reporting Manager",e.manager],["Basic Salary",e.salary?pmMoney(e.salary):"-"],["Employment Status",e.status],["HR Notes",e.notes||"-"],["Document",e.docName||"Not attached"]].forEach(function(x){
+      d.setFont("helvetica","bold");d.text(String(x[0])+":",14,y);
+      d.setFont("helvetica","normal");d.text(String(x[1]||"-").slice(0,105),55,y);y+=7;
+    });
+    d.setFontSize(7);d.setTextColor(100);d.text("Generated by Shree Shyam RMC ERP | "+new Date().toLocaleString("en-IN"),14,285);
+    d.save("Employee_Profile_"+String(e.empId).replace(/[^a-z0-9_-]/gi,"_")+".pdf");
+    toast("Employee profile PDF downloaded","success");
+  }catch(err){toast("PDF error: "+err.message,"error");}
+}
+function ssHRExportAllPDF(){
+  if(!masterCan())return;ssHRLoad();
+  var rows=SS_HR_EMPLOYEES.map(function(e,i){return[i+1,e.empId,e.name,e.dept,e.role,e.phone,e.email,e.join,e.status];});
+  saveReportPDF("All Employee Profiles","HR_All_Employee_Profiles.pdf",["#","Employee ID","Name","Department","Designation","Phone","Email","Joining","Status"],rows,true);
+}
+function ssHROpenWorkspace(){
+  if(!masterCan())return;
+  ssHRLoad();
+  pmModal("HR & Payroll — Employee Registration",ssHRForm(null),"Save Employee","ssHRSaveEmployee");
+}
+
+// Preserve every existing Master module, but give HR its proper dedicated workspace.
+var ssOldMasterOpenModuleWorkspace = masterOpenModuleWorkspace;
+function masterOpenModuleWorkspace(id){
+  if(id==="hr"){ssHROpenWorkspace();return;}
+  return ssOldMasterOpenModuleWorkspace(id);
+}
+
+
+// =========================================================
+// MANAGEMENT ATTENTION — WORKING WATCH ACTIONS
+// =========================================================
+function ssAttentionModule(label){
+  label=String(label||"").toLowerCase();
+  if(label.indexOf("material")>=0||label.indexOf("stock")>=0)return "inventory";
+  if(label.indexOf("maintenance")>=0)return "machinery";
+  if(label.indexOf("qc")>=0||label.indexOf("quality")>=0)return "production";
+  if(label.indexOf("billing")>=0||label.indexOf("outstanding")>=0)return "finance";
+  if(label.indexOf("plant order")>=0||label.indexOf("dispatch")>=0||label.indexOf("production")>=0)return "production";
+  return "mis";
+}
+function ssWatchClick(label){
+  if(!masterCan()){toast("Master/Admin access required","error");return;}
+  var id=ssAttentionModule(label);
+  try{masterOpenModuleWorkspace(id);toast("Opened "+id+" workspace","success");}catch(e){toast("Unable to open attention workspace","error");}
+}
+var ssOldPhase3Render=phase3Render;
+phase3Render=function(){
+  ssOldPhase3Render();
+  var box=document.getElementById("phase3Alerts");
+  if(!box)return;
+  box.querySelectorAll(".erp-alert").forEach(function(row){
+    var tag=row.querySelector(".tag");
+    if(!tag||tag.textContent.trim()==="OK")return;
+    tag.classList.add("ss-watch");
+    tag.setAttribute("role","button");
+    tag.title="Open relevant workspace";
+    tag.onclick=function(){ssWatchClick(row.innerText||"");};
+  });
+};
+var ssOldPhase1Render=phase1Render;
+phase1Render=function(){
+  ssOldPhase1Render();
+  var box=document.getElementById("phase1Alerts");
+  if(!box)return;
+  box.querySelectorAll(".p1-row").forEach(function(row){
+    var b=row.querySelector(".p1-badge");
+    if(!b||b.textContent.trim()==="")return;
+    var t=b.textContent.trim().toUpperCase();
+    if(t!=="WATCH"&&t!=="ACTION")return;
+    b.classList.add("ss-watch");
+    b.onclick=function(){ssWatchClick(row.innerText||"");};
+  });
+};
+
+// Friendly animated login welcome.
+function ssLoginSmile(name){
+  var old=document.getElementById("ssSmile");if(old)old.remove();
+  var el=document.createElement("div");el.id="ssSmile";el.className="ss-smile";
+  el.innerHTML='<div class="face">😊</div><div><b>Welcome back, '+pmEsc(name||"User")+'!</b><span>Shree Shyam RMC ERP is ready for you.</span></div>';
+  document.body.appendChild(el);
+  requestAnimationFrame(function(){el.classList.add("show");});
+  setTimeout(function(){el.classList.remove("show");el.classList.add("hide");setTimeout(function(){el.remove();},500);},2600);
+}
+var ssOriginalDoLogin=doLogin;
+function doLogin(){
+  var before=CU;
+  ssOriginalDoLogin();
+  if(CU && CU!==before)setTimeout(function(){ssLoginSmile(CU.name);},280);
 }
 
 </script>
