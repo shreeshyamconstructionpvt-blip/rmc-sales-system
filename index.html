@@ -675,6 +675,21 @@ td{padding:9px 10px}
 @media(max-width:1050px){.pm-grid{grid-template-columns:repeat(2,minmax(180px,1fr))}.pm-layout{grid-template-columns:1fr}}
 @media(max-width:640px){.pm-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.pm-stat{padding:12px}.pm-stat .num{font-size:1.35rem}.pm-title{font-size:1.2rem}}
 
+
+/* ===== MASTER ERP PREMIUM UI UPGRADE ===== */
+.master-hero{padding:30px 32px;background:radial-gradient(circle at 10% 10%,rgba(255,255,255,.16),transparent 24%),radial-gradient(circle at 88% 20%,rgba(245,158,11,.18),transparent 20%),linear-gradient(125deg,#08090c 0%,#17181d 46%,#b20d2d 100%);border:1px solid rgba(255,255,255,.12);box-shadow:0 24px 70px rgba(8,9,12,.24)}
+.master-title{font-size:2rem;letter-spacing:-.7px;line-height:1.15}.master-sub{font-size:.84rem;max-width:1050px}.master-chips{margin-top:18px}.master-chip{backdrop-filter:blur(10px);padding:8px 11px}
+.master-grid{grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:14px}
+.master-module{position:relative;min-height:175px;padding:18px;border-radius:18px;border:1px solid #e7eaf0;background:linear-gradient(145deg,#fff 0%,#fbfcfe 68%,#fff5f6 100%);box-shadow:0 8px 24px rgba(15,23,42,.07);overflow:hidden}
+.master-module:before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#c8102e,#f59e0b)}
+.master-module:after{content:'';position:absolute;width:110px;height:110px;right:-45px;top:-45px;border-radius:50%;background:rgba(200,16,46,.055);pointer-events:none}
+.master-module:hover{transform:translateY(-5px) scale(1.01);box-shadow:0 18px 42px rgba(15,23,42,.13);border-color:#fecaca}
+.master-module .mi{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff1f2,#f8fafc);border:1px solid #fee2e2;box-shadow:0 6px 16px rgba(200,16,46,.08);font-size:1.45rem}
+.master-module h3{font-size:.96rem;margin:11px 0 5px}.master-module p{font-size:.72rem;max-width:94%}.master-module .mm-foot{margin-top:14px}.master-module .mm-foot span:first-child{color:#991b1b}.master-module .mm-badge{background:#fff1f2;color:#991b1b;border:1px solid #fecdd3}
+.master-kpi{border-radius:16px;padding:16px;background:linear-gradient(145deg,#fff,#fbfbfc);box-shadow:0 8px 25px rgba(15,23,42,.07)}
+.master-report-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.master-report-card{padding:15px;border:1px solid #e5e7eb;border-radius:15px;background:linear-gradient(145deg,#fff,#fafafa);box-shadow:0 7px 22px rgba(15,23,42,.06)}.master-report-card strong{display:block;font-size:.84rem}.master-report-card span{display:block;color:#64748b;font-size:.69rem;margin:4px 0 11px;line-height:1.4}.master-report-card .btn{width:100%}
+.master-access-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin:0 0 14px;border-radius:15px;background:linear-gradient(90deg,#111827,#2b0b13);color:#fff;box-shadow:0 10px 28px rgba(15,23,42,.14)}.master-access-strip strong{font-size:.82rem}.master-access-strip small{display:block;opacity:.7;font-size:.66rem;margin-top:2px}
+@media(max-width:700px){.master-hero{padding:22px 18px}.master-title{font-size:1.45rem}.master-grid{grid-template-columns:1fr}.master-access-strip{align-items:flex-start;flex-direction:column}}
 </style>
 </head>
 <body>
@@ -722,7 +737,7 @@ td{padding:9px 10px}
     <button class="btn bw sales-access" onclick="openAddVisitModal()">&#10133; Add New Visit</button>
     <button class="btn bp admin-only" onclick="openAddStaffModal()">&#128100; Add Staff + Login</button>
     <button class="btn bw admin-only" onclick="openUserManagerModal()">&#128273; Login Users</button>
-    <button class="btn ba" onclick="exportPDF()">&#128196; PDF</button>
+    <button class="btn ba" onclick="exportPDF()">&#128196; PDF</button><button class="btn bw admin-only master-only" onclick="exportAdminOfficeWorkPDF()">&#128221; Work PDF</button>
     <button class="btn bw" onclick="window.print()">&#128424; Print</button>
     <div class="user-badge" id="userBadge"></div>
     <button class="btn bd bsm" onclick="doLogout()">&#128682; Logout</button>
@@ -769,7 +784,7 @@ td{padding:9px 10px}
     <button class="tb office-access" onclick="swTab(this,'tp-4')">&#127970; Office Work</button>
     <button class="tb admin-only" onclick="swTab(this,'tp-5')">&#128197; Attendance</button>
     <button class="tb admin-only" onclick="swTab(this,'tp-6')">&#128176; Quotations</button>
-    <button class="tb admin-only" onclick="swTab(this,'tp-7')">&#128202; Analytics</button>
+    <button class="tb admin-only" onclick="swTab(this,'tp-7')">&#128202; Analytics &amp; Reports</button>
   </div>
 
   <!-- ===== MASTER ERP CONTROL CENTRE ===== -->
@@ -778,9 +793,10 @@ td{padding:9px 10px}
       <div class="master-kicker">&#9733; Enterprise RMC Master Control</div>
       <div class="master-title">Shree Shyam Integrated ERP Command Centre</div>
       <div class="master-sub">One master workspace for company administration, RMC plant operations, sales, procurement, inventory, finance, people, projects, machinery, quality and management reporting. Existing Visits, Office Work, Quotations and Plant Manager data remain connected.</div>
-      <div class="master-chips"><span class="master-chip">&#128273; MASTER ACCESS</span><span class="master-chip">&#128274; ALL MODULES</span><span class="master-chip">&#127981; ALL PLANTS</span><span class="master-chip">&#128202; LIVE MIS</span></div>
+      <div class="master-chips"><span class="master-chip">&#128273; MASTER ACCESS</span><span class="master-chip">&#128274; ALL MODULES</span><span class="master-chip">&#127981; ALL PLANTS</span><span class="master-chip">&#128202; LIVE MIS</span><button class="btn bw bsm" onclick="openMasterReports()">&#128196; Reports Centre</button></div>
     </div>
     <div class="master-kpis" id="masterKpis"></div>
+    <div id="masterReportsInline"></div>
     <div class="master-grid" id="masterModules"></div>
     <div class="master-layout">
       <div class="master-panel">
@@ -966,6 +982,26 @@ td{padding:9px 10px}
   </div>
   <!-- TAB 7: ANALYTICS (Admin Only) -->
   <div class="tp" id="tp-7">
+
+    <div class="tc" style="margin-bottom:14px">
+      <div class="tch"><div><h2>&#128196; Admin Report &amp; Download Centre</h2><div style="font-size:.7rem;color:var(--m);margin-top:3px">Admin can review all login credentials, staff work, visits and plant activity and download each report separately.</div></div><span class="master-status ok">ADMIN FULL REPORT ACCESS</span></div>
+      <div class="master-report-grid" style="padding:14px">
+        <div class="master-report-card"><strong>&#128273; User &amp; Login Credentials</strong><span>All Staff, Office Staff, Plant Manager and account roles with Login ID and password.</span><button class="btn ba bsm" onclick="exportAdminUsersPDF()">Download Users PDF</button></div>
+        <div class="master-report-card"><strong>&#128221; Office Work Report</strong><span>Complete Office Staff work log with task, status, priority and notes.</span><button class="btn ba bsm" onclick="exportAdminOfficeWorkPDF()">Download Work PDF</button></div>
+        <div class="master-report-card"><strong>&#128203; Sales Visits Report</strong><span>All customer visits, contacts, sites, areas, grades and remarks.</span><button class="btn ba bsm" onclick="exportAdminVisitsPDF()">Download Visits PDF</button></div>
+        <div class="master-report-card"><strong>&#127981; Plant Operations Report</strong><span>Orders, fleet, quality, materials, billing and maintenance in one plant report.</span><button class="btn ba bsm" onclick="exportAdminPlantPDF()">Download Plant PDF</button></div>
+        <div class="master-report-card"><strong>&#9733; Master ERP Report</strong><span>All Master ERP records and approval status across every module.</span><button class="btn ba bsm" onclick="exportMasterERPPDF()">Download ERP PDF</button></div>
+        <div class="master-report-card"><strong>&#128197; Attendance Report</strong><span>Daily attendance for all active Sales and Office Staff.</span><button class="btn ba bsm" onclick="exportAttPDF()">Download Attendance PDF</button></div>
+      </div>
+    </div>
+    <div class="tc" style="margin-bottom:14px">
+      <div class="tch"><h2>&#128273; All Login Accounts — Admin View</h2><button class="btn bw bsm" onclick="openUserManagerModal()">Manage Users</button></div>
+      <div class="tr2"><table><thead><tr><th>#</th><th>Name</th><th>Role</th><th>Login ID</th><th>Password</th><th>Phone</th><th>Profile</th></tr></thead><tbody id="adminUsersReportBody"></tbody></table></div>
+    </div>
+    <div class="tc" style="margin-bottom:14px">
+      <div class="tch"><h2>&#128221; All Staff Work Report — Admin View</h2><button class="btn bw bsm" onclick="exportAdminOfficeWorkPDF()">PDF</button></div>
+      <div class="tr2"><table><thead><tr><th>#</th><th>Staff</th><th>Date</th><th>Task / Work</th><th>Status</th><th>Priority</th><th>Notes</th></tr></thead><tbody id="adminWorkReportBody"></tbody></table></div>
+    </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px">
       <div class="tc"><div class="tch"><h2>&#128202; Visits by Salesperson</h2></div><table><thead><tr><th>Salesperson</th><th>Visits</th><th>Area(sqft)</th></tr></thead><tbody id="an1"></tbody></table></div>
       <div class="tc"><div class="tch"><h2>&#129521; Grade Distribution</h2></div><table><thead><tr><th>Grade</th><th>Count</th><th>%</th></tr></thead><tbody id="an2"></tbody></table></div>
@@ -1867,7 +1903,7 @@ function saveQt(){var cu=(document.getElementById("qcu")||{}).value||"";cu=cu.tr
 function delQt(id){if(!canEdit())return;if(!confirm("Delete?"))return;QT=QT.filter(function(q){return q.id!==id;});rQt();rStats();toast("Deleted","error");}
 function exportQtPDF(){try{var jsPDF=window.jspdf.jsPDF;var doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});doc.setFillColor(5,122,85);doc.rect(0,0,297,20,"F");doc.setTextColor(255,255,255);doc.setFontSize(12);doc.setFont("helvetica","bold");doc.text("Quotation Report - Shree Shyam Construction",14,13);doc.setFontSize(8);doc.text("Generated: "+new Date().toLocaleString("en-IN"),200,13);doc.setTextColor(0,0,0);doc.autoTable({head:[["#","Date","Customer","Site","Grade","Qty","Rate","Total","Status","Valid"]],body:FQ.map(function(q,i){return[i+1,fd(q.dt),q.cu,q.si,q.gr,q.qty,"Rs."+Number(q.rate).toLocaleString(),"Rs."+Number(q.total).toLocaleString(),q.sts,fd(q.vt)];}),startY:23,styles:{fontSize:7.5,cellPadding:2},headStyles:{fillColor:[5,122,85],textColor:255,fontStyle:"bold"},margin:{left:12,right:12}});doc.save("Quotations.pdf");toast("PDF saved!","success");}catch(e){toast("PDF error","error");}}
 // ===== ANALYTICS =====
-function rAn(){if(!canEdit())return;
+function rAn(){renderAdminReportCentre();if(!canEdit())return;
   var bsp={};R.forEach(function(r){if(!bsp[r.sp])bsp[r.sp]={c:0,a:0};bsp[r.sp].c++;bsp[r.sp].a+=parseInt(r.ar)||0;});
   var a1=document.getElementById("an1");if(a1)a1.innerHTML=Object.keys(bsp).map(function(k){return"<tr><td>"+k+"</td><td><strong>"+bsp[k].c+"</strong></td><td>"+bsp[k].a.toLocaleString()+"</td></tr>";}).join("");
   var bgr={};R.forEach(function(r){if(r.gr&&r.gr!=="NA"&&r.gr)bgr[r.gr]=(bgr[r.gr]||0)+1;});var tot=Object.values(bgr).reduce(function(s,v){return s+v;},0)||1;
@@ -2228,6 +2264,25 @@ function pmDelete(type,id){
   var i=arr.findIndex(x=>x.id===id);if(i>=0)arr.splice(i,1);
   pmSave();pmRenderAll();toast("Record deleted","error");
 }
+
+// ===== ADMIN REPORT CENTRE / SEPARATE PDF EXPORTS =====
+function reportCan(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'));}
+function renderAdminReportCentre(){
+  if(!reportCan())return;
+  var ub=document.getElementById('adminUsersReportBody'),wb=document.getElementById('adminWorkReportBody');
+  if(ub){var keys=Object.keys(USERS).sort();ub.innerHTML=keys.map(function(k,i){var a=USERS[k]||{},kind=accountKind(a),profile=kind==='office'?OS.filter(function(x){return x.nm===a.name;})[0]:SL.filter(function(x){return x.nm===a.name;})[0];return '<tr><td>'+(i+1)+'</td><td><strong>'+pmEsc(a.name||'-')+'</strong></td><td>'+pmEsc(kind)+'</td><td><code>'+pmEsc(k)+'</code></td><td><code>'+pmEsc(a.pass||'-')+'</code></td><td>'+pmEsc(profile&&profile.ph||a.phone||'-')+'</td><td><button class="ib" onclick="openUserProfile('+JSON.stringify(k)+')">&#128065;</button></td></tr>';}).join('');}
+  if(wb){var rows=WL.slice().sort(function(a,b){return b.dt.localeCompare(a.dt);});wb.innerHTML=rows.length?rows.map(function(w,i){return '<tr><td>'+(i+1)+'</td><td><strong>'+pmEsc(w.nm)+'</strong></td><td>'+fd(w.dt)+'</td><td>'+pmEsc(w.tk)+'</td><td>'+pmEsc(w.sts)+'</td><td>'+pmEsc(w.pr)+'</td><td>'+pmEsc(w.nt||'-')+'</td></tr>';}).join(''):'<tr><td colspan="7" class="nd">No work records yet.</td></tr>';}
+}
+function pdfDoc(title,landscape){if(!window.jspdf||!window.jspdf.jsPDF)throw new Error('PDF library not loaded');var d=new window.jspdf.jsPDF({orientation:landscape?'landscape':'portrait',unit:'mm',format:'a4'});d.setFillColor(145,16,39);d.rect(0,0,landscape?297:210,20,'F');d.setTextColor(255,255,255);d.setFontSize(12);d.setFont('helvetica','bold');d.text(title,14,13);d.setFontSize(7.5);d.setFont('helvetica','normal');d.text('Shree Shyam Construction | '+new Date().toLocaleString('en-IN'),14,18);d.setTextColor(0,0,0);return d;}
+function saveReportPDF(title,file,head,body,landscape){try{if(!reportCan())throw new Error('Admin/Master access required');var d=pdfDoc(title,landscape);if(typeof d.autoTable==='function'){d.autoTable({head:[head],body:body,startY:24,styles:{fontSize:7.2,cellPadding:2,overflow:'linebreak'},headStyles:{fillColor:[145,16,39],textColor:255,fontStyle:'bold'},margin:{left:10,right:10,top:24,bottom:12}});}else{var y=28;body.forEach(function(r){d.text(r.join(' | ').slice(0,180),10,y);y+=5;if(y>190){d.addPage();y=15;}});}d.save(file);toast('PDF downloaded: '+file,'success');}catch(e){toast('PDF error: '+e.message,'error');}}
+function exportAdminUsersPDF(){var rows=Object.keys(USERS).sort().map(function(k,i){var a=USERS[k]||{},kind=accountKind(a),profile=kind==='office'?OS.filter(function(x){return x.nm===a.name;})[0]:SL.filter(function(x){return x.nm===a.name;})[0];return[i+1,a.name||'-',kind,k,a.pass||'-',(profile&&profile.ph)||'-',(profile&&profile.em)||'-'];});saveReportPDF('All Login Accounts & Credentials','Admin_Login_Accounts.pdf',['#','Name','Role','Login ID','Password','Phone','Email'],rows,false);}
+function exportAdminOfficeWorkPDF(){var rows=WL.slice().sort(function(a,b){return b.dt.localeCompare(a.dt);}).map(function(w,i){return[i+1,w.nm,fd(w.dt),w.tk,w.sts,w.pr,w.nt||'-'];});saveReportPDF('Complete Office Work Report','Admin_Office_Work_Report.pdf',['#','Staff','Date','Task / Work','Status','Priority','Notes'],rows,true);}
+function exportAdminVisitsPDF(){var rows=R.slice().sort(function(a,b){return b.vd.localeCompare(a.vd);}).map(function(r,i){return[i+1,r.sp,fd(r.vd),r.cu||'-',r.cc||'-',r.co||'-',r.si||'-',r.sa||'-',r.ar||'-',r.gr||'-',r.rm||'-'];});saveReportPDF('Complete Sales Visit Report','Admin_Sales_Visits_Report.pdf',['#','Salesperson','Date','Customer','Contact','Contractor','Site','Address','Area','Grade','Remarks'],rows,true);}
+function exportAdminPlantPDF(){var body=[];PM_ORDERS.forEach(function(x){body.push(['Order',x.order||'-',x.customer||'-',x.site||'-',x.grade||'-',x.qty||0,x.status||'-']);});PM_FLEET.forEach(function(x){body.push(['Fleet',x.vehicle||'-',x.driver||'-','Capacity '+(x.capacity||'-'),'Trips '+(x.trips||0),x.status||'-',x.last||'-']);});PM_MAT.forEach(function(x){var b=pmMaterialBalance(x);body.push(['Material',x.name||'-','Opening '+b.opening,'Received '+b.received,'Consumed '+b.consumed,'Balance '+b.balance,'Reorder '+(x.reorder||0)]);});PM_MAINT.forEach(function(x){body.push(['Maintenance',x.equipment||'-',x.issue||'-',x.type||'-',x.priority||'-',x.status||'-',x.remarks||'-']);});saveReportPDF('RMC Plant Operations Report','Admin_Plant_Operations_Report.pdf',['Type','Item','Detail 1','Detail 2','Detail 3','Status / Balance','Remarks'],body,true);}
+function exportMasterERPPDF(){var rows=MASTER_RECORDS.map(function(x,i){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module};return[i+1,m.name,x.ref,x.name,x.status,pmMoney(x.amount||0),x.notes||'-'];});saveReportPDF('Shree Shyam Integrated Master ERP Report','Master_ERP_Report.pdf',['#','Module','Reference','Name / Party','Status','Amount','Notes'],rows,true);}
+function openMasterReports(){if(!masterCan())return;var el=document.getElementById('masterReportsInline');if(!el)return;el.innerHTML='<div class="master-panel" style="margin:0 0 16px"><div class="mph"><div><h3>&#128196; Master Reports Centre</h3><small style="color:#64748b">Download separate management reports without changing existing records.</small></div><button class="btn bo bsm" onclick="document.getElementById(\'masterReportsInline\').innerHTML=\'\'">Close</button></div><div class="master-report-grid" style="padding:14px"><div class="master-report-card"><strong>&#128273; Users</strong><span>All credentials and account roles.</span><button class="btn ba bsm" onclick="exportAdminUsersPDF()">Users PDF</button></div><div class="master-report-card"><strong>&#128221; Office Work</strong><span>All office work entries.</span><button class="btn ba bsm" onclick="exportAdminOfficeWorkPDF()">Work PDF</button></div><div class="master-report-card"><strong>&#128203; Visits</strong><span>All sales visits.</span><button class="btn ba bsm" onclick="exportAdminVisitsPDF()">Visits PDF</button></div><div class="master-report-card"><strong>&#127981; Plant</strong><span>Orders, fleet, stock and maintenance.</span><button class="btn ba bsm" onclick="exportAdminPlantPDF()">Plant PDF</button></div><div class="master-report-card"><strong>&#9733; ERP</strong><span>Master records and approvals.</span><button class="btn ba bsm" onclick="exportMasterERPPDF()">ERP PDF</button></div></div></div>';
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
 // ===== MASTER ERP / INTEGRATED MODULES =====
 var MASTER_MODULES=[
   {id:"finance",icon:"&#128176;",name:"Finance & Accounts",desc:"Invoices, receipts, outstanding, cash flow and plant-linked commercial control."},
@@ -2273,10 +2328,47 @@ function masterRenderApprovals(){
   var pending=MASTER_RECORDS.filter(function(x){return x.status==='Pending'||x.status==='For Approval';});var k=document.getElementById('masterApprovalKpi');if(k)k.textContent=pending.length+' pending';var el=document.getElementById('masterApprovals');if(!el)return;
   el.innerHTML=pending.length?pending.map(function(x){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module};return '<div class="master-approval"><div><strong>'+pmEsc(x.ref)+' · '+pmEsc(x.name)+'</strong><small>'+pmEsc(m.name)+' · '+pmEsc(x.notes||'Approval required')+'</small></div><div class="master-actions"><button class="btn bs bsm" onclick="masterSetStatus('+x.id+',\'Approved\')">Approve</button><button class="btn bo bsm" onclick="masterSetStatus('+x.id+',\'Rejected\')">Reject</button></div></div>';}).join(''):'<div class="master-empty">No pending approvals.</div>';
 }
-function masterOpenModule(id){var s=document.getElementById('masterModuleFilter');if(s){s.value=id;masterRenderRecords();}var el=document.getElementById('masterRecordsBody');if(el)el.closest('.master-panel').scrollIntoView({behavior:'smooth',block:'start'});}
-function masterOpenRecord(id){
-  if(!masterCan()){toast('Master/Admin access required','error');return;}var x=id?MASTER_RECORDS.find(function(a){return Number(a.id)===Number(id);}):{};x=x||{};
-  var opts=MASTER_MODULES.map(function(m){return '<option value="'+m.id+'" '+(x.module===m.id?'selected':'')+'>'+m.name+'</option>';}).join('');
+function masterOpenModule(id){
+  if(!masterCan())return;
+  var s=document.getElementById('masterModuleFilter');if(s){s.value=id;masterRenderRecords();}
+  masterOpenModuleWorkspace(id);
+}
+function masterOpenModuleWorkspace(id){
+  if(!masterCan())return;
+  var m=MASTER_MODULES.find(function(a){return a.id===id;})||MASTER_MODULES[0];
+  var labels={
+    finance:['Invoice / Voucher No.','Party / Account','Amount','Transaction Date','Status','Notes'],
+    hr:['Employee Name','Employee ID','Department','Payroll Month','Gross Salary','Notes'],
+    purchase:['Purchase Request / PO No.','Vendor','Amount','Expected Delivery','Approval Status','Notes'],
+    inventory:['Material / Item','Store / Plant','Quantity','Unit','Movement Type','Notes'],
+    production:['Production Batch / Plan','Plant','Mix Grade','Quantity m³','Production Date','Notes'],
+    machinery:['Vehicle / Machine','Registration / Asset ID','Service Type','Service Date','Status','Notes'],
+    labour:['Labour / Team','Work Site','Attendance / Days','Wage Amount','Period','Notes'],
+    contractor:['Contractor Name','Work Order','Site / Project','Contract Value','Progress %','Notes'],
+    planning:['Plan / Estimate No.','Project / Site','Budget','Target Date','Variance','Notes'],
+    projects:['Project / Site Name','Project Code','Client','Budget','Target Date','Notes'],
+    mis:['Report Name','Period','Department / Plant','KPI / Value','Report Date','Notes'],
+    approvals:['Request No.','Requested By','Approval Type','Amount','Due Date','Notes']
+  };
+  var f=labels[id]||['Reference','Name / Party','Amount','Date','Status','Notes'];
+  var fields=[
+    pmField(f[0],"mx1",''),pmField(f[1],"mx2",''),pmField(f[2],"mx3",0,"number"),pmField(f[3],"mx4",''),pmField(f[4],"mx5",''),pmField(f[5],"mx6",'','text',true)
+  ];
+  var html="<div class='master-access-strip'><div><strong>"+m.icon+" "+pmEsc(m.name)+" Workspace</strong><small>Master / Admin full access · module-specific entry form</small></div><span class='master-status ok'>ACTIVE</span></div>"+pmForm(fields);
+  pmModal("&#9733; "+m.name+" — Master Workspace",html,"Save "+m.name,"masterSaveModuleWorkspace");
+  window.masterWorkspaceModule=id;
+}
+function masterSaveModuleWorkspace(){
+  if(!masterCan())return;
+  var id=window.masterWorkspaceModule||"finance",m=MASTER_MODULES.find(function(a){return a.id===id;})||MASTER_MODULES[0];
+  var val=function(k){var e=document.getElementById(k);return e?e.value.trim():'';};
+  var d={module:id,ref:val('mx1')||'ERP-'+String(MASTER_RECORDS.length+1).padStart(4,'0'),name:val('mx2')||m.name,status:'Pending',amount:Number(val('mx3'))||0,notes:val('mx6'),meta:{field1:val('mx1'),field2:val('mx2'),field3:val('mx3'),field4:val('mx4'),field5:val('mx5')}};
+  MASTER_RECORDS.push(Object.assign({id:MASTER_RECORDS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1},d));
+  masterSave();closeModal();masterRenderAll();window.masterWorkspaceModule='';toast(m.name+' record saved','success');
+}
+function masterOpenRecord(id,moduleContext){
+  if(!masterCan()){toast('Master/Admin access required','error');return;}var x=id?MASTER_RECORDS.find(function(a){return Number(a.id)===Number(id);}):{};x=x||{};var selectedModule=moduleContext||x.module||((document.getElementById('masterModuleFilter')||{}).value)||'finance';
+  var opts=MASTER_MODULES.map(function(m){return '<option value="'+m.id+'" '+(selectedModule===m.id?'selected':'')+'>'+m.name+'</option>';}).join('');
   pmModal(id?'Edit ERP Record':'Add Integrated ERP Record',pmForm([
     '<div class="fi"><label>Module *</label><select id="mrm">'+opts+'</select></div>',
     pmField('Reference *','mrr',x.ref||'ERP-'+String(MASTER_RECORDS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1).padStart(4,'0')),
@@ -2298,7 +2390,7 @@ pmLoad();
 // ===== INIT =====
 function initApp(){
   document.getElementById("attDate").value=new Date().toISOString().slice(0,10);
-  popDD();applyF();rStats();rStg();rOS();rWL();rQt();popAttFilter();showReminders();applyRoleAccess();applyPlantAccess();masterInit();
+  popDD();applyF();rStats();rStg();rOS();rWL();rQt();popAttFilter();showReminders();applyRoleAccess();applyPlantAccess();masterInit();renderAdminReportCentre();
 }
 document.addEventListener("DOMContentLoaded",function(){
   var first=document.querySelector('.role-tab');if(first)setRole('admin',first);
