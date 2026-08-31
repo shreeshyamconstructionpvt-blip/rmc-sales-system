@@ -1314,6 +1314,45 @@ body{--gold:#c91435}
   .ss-smile{width:calc(100% - 28px);justify-content:center}
 }
 
+
+/* =========================================================
+   INTERNATIONAL ERP PALETTE — DIFFERENTIATE MODULES
+   ========================================================= */
+:root{
+  --ss-ink:#172033; --ss-muted:#667085; --ss-red:#b4233d; --ss-red2:#d92d4a;
+  --ss-blue:#175cd3; --ss-teal:#087f8c; --ss-green:#087443;
+  --ss-amber:#b54708; --ss-purple:#6941c6; --ss-slate:#475467;
+}
+.login-btn{
+  background:linear-gradient(135deg,#b4233d,#d92d4a 52%,#8f1230)!important;
+  box-shadow:0 12px 28px rgba(180,35,61,.24)!important;
+}
+.login-btn:hover{transform:translateY(-2px)!important;filter:saturate(1.08)}
+.role-tab.act{color:#b4233d!important;border-color:#fecdD6!important;box-shadow:0 8px 22px rgba(180,35,61,.12)!important}
+.master-kpis .p1-card:nth-child(1),.p1-grid .p1-card:nth-child(1){border-top:3px solid #175cd3}
+.master-kpis .p1-card:nth-child(2),.p1-grid .p1-card:nth-child(2){border-top:3px solid #087f8c}
+.master-kpis .p1-card:nth-child(3),.p1-grid .p1-card:nth-child(3){border-top:3px solid #6941c6}
+.master-kpis .p1-card:nth-child(4),.p1-grid .p1-card:nth-child(4){border-top:3px solid #087443}
+.master-kpis .p1-card:nth-child(5),.p1-grid .p1-card:nth-child(5){border-top:3px solid #b54708}
+.master-kpis .p1-card:nth-child(6),.p1-grid .p1-card:nth-child(6){border-top:3px solid #b4233d}
+.master-kpis .p1-card:nth-child(7),.p1-grid .p1-card:nth-child(7){border-top:3px solid #475467}
+.master-kpis .p1-card:nth-child(8),.p1-grid .p1-card:nth-child(8){border-top:3px solid #175cd3}
+
+/* Master module cards: each department has a distinct accent */
+.master-module-card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.master-module-card:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(16,24,40,.10)}
+.master-module-card:nth-child(5n+1){border-top:3px solid #175cd3}
+.master-module-card:nth-child(5n+2){border-top:3px solid #6941c6}
+.master-module-card:nth-child(5n+3){border-top:3px solid #087f8c}
+.master-module-card:nth-child(5n+4){border-top:3px solid #b54708}
+.master-module-card:nth-child(5n+5){border-top:3px solid #087443}
+
+/* Buttons get restrained status accents rather than one universal colour */
+.btn.bw:hover{border-color:#175cd3!important;color:#175cd3!important}
+.btn.bo:hover{border-color:#b54708!important;color:#b54708!important}
+.btn.bs:hover{background:#087443!important}
+.btn.ba:hover{filter:brightness(.96) saturate(1.1)}
+
 </style>
 </head>
 <body>
@@ -2081,7 +2120,7 @@ function doLogin(){
     applyRoleAccess();
     applyPlantAccess();
     initApp();
-    toast('Welcome, '+CU.name+'!','success');
+    toast('Welcome, '+CU.name+'!','success'); setTimeout(function(){if(typeof ssLoginSmile==='function')ssLoginSmile(CU.name);},280);
   }else{
     err.style.display='block';err.textContent='Incorrect username or password';
     document.getElementById('lPass').value='';
@@ -3849,12 +3888,6 @@ function ssLoginSmile(name){
   document.body.appendChild(el);
   requestAnimationFrame(function(){el.classList.add("show");});
   setTimeout(function(){el.classList.remove("show");el.classList.add("hide");setTimeout(function(){el.remove();},500);},2600);
-}
-var ssOriginalDoLogin=doLogin;
-function doLogin(){
-  var before=CU;
-  ssOriginalDoLogin();
-  if(CU && CU!==before)setTimeout(function(){ssLoginSmile(CU.name);},280);
 }
 
 </script>
