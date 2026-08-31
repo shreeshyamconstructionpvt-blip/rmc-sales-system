@@ -1184,6 +1184,67 @@ body:has(.master-hero){
   .enterprise-ribbon,.executive-callout,.er-pill.live:before{animation:none!important}
 }
 
+
+/* =========================================================
+   SHREE SHYAM — COMPACT EXECUTIVE RED/BLACK THEME
+   Only black + red as primary brand colors. Gold/blue accents
+   are neutralized in the new premium surfaces.
+   ========================================================= */
+:root{
+  --ss-red:#c91435;--ss-red2:#ed2348;--ss-black:#080a0f;
+  --ss-ink:#111318;--ss-muted:#667085;--ss-border:#e4e7ec;
+}
+.enterprise-ribbon{
+  background:linear-gradient(110deg,#080a0f 0%,#111318 58%,#9d102b 100%)!important;
+  padding:9px 13px!important;margin:0 0 10px!important;border-radius:13px!important;
+}
+.enterprise-ribbon .er-mark{
+  background:linear-gradient(145deg,#c91435,#ed2348)!important;color:#fff!important;
+  box-shadow:0 7px 18px rgba(201,20,53,.25)!important;
+}
+.enterprise-ribbon .er-right .er-pill{border-color:rgba(255,255,255,.12)!important}
+.master-hero{
+  min-height:0!important;height:auto!important;
+  padding:21px 24px 20px!important;margin-bottom:12px!important;
+  border-radius:19px!important;
+  background:
+    radial-gradient(circle at 92% 12%,rgba(237,35,72,.16),transparent 20%),
+    linear-gradient(115deg,#07090d 0%,#111318 60%,#8f1028 100%)!important;
+  box-shadow:0 17px 45px rgba(15,23,42,.16)!important;
+}
+.master-title{
+  font-size:1.82rem!important;line-height:1.1!important;margin:2px 0 7px!important;
+}
+.master-hero p{font-size:.74rem!important;line-height:1.5!important;max-width:1080px!important;margin:0!important}
+.master-hero .btn,.master-hero .pill,.master-hero .chip{padding:7px 10px!important}
+.master-kpis{margin-top:11px!important;gap:9px!important}
+.master-kpi{min-height:70px!important;padding:11px 12px!important}
+.master-kpi .v{font-size:1.35rem!important}
+.master-grid{gap:11px!important}
+.master-module{
+  min-height:156px!important;border-radius:15px!important;
+  box-shadow:0 7px 22px rgba(15,23,42,.055)!important;
+}
+.master-module:hover{transform:translateY(-4px)!important;box-shadow:0 15px 32px rgba(15,23,42,.11)!important}
+.master-module .mi{
+  width:38px!important;height:38px!important;border-radius:11px!important;
+  box-shadow:none!important;background:#fff1f3!important;color:#a90e2b!important;
+}
+.master-access-strip{background:linear-gradient(90deg,#080a0f,#1b0b11)!important}
+.master-kpi .bar,.master-module .bar{background:#c91435!important}
+.product-trust>div{border-top:2px solid #c91435!important}
+.command-strip{border-left:3px solid #c91435!important}
+.executive-callout{border-left:3px solid #c91435!important}
+.erp-phase-btn.active{background:linear-gradient(135deg,#a90e2b,#e21e43)!important}
+.btn.ba,.login-btn{background:linear-gradient(135deg,#a90e2b,#e21e43)!important}
+.tb.act{background:linear-gradient(135deg,#a90e2b,#e21e43)!important}
+body{--gold:#c91435}
+@media(max-width:800px){
+  .master-hero{padding:18px 17px!important}
+  .master-title{font-size:1.5rem!important}
+  .master-module{min-height:142px!important}
+}
+
 </style>
 </head>
 <body>
@@ -1331,6 +1392,8 @@ body:has(.master-hero){
     
 <div class="command-strip">
   <span class="cs-title">EXECUTIVE QUICK ACTIONS</span>
+<button class="btn ba" onclick="runFreshStartReset(true)">🧹 Fresh Start Reset</button>
+
   <button onclick="phase3Refresh()">↻ Refresh MIS</button>
   <button onclick="downloadMasterDailyPDF()">📄 Master Daily PDF</button>
   <button onclick="phase2Sync()">🔗 Sync Workflows</button>
@@ -3439,6 +3502,76 @@ function downloadMasterDailyPDF(){
     ["Office Staff",m.office]
   ];
   saveReportPDF("Shree Shyam RMC — Master Daily ERP Report","Master_Daily_ERP_Report_"+d+".pdf",["Today's Master Snapshot","Value"],all,false);
+}
+
+
+// =========================================================
+// SHREE SHYAM — FRESH START 01-09-2026
+// Clears historical transactional/demo records once on/after
+// 1 September 2026. Account identities and module/master
+// definitions are retained so the system remains usable.
+// =========================================================
+(function(){
+  var FRESH_START_KEY="SS_RMC_FRESH_START_2026_09_01";
+  var FRESH_START_DATE="2026-09-01";
+  var today=new Date();
+  var iso=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+
+  // This runs automatically only from the requested fresh-start date.
+  if(iso>=FRESH_START_DATE && localStorage.getItem(FRESH_START_KEY)!=="DONE"){
+    var clearKeys=[
+      "RMC_SL",                 // Sales visits
+      "RMC_FQ",                 // Quotations
+      "RMC_WL",                 // Office work
+      "RMC_PM_ORDERS",          // Plant orders / dispatch
+      "RMC_PM_FLEET",           // Fleet/trip history
+      "RMC_PM_QC",              // QC history
+      "RMC_PM_BILL",            // Billing history
+      "RMC_PM_MAINT",           // Maintenance history
+      "RMC_PHASE1_ACTIVITY",    // Old activity/audit records
+      "RMC_ERP_WORKFLOWS",      // Old connected workflows
+      "RMC_MASTER_RECORDS"      // Old master/management records
+    ];
+    clearKeys.forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+
+    // Reset raw materials to zero while keeping the material names/units.
+    // This intentionally preserves the material master but removes old stock.
+    try{
+      var mats=JSON.parse(localStorage.getItem("RMC_PM_MAT")||"[]");
+      if(!Array.isArray(mats))mats=[];
+      mats=mats.map(function(m){
+        m=m||{};
+        return Object.assign({},m,{
+          opening:0, openingStock:0, received:0, consumed:0, balance:0, current:0
+        });
+      });
+      if(mats.length) localStorage.setItem("RMC_PM_MAT",JSON.stringify(mats));
+      else localStorage.removeItem("RMC_PM_MAT");
+    }catch(e){}
+
+    localStorage.setItem(FRESH_START_KEY,"DONE");
+    localStorage.setItem("SS_RMC_FRESH_START_DATE",FRESH_START_DATE);
+  }
+})();
+
+
+function runFreshStartReset(manual){
+  if(manual && !(CU && CU.kind==="admin")){alert("Admin access required.");return;}
+  var ok=manual ? confirm("Fresh Start will clear historical visits, quotations, office work, plant orders, fleet, QC, billing, maintenance, workflows and old management activity. User accounts and master definitions will remain. Continue?") : true;
+  if(!ok)return;
+  [
+    "RMC_SL","RMC_FQ","RMC_WL","RMC_PM_ORDERS","RMC_PM_FLEET","RMC_PM_QC",
+    "RMC_PM_BILL","RMC_PM_MAINT","RMC_PHASE1_ACTIVITY","RMC_ERP_WORKFLOWS","RMC_MASTER_RECORDS"
+  ].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+  try{
+    var mats=JSON.parse(localStorage.getItem("RMC_PM_MAT")||"[]");
+    if(Array.isArray(mats) && mats.length){
+      mats=mats.map(function(m){return Object.assign({},m,{opening:0,openingStock:0,received:0,consumed:0,balance:0,current:0});});
+      localStorage.setItem("RMC_PM_MAT",JSON.stringify(mats));
+    }
+  }catch(e){}
+  alert("Fresh Start completed. Historical transaction data has been cleared.");
+  location.reload();
 }
 
 </script>
