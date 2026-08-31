@@ -1363,6 +1363,9 @@ body{--gold:#c91435}
 }
 .master-module .mm-new:hover{background:#b4233d;color:#fff;transform:translateY(-1px)}
 
+
+.ss-fresh-security{font-size:.56rem;color:#667085;margin-left:3px}
+
 </style>
 </head>
 <body>
@@ -1510,7 +1513,7 @@ body{--gold:#c91435}
     
 <div class="command-strip">
   <span class="cs-title">EXECUTIVE QUICK ACTIONS</span>
-<button class="btn ba" onclick="runFreshStartReset(true)">🧹 Fresh Start Reset</button>
+<button class="btn ba" onclick="askFreshStartPassword()">🔐 Ask Password · Fresh Start Reset</button>
 
   <button onclick="phase3Refresh()">↻ Refresh MIS</button>
   <button onclick="downloadMasterDailyPDF()">📄 Master Daily PDF</button>
@@ -3674,22 +3677,53 @@ function downloadMasterDailyPDF(){
 })();
 
 
-function runFreshStartReset(manual){
-  if(manual && !(CU && CU.kind==="admin")){alert("Admin access required.");return;}
-  var ok=manual ? confirm("Fresh Start will clear historical visits, quotations, office work, plant orders, fleet, QC, billing, maintenance, workflows and old management activity. User accounts and master definitions will remain. Continue?") : true;
+function askFreshStartPassword(){
+  if(!CU || (CU.accountKind!=="master" && CU.accountKind!=="admin")){
+    alert("Master/Admin access required.");
+    return;
+  }
+  var entered=window.prompt("Master Password Required\n\nEnter the authorized password to continue Fresh Start Reset:");
+  if(entered===null)return;
+  if(entered!=="Indiahsr@786"){
+    alert("Incorrect password. Fresh Start Reset was not performed.");
+    return;
+  }
+  runFreshStartReset(true,true);
+}
+
+function runFreshStartReset(manual,authorized){
+  if(manual && !(CU && (CU.accountKind==="master" || CU.accountKind==="admin"))){
+    alert("Master/Admin access required.");return;
+  }
+  if(manual && !authorized){
+    askFreshStartPassword();return;
+  }
+  var ok=manual ? confirm(
+    "FINAL CONFIRMATION\n\nFresh Start will clear historical visits, quotations, office work, plant orders, fleet, QC, billing, maintenance, workflows, old management activity and HR employee profiles. User login accounts and master definitions will remain.\n\nContinue?"
+  ) : true;
   if(!ok)return;
+
   [
     "RMC_SL","RMC_FQ","RMC_WL","RMC_PM_ORDERS","RMC_PM_FLEET","RMC_PM_QC",
-    "RMC_PM_BILL","RMC_PM_MAINT","RMC_PHASE1_ACTIVITY","RMC_ERP_WORKFLOWS","RMC_MASTER_RECORDS","RMC_HR_EMPLOYEES"
+    "RMC_PM_BILL","RMC_PM_MAINT","RMC_PHASE1_ACTIVITY","RMC_ERP_WORKFLOWS",
+    "RMC_MASTER_RECORDS","RMC_HR_EMPLOYEES"
   ].forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+
   try{
     var mats=JSON.parse(localStorage.getItem("RMC_PM_MAT")||"[]");
     if(Array.isArray(mats) && mats.length){
-      mats=mats.map(function(m){return Object.assign({},m,{opening:0,openingStock:0,received:0,consumed:0,balance:0,current:0});});
+      mats=mats.map(function(m){
+        return Object.assign({},m,{
+          opening:0,openingStock:0,received:0,consumed:0,balance:0,current:0
+        });
+      });
       localStorage.setItem("RMC_PM_MAT",JSON.stringify(mats));
     }
   }catch(e){}
-  alert("Fresh Start completed. Historical transaction data has been cleared.");
+
+  localStorage.setItem("SS_RMC_FRESH_START_DATE","2026-09-01");
+  localStorage.setItem("SS_RMC_FRESH_START_MANUAL","DONE");
+  alert("Fresh Start completed successfully.\n\nAll selected historical transaction data is now cleared.");
   location.reload();
 }
 
