@@ -608,6 +608,22 @@ td{padding:9px 10px}
 }
 
 
+
+/* ===== MASTER ERP / INTEGRATED RMC CONTROL CENTRE ===== */
+.master-only{display:none}
+.master-mode .master-only{display:inline-flex}
+.master-mode .sales-access,.master-mode .admin-only,.master-mode .office-access,.master-mode .plant-only{display:inline-flex!important}
+.master-mode .plant-panel{display:none}
+.master-mode .plant-panel.act{display:block}
+.master-hero{margin-bottom:16px;padding:24px;border-radius:20px;color:#fff;position:relative;overflow:hidden;background:radial-gradient(circle at 85% 18%,rgba(255,255,255,.16),transparent 25%),linear-gradient(120deg,#09090b 0%,#171717 42%,#9b1028 100%);box-shadow:0 20px 55px rgba(15,23,42,.2)}
+.master-hero:after{content:'';position:absolute;width:320px;height:320px;right:-110px;bottom:-160px;border:1px solid rgba(255,255,255,.14);border-radius:50%;box-shadow:0 0 0 35px rgba(255,255,255,.025),0 0 0 70px rgba(255,255,255,.018)}
+.master-kicker{font-size:.68rem;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;opacity:.75}.master-title{font-size:1.8rem;font-weight:850;margin:5px 0}.master-sub{font-size:.8rem;opacity:.86;max-width:900px;line-height:1.65}.master-chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.master-chip{padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);font-size:.68rem;font-weight:800}
+.master-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:14px 0}.master-kpi{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:14px;box-shadow:0 5px 18px rgba(15,23,42,.06);position:relative;overflow:hidden}.master-kpi:before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--p)}.master-kpi .mk-label{font-size:.66rem;text-transform:uppercase;letter-spacing:.5px;color:#64748b;font-weight:800}.master-kpi .mk-num{font-size:1.45rem;font-weight:850;margin-top:4px}.master-kpi .mk-hint{font-size:.68rem;color:#94a3b8;margin-top:3px}
+.master-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}.master-module{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px;box-shadow:0 5px 18px rgba(15,23,42,.06);transition:.18s;cursor:pointer}.master-module:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(15,23,42,.1);border-color:#fecaca}.master-module .mi{font-size:1.5rem}.master-module h3{font-size:.9rem;margin:8px 0 4px}.master-module p{font-size:.7rem;line-height:1.55;color:#64748b}.master-module .mm-foot{display:flex;justify-content:space-between;align-items:center;margin-top:11px;font-size:.67rem;font-weight:800}.master-module .mm-badge{padding:4px 7px;border-radius:999px;background:#f1f5f9;color:#475569}
+.master-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:14px}.master-panel{background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;box-shadow:0 5px 18px rgba(15,23,42,.06)}.master-panel .mph{padding:14px 16px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.master-panel .mph h3{font-size:.92rem}.master-table{width:100%;border-collapse:collapse;font-size:.75rem}.master-table th{background:#f8fafc;padding:9px 10px;text-align:left;color:#475569;font-size:.67rem;text-transform:uppercase;letter-spacing:.4px}.master-table td{padding:9px 10px;border-top:1px solid #f1f5f9}.master-empty{padding:28px;text-align:center;color:#94a3b8;font-size:.78rem}.master-approval{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-top:1px solid #f1f5f9;align-items:center}.master-approval strong{font-size:.75rem}.master-approval small{display:block;color:#64748b;margin-top:2px}.master-actions{display:flex;gap:6px;flex-wrap:wrap}.master-filter{padding:8px 10px;border:1px solid #e2e8f0;border-radius:9px;font-size:.75rem;background:#fff;outline:none}.master-status{padding:4px 8px;border-radius:999px;font-size:.65rem;font-weight:800;background:#fef3c7;color:#92400e}.master-status.ok{background:#dcfce7;color:#166534}.master-status.bad{background:#fee2e2;color:#991b1b}
+@media(max-width:900px){.master-layout{grid-template-columns:1fr}.master-title{font-size:1.4rem}}
+.master-mode.plant-mode .sales-access,.master-mode.plant-mode .admin-only,.master-mode.plant-mode .office-access,.master-mode.plant-mode .plant-only{display:inline-flex!important}
+
 /* ===== PLANT MANAGER / RMC OPERATIONS SUITE ===== */
 .plant-only{display:none}
 .plant-mode .plant-only{display:inline-flex}
@@ -738,6 +754,7 @@ td{padding:9px 10px}
   <div class="sg" id="sg"></div>
   <div class="tabs">
 
+    <button class="tb master-only" onclick="swMasterTab(this,'tp-master')">&#9733; Master Control</button>
     <button class="tb plant-only act" onclick="swPlantTab(this,'pm-dashboard')">&#127981; Plant Dashboard</button>
     <button class="tb plant-only" onclick="swPlantTab(this,'pm-orders')">&#128230; Orders &amp; Dispatch</button>
     <button class="tb plant-only" onclick="swPlantTab(this,'pm-fleet')">&#128666; Fleet</button>
@@ -753,6 +770,28 @@ td{padding:9px 10px}
     <button class="tb admin-only" onclick="swTab(this,'tp-5')">&#128197; Attendance</button>
     <button class="tb admin-only" onclick="swTab(this,'tp-6')">&#128176; Quotations</button>
     <button class="tb admin-only" onclick="swTab(this,'tp-7')">&#128202; Analytics</button>
+  </div>
+
+  <!-- ===== MASTER ERP CONTROL CENTRE ===== -->
+  <div class="tp" id="tp-master">
+    <div class="master-hero">
+      <div class="master-kicker">&#9733; Enterprise RMC Master Control</div>
+      <div class="master-title">Shree Shyam Integrated ERP Command Centre</div>
+      <div class="master-sub">One master workspace for company administration, RMC plant operations, sales, procurement, inventory, finance, people, projects, machinery, quality and management reporting. Existing Visits, Office Work, Quotations and Plant Manager data remain connected.</div>
+      <div class="master-chips"><span class="master-chip">&#128273; MASTER ACCESS</span><span class="master-chip">&#128274; ALL MODULES</span><span class="master-chip">&#127981; ALL PLANTS</span><span class="master-chip">&#128202; LIVE MIS</span></div>
+    </div>
+    <div class="master-kpis" id="masterKpis"></div>
+    <div class="master-grid" id="masterModules"></div>
+    <div class="master-layout">
+      <div class="master-panel">
+        <div class="mph"><h3>&#128221; Integrated ERP Records</h3><div class="master-actions"><select class="master-filter" id="masterModuleFilter" onchange="masterRenderRecords()"><option value="">All Modules</option></select><button class="btn bs bsm" onclick="masterOpenRecord()">&#10133; Add Record</button></div></div>
+        <div style="overflow:auto"><table class="master-table"><thead><tr><th>Module</th><th>Reference</th><th>Name / Party</th><th>Status</th><th>Amount</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="masterRecordsBody"></tbody></table></div>
+      </div>
+      <div class="master-panel">
+        <div class="mph"><h3>&#9989; Approval &amp; Alerts Desk</h3><span class="master-status" id="masterApprovalKpi">0 pending</span></div>
+        <div id="masterApprovals"></div>
+      </div>
+    </div>
   </div>
 
   <!-- ===== PLANT MANAGER OPERATIONS SUITE ===== -->
@@ -940,6 +979,7 @@ td{padding:9px 10px}
 // ===== USER ACCOUNTS =====
 var USERS = {
   admin:     {pass:"admin@123", role:"admin", name:"Administrator"},
+  master:    {pass:"Master@2026", role:"master", name:"Master Control"},
   parvinder: {pass:"staff@123", role:"staff", name:"Parvinder Kumar"},
   parveen:   {pass:"plant@123", role:"plant", type:"plant", name:"Parveen Dahiya"},
   pawan:     {pass:"staff@123", role:"staff", name:"Pawan Kumar"}
@@ -1026,11 +1066,11 @@ function renderUserList(){
     "<div style='display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px'><div><div style='font-weight:850;font-size:.98rem;color:#111827'>&#128273; Staff Login Credentials</div><div style='font-size:.7rem;color:#64748b;margin-top:3px'>Admin can see, verify and update each staff member's Login ID and password here.</div></div><span style='font-size:.66rem;font-weight:800;padding:5px 8px;border-radius:999px;background:#fee2e2;color:#991b1b'>ADMIN ONLY</span></div>"+
     "<div style='display:flex;flex-direction:column;gap:8px'>"+
     keys.map(function(k){
-      var x=USERS[k],canDel=k!=="admin"&&(!CU||k!==CU.uname),kind=accountKind(x);
+      var x=USERS[k],canDel=k!=="admin"&&k!=="master"&&(!CU||k!==CU.uname),kind=accountKind(x);
       var profile=kind==="office"?OS.filter(function(s){return s.nm===x.name;})[0]:SL.filter(function(s){return s.nm===x.name;})[0];
       var pid=(profile&&profile.id)||"";
       return "<div style='display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(130px,1fr) minmax(150px,1fr) auto;align-items:center;gap:10px;padding:11px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:12px'>"+
-        "<div><div style='font-size:.66rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em'>Employee</div><strong style='font-size:.82rem'>"+(x.name||"-")+"</strong><div style='font-size:.67rem;color:#64748b;margin-top:2px'>"+(kind==="office"?"Office Staff":"Sales Staff")+" &middot; "+(x.role||"staff").toUpperCase()+"</div></div>"+
+        "<div><div style='font-size:.66rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em'>Employee</div><strong style='font-size:.82rem'>"+(x.name||"-")+"</strong><div style='font-size:.67rem;color:#64748b;margin-top:2px'>"+(kind==="master"?"Master Control":kind==="office"?"Office Staff":kind==="plant"?"Plant Manager":"Sales Staff")+" &middot; "+(x.role||"staff").toUpperCase()+"</div></div>"+
         "<div><div style='font-size:.66rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em'>Login ID</div><div style='font-family:ui-monospace,monospace;font-weight:800;color:#111827;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:6px 8px;margin-top:3px'>"+k+"</div></div>"+
         "<div><div style='font-size:.66rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em'>Password</div><div style='display:flex;gap:5px;margin-top:3px'><input id='pwview_"+k.replace(/[^a-z0-9_-]/gi,'_')+"' type='password' readonly value='"+(x.pass||"").replace(/&/g,'&amp;').replace(/"/g,'&quot;')+"' style='min-width:0;flex:1;font-family:ui-monospace,monospace;font-weight:800;padding:6px 8px;border:1px solid #e5e7eb;border-radius:8px;background:#f8fafc'><button class='ib' title='Show / hide password' onclick='toggleUserPass("+JSON.stringify(k)+")'>&#128065;</button></div></div>"+
         "<div style='display:flex;gap:5px;justify-content:flex-end'><button class='ib' title='View full profile & credentials' onclick='openUserProfile("+JSON.stringify(k)+")'>&#128065;</button>"+
@@ -1045,7 +1085,7 @@ function toggleUserPass(u){
 }
 
 function deleteUser(u){
-  if(!canEdit()||u==="admin"||(CU&&u===CU.uname)){toast("This account cannot be deleted","error");return;}
+  if(!canEdit()||u==="admin"||u==="master"||(CU&&u===CU.uname)){toast("This account cannot be deleted","error");return;}
   if(!confirm("Delete login account '"+u+"'?"))return;
   delete USERS[u];
   saveUsers();
@@ -1122,6 +1162,7 @@ function closeLoginAccessModal(){
 }
 function accountKind(account){
   if(!account)return "staff";
+  if(account.role==="master")return "master";
   if(account.role==="admin")return "admin";
   if(account.role==="office" || account.type==="office")return "office";
   if(account.role==="plant" || account.type==="plant")return "plant";
@@ -1131,18 +1172,27 @@ function accountKind(account){
 function applyPlantAccess(){
   var app=document.getElementById("app");
   if(!app)return;
-  var isPlant=CU&&CU.accountKind==="plant";
+  var isPlant=CU&&(CU.accountKind==="plant"||CU.accountKind==="master");
   app.classList.toggle("plant-mode",!!isPlant);
   document.querySelectorAll(".plant-panel").forEach(function(p){p.classList.remove("act");});
   if(isPlant){
-    var first=document.getElementById("pm-dashboard");if(first)first.classList.add("act");
-    document.querySelectorAll(".tabs .tb").forEach(function(b){b.classList.remove("act");});
-    var pt=document.querySelector(".tabs .tb.plant-only");if(pt)pt.classList.add("act");
+    if(CU.accountKind!=="master"){
+      var first=document.getElementById("pm-dashboard");if(first)first.classList.add("act");
+      document.querySelectorAll(".tabs .tb").forEach(function(b){b.classList.remove("act");});
+      var pt=document.querySelector(".tabs .tb.plant-only");if(pt)pt.classList.add("act");
+    }
     pmInit();
   }
 }
+function swMasterTab(btn,id){
+  if(!CU||CU.accountKind!=="master")return;
+  document.querySelectorAll(".plant-panel").forEach(function(p){p.classList.remove("act");});
+  swTab(btn,id);
+  masterRenderAll();
+}
+
 function swPlantTab(btn,id){
-  if(!CU||CU.accountKind!=="plant"){return;}
+  if(!CU||(CU.accountKind!=="plant"&&CU.accountKind!=="master")){return;}
   document.querySelectorAll(".plant-panel").forEach(function(p){p.classList.remove("act");});
   var el=document.getElementById(id);if(el)el.classList.add("act");
   document.querySelectorAll(".tabs .tb").forEach(function(b){b.classList.remove("act");});
@@ -1162,7 +1212,7 @@ function doLogin(){
   var account=USERS[u];
   if(account && account.pass===p){
     var kind=accountKind(account);
-    if(selectedLoginRole==="admin" && kind!=="admin"){
+    if(selectedLoginRole==="admin" && kind!=="admin" && kind!=="master"){
       showLoginAccessModal(
         "Staff Account Detected",
         kind==="office"
@@ -1185,10 +1235,10 @@ function doLogin(){
     document.getElementById('loginPage').style.display='none';
     document.getElementById('app').style.display='block';
     document.getElementById('app').classList.remove('admin-mode','staff-mode','office-mode');
-    document.getElementById('app').classList.add(kind==='admin'?'admin-mode':kind==='office'?'office-mode':'staff-mode');
+    document.getElementById('app').classList.add(kind==='master'?'master-mode':kind==='admin'?'admin-mode':kind==='office'?'office-mode':'staff-mode');
     document.getElementById('userBadge').innerHTML='&#128100; '+CU.name+' <span class="'+(kind==='admin'?'badge bb':kind==='office'?'staff-badge office-badge':kind==='plant'?'staff-badge plant-badge':'staff-badge')+'">'+(kind==='admin'?'ADMIN':kind==='office'?'OFFICE':kind==='plant'?'PLANT MANAGER':'STAFF')+'</span>';
     var dw=document.getElementById('dwUser');if(dw)dw.textContent=CU.name;
-    document.getElementById('hSub').textContent=kind==='admin'?'Admin Mode — Full Access':kind==='office'?'Office Staff Mode — My Work Only':kind==='plant'?'Plant Manager Mode — Operations Control':'Sales Staff Mode — My Visits Only';
+    document.getElementById('hSub').textContent=kind==='master'?'Master Control — Enterprise Full Access':kind==='admin'?'Admin Mode — Full Access':kind==='office'?'Office Staff Mode — My Work Only':kind==='plant'?'Plant Manager Mode — Operations Control':'Sales Staff Mode — My Visits Only';
     applyRoleAccess();
     applyPlantAccess();
     initApp();
@@ -1203,7 +1253,7 @@ function applyRoleAccess(){
   if(!CU||!app)return;
   document.querySelectorAll(".tp").forEach(function(p){p.classList.remove("act");});
   document.querySelectorAll(".tb").forEach(function(b){b.classList.remove("act");});
-  var target=CU.accountKind==="admin"?"tp-1":CU.accountKind==="office"?"tp-4":"tp-1";
+  var target=CU.accountKind==="master"?"tp-master":CU.accountKind==="admin"?"tp-1":CU.accountKind==="office"?"tp-4":"tp-1";
   var panel=document.getElementById(target);
   var tab=document.querySelector('.tb[onclick*="' + target + '"]');
   if(panel)panel.classList.add("act");
@@ -1215,12 +1265,12 @@ function doLogout(){
   CU=null;
   document.getElementById('app').classList.remove('admin-mode');
   document.getElementById('app').style.display='none';
-  document.getElementById('app').classList.remove('admin-mode','office-mode');
+  document.getElementById('app').classList.remove('admin-mode','office-mode','master-mode','plant-mode','staff-mode');
   document.getElementById('loginPage').style.display='flex';
   document.getElementById('lUser').value='';document.getElementById('lPass').value='';
   document.getElementById('lErr').style.display='none';
 }
-function canEdit(){return CU && CU.accountKind==='admin';}
+function canEdit(){return CU && (CU.accountKind==='admin' || CU.accountKind==='master');}
 function canAddVisit(){return CU && (CU.accountKind==='admin' || CU.accountKind==='staff');}
 function canOfficeWork(){return CU && (CU.accountKind==='admin' || CU.accountKind==='office');}
 function isMySalesName(n){return !!(CU && CU.accountKind==='staff' && String(n||'')===String(CU.name||''));}
@@ -2178,12 +2228,77 @@ function pmDelete(type,id){
   var i=arr.findIndex(x=>x.id===id);if(i>=0)arr.splice(i,1);
   pmSave();pmRenderAll();toast("Record deleted","error");
 }
+// ===== MASTER ERP / INTEGRATED MODULES =====
+var MASTER_MODULES=[
+  {id:"finance",icon:"&#128176;",name:"Finance & Accounts",desc:"Invoices, receipts, outstanding, cash flow and plant-linked commercial control."},
+  {id:"hr",icon:"&#128101;",name:"HR & Payroll",desc:"Employee profiles, attendance, payroll readiness, leave and workforce records."},
+  {id:"purchase",icon:"&#128722;",name:"Purchase Management",desc:"Purchase requests, vendors, quotations, POs, approvals and GRN workflow."},
+  {id:"inventory",icon:"&#128230;",name:"Store & Inventory",desc:"Raw material, stock movement, reorder, transfers and consumption visibility."},
+  {id:"production",icon:"&#127981;",name:"Plant & Production",desc:"Batching, production plans, plant status, dispatch and production output."},
+  {id:"machinery",icon:"&#128295;",name:"Machinery & Vehicles",desc:"Fleet, machine logs, service schedules, permits and maintenance control."},
+  {id:"labour",icon:"&#128119;",name:"Labour Management",desc:"Labour deployment, attendance, productivity and wage-ready records."},
+  {id:"contractor",icon:"&#129309;",name:"Contractor Management",desc:"Contractors, work orders, progress, certification and payment tracking."},
+  {id:"planning",icon:"&#128203;",name:"Planning & Estimation",desc:"Budgets, resource plans, estimates, targets and variance alerts."},
+  {id:"projects",icon:"&#127959;",name:"Project Management",desc:"Sites, milestones, tasks, progress, resources and project health."},
+  {id:"mis",icon:"&#128202;",name:"Management Information System",desc:"Consolidated KPIs across sales, plant, stock, people, machinery and finance."},
+  {id:"approvals",icon:"&#9989;",name:"Approvals & Compliance",desc:"Central approval desk for purchase, quotations, invoices, inspections and requests."}
+];
+var MASTER_RECORDS=[];
+function masterLoad(){try{var x=JSON.parse(localStorage.getItem("RMC_MASTER_RECORDS")||"[]");if(Array.isArray(x))MASTER_RECORDS=x;}catch(e){MASTER_RECORDS=[];}}
+function masterSave(){try{localStorage.setItem("RMC_MASTER_RECORDS",JSON.stringify(MASTER_RECORDS));}catch(e){}}
+function masterEnsure(){masterLoad();if(!MASTER_RECORDS.length){MASTER_RECORDS=[
+  {id:1,module:"projects",ref:"PRJ-001",name:"RMC Operations — Kharkhoda",status:"Active",amount:0,notes:"Central plant/project workspace"},
+  {id:2,module:"planning",ref:"PLAN-001",name:"Monthly Plant Plan",status:"Pending",amount:0,notes:"Production and resource planning"},
+  {id:3,module:"approvals",ref:"APR-001",name:"Master Approval Desk",status:"Approved",amount:0,notes:"Centralized approvals"}
+];masterSave();}}
+function masterCan(){return !!(CU&&(CU.accountKind==="master"||CU.accountKind==="admin"));}
+function masterInit(){if(!masterCan())return;masterEnsure();masterRenderAll();}
+function masterRenderAll(){masterRenderKpis();masterRenderModules();masterRenderRecords();masterRenderApprovals();}
+function masterRenderKpis(){
+  var sales=R.length,quotes=FQ.length,office=OS.length,plantOrders=PM_ORDERS.length,stock=PM_MAT.reduce(function(s,x){return s+Math.max(0,pmMaterialBalance(x).balance);},0),out=PM_BILL.reduce(function(s,x){return s+(Number(x.outstanding)||0);},0);
+  var k=[['&#128203;','Sales Visits',sales,'Existing sales data'],['&#128176;','Quotations',quotes,'Commercial pipeline'],['&#127970;','Office Staff',office,'People & office'],['&#127981;','Plant Orders',plantOrders,'RMC dispatch'],['&#128230;','Stock Units',stock.toLocaleString('en-IN',{maximumFractionDigits:2}),'Current plant stock'],['&#8377;','Outstanding',pmMoney(out),'Plant receivables']];
+  var el=document.getElementById('masterKpis');if(!el)return;el.innerHTML=k.map(function(x){return "<div class='master-kpi'><div class='mk-label'>"+x[0]+" "+x[1]+"</div><div class='mk-num'>"+x[2]+"</div><div class='mk-hint'>"+x[3]+"</div></div>";}).join('');
+}
+function masterRenderModules(){
+  var el=document.getElementById('masterModules');if(!el)return;
+  el.innerHTML=MASTER_MODULES.map(function(m){var count=MASTER_RECORDS.filter(function(x){return x.module===m.id;}).length;return "<div class='master-module' onclick='masterOpenModule("+JSON.stringify(m.id)+")'><div class='mi'>"+m.icon+"</div><h3>"+m.name+"</h3><p>"+m.desc+"</p><div class='mm-foot'><span>Open workspace &#8594;</span><span class='mm-badge'>"+count+" records</span></div></div>";}).join('');
+}
+function masterPopulateFilter(){var s=document.getElementById('masterModuleFilter');if(!s)return;var old=s.value;s.innerHTML='<option value="">All Modules</option>'+MASTER_MODULES.map(function(m){return '<option value="'+m.id+'">'+m.name+'</option>';}).join('');s.value=old;}
+function masterRenderRecords(){
+  masterPopulateFilter();var filter=(document.getElementById('masterModuleFilter')||{}).value||'';var body=document.getElementById('masterRecordsBody');if(!body)return;
+  var rows=MASTER_RECORDS.filter(function(x){return !filter||x.module===filter;}).slice().reverse();
+  body.innerHTML=rows.length?rows.map(function(x){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module};var st=x.status||'Pending';var cls=st==='Approved'||st==='Completed'||st==='Active'?'ok':st==='Rejected'||st==='Cancelled'?'bad':'';return '<tr><td><strong>'+pmEsc(m.name)+'</strong></td><td>'+pmEsc(x.ref)+'</td><td>'+pmEsc(x.name)+'</td><td><span class="master-status '+cls+'">'+pmEsc(st)+'</span></td><td>'+pmMoney(x.amount||0)+'</td><td>'+pmEsc(x.notes||'—')+'</td><td><button class="ib" onclick="masterOpenRecord('+x.id+')">&#9999;</button><button class="ib" onclick="masterDeleteRecord('+x.id+')">&#128465;</button></td></tr>';}).join(''):'<tr><td colspan="7" class="master-empty">No integrated records yet.</td></tr>';
+}
+function masterRenderApprovals(){
+  var pending=MASTER_RECORDS.filter(function(x){return x.status==='Pending'||x.status==='For Approval';});var k=document.getElementById('masterApprovalKpi');if(k)k.textContent=pending.length+' pending';var el=document.getElementById('masterApprovals');if(!el)return;
+  el.innerHTML=pending.length?pending.map(function(x){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module};return '<div class="master-approval"><div><strong>'+pmEsc(x.ref)+' · '+pmEsc(x.name)+'</strong><small>'+pmEsc(m.name)+' · '+pmEsc(x.notes||'Approval required')+'</small></div><div class="master-actions"><button class="btn bs bsm" onclick="masterSetStatus('+x.id+',\'Approved\')">Approve</button><button class="btn bo bsm" onclick="masterSetStatus('+x.id+',\'Rejected\')">Reject</button></div></div>';}).join(''):'<div class="master-empty">No pending approvals.</div>';
+}
+function masterOpenModule(id){var s=document.getElementById('masterModuleFilter');if(s){s.value=id;masterRenderRecords();}var el=document.getElementById('masterRecordsBody');if(el)el.closest('.master-panel').scrollIntoView({behavior:'smooth',block:'start'});}
+function masterOpenRecord(id){
+  if(!masterCan()){toast('Master/Admin access required','error');return;}var x=id?MASTER_RECORDS.find(function(a){return Number(a.id)===Number(id);}):{};x=x||{};
+  var opts=MASTER_MODULES.map(function(m){return '<option value="'+m.id+'" '+(x.module===m.id?'selected':'')+'>'+m.name+'</option>';}).join('');
+  pmModal(id?'Edit ERP Record':'Add Integrated ERP Record',pmForm([
+    '<div class="fi"><label>Module *</label><select id="mrm">'+opts+'</select></div>',
+    pmField('Reference *','mrr',x.ref||'ERP-'+String(MASTER_RECORDS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1).padStart(4,'0')),
+    pmField('Name / Party *','mrn',x.name||''),
+    '<div class="fi"><label>Status</label><select id="mrs">'+['Draft','Pending','For Approval','Approved','Active','Completed','Rejected','Cancelled'].map(function(v){return '<option '+(x.status===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>',
+    pmField('Amount','mra',x.amount||0,'number'),
+    pmField('Notes','mrnotes',x.notes||'','text',true)
+  ]),'Save ERP Record','masterSaveRecord');window.masterEditId=id||0;
+}
+function masterSaveRecord(){
+  if(!masterCan())return;var d={module:document.getElementById('mrm').value,ref:document.getElementById('mrr').value.trim(),name:document.getElementById('mrn').value.trim(),status:document.getElementById('mrs').value,amount:Number(document.getElementById('mra').value)||0,notes:document.getElementById('mrnotes').value.trim()};if(!d.ref||!d.name){toast('Reference and name are required','error');return;}
+  if(window.masterEditId){var i=MASTER_RECORDS.findIndex(function(x){return x.id===window.masterEditId;});if(i>=0)MASTER_RECORDS[i]=Object.assign({},MASTER_RECORDS[i],d);}else{d.id=MASTER_RECORDS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1;MASTER_RECORDS.push(d);}masterSave();closeModal();window.masterEditId=0;masterRenderAll();toast('ERP record saved','success');
+}
+function masterSetStatus(id,status){var i=MASTER_RECORDS.findIndex(function(x){return x.id===id;});if(i<0)return;MASTER_RECORDS[i].status=status;masterSave();masterRenderAll();toast('Request '+status.toLowerCase(),'success');}
+function masterDeleteRecord(id){if(!masterCan())return;if(!confirm('Delete this ERP record?'))return;MASTER_RECORDS=MASTER_RECORDS.filter(function(x){return x.id!==id;});masterSave();masterRenderAll();}
+
 pmLoad();
 
 // ===== INIT =====
 function initApp(){
   document.getElementById("attDate").value=new Date().toISOString().slice(0,10);
-  popDD();applyF();rStats();rStg();rOS();rWL();rQt();popAttFilter();showReminders();applyRoleAccess();applyPlantAccess();
+  popDD();applyF();rStats();rStg();rOS();rWL();rQt();popAttFilter();showReminders();applyRoleAccess();applyPlantAccess();masterInit();
 }
 document.addEventListener("DOMContentLoaded",function(){
   var first=document.querySelector('.role-tab');if(first)setRole('admin',first);
