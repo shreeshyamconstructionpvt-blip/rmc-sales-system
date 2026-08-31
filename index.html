@@ -1366,6 +1366,12 @@ body{--gold:#c91435}
 
 .ss-fresh-security{font-size:.56rem;color:#667085;margin-left:3px}
 
+
+/* ===== MODULE PDF ACTIONS / DATA-SAFE REPORTING ===== */
+.mm-foot{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.mm-pdf{border:1px solid #fecaca;background:#fff;color:#991b1b;border-radius:8px;padding:6px 9px;font-size:.65rem;font-weight:800;cursor:pointer;transition:.18s}
+.mm-pdf:hover{background:#fff1f2;transform:translateY(-1px);box-shadow:0 4px 12px rgba(153,27,27,.10)}
+@media(max-width:650px){.mm-pdf,.mm-new{font-size:.62rem;padding:6px 8px}}
 </style>
 </head>
 <body>
@@ -3309,7 +3315,7 @@ function masterRenderKpis(){
 }
 function masterRenderModules(){
   var el=document.getElementById('masterModules');if(!el)return;
-  el.innerHTML=MASTER_MODULES.map(function(m){var count=MASTER_RECORDS.filter(function(x){return x.module===m.id;}).length;return "<div class='master-module "+m.id+"' onclick='masterOpenModule("+JSON.stringify(m.id)+")' tabindex='0'><div class='mi'>"+m.icon+"</div><h3>"+m.name+"</h3><p>"+m.desc+"</p><div class='mm-foot'><span>Open workspace &#8594;</span><span class='mm-badge'>"+count+" records</span><button class='mm-new' onclick='event.stopPropagation();masterOpenModule("+JSON.stringify(m.id)+")'>＋ New Entry</button></div></div>";}).join('');
+  el.innerHTML=MASTER_MODULES.map(function(m){var count=MASTER_RECORDS.filter(function(x){return x.module===m.id;}).length;return "<div class='master-module "+m.id+"' onclick='masterOpenModule("+JSON.stringify(m.id)+")' tabindex='0'><div class='mi'>"+m.icon+"</div><h3>"+m.name+"</h3><p>"+m.desc+"</p><div class='mm-foot'><span>Open workspace &#8594;</span><span class='mm-badge'>"+count+" records</span><button class='mm-new' onclick='event.stopPropagation();masterOpenModule("+JSON.stringify(m.id)+")'>＋ New Entry</button><button class='mm-pdf' onclick='event.stopPropagation();exportMasterModulePDF("+JSON.stringify(m.id)+")'>📄 PDF</button></div></div>";}).join('');
 }
 function masterPopulateFilter(){var s=document.getElementById('masterModuleFilter');if(!s)return;var old=s.value;s.innerHTML='<option value="">All Modules</option>'+MASTER_MODULES.map(function(m){return '<option value="'+m.id+'">'+m.name+'</option>';}).join('');s.value=old;}
 function masterRenderRecords(){
@@ -3735,8 +3741,7 @@ function phase3ExportCommercialPDF(){
   saveReportPDF("Commercial & Receivables Report","Commercial_Receivables_Report.pdf",["#","Customer","Date","Grade","Qty","Rate","Total","Status"],rows,true);
 }
 function phase3ExportStockPDF(){
-  var rows=(PM_MAT||[]).map(function(x,i){var b=pmMaterialBalance(x);return[i+1,x.name||"-",x.unit||"-",b.opening,b.received,b.consumed,b.balance,b.reorder];});
-  saveReportPDF("Raw Material Stock Health","Raw_Material_Stock_Health.pdf",["#","Material","Unit","Opening","Received","Consumed","Current","Reorder"],rows,true);
+  exportMasterModulePDF("inventory","Raw_Material_Stock_Health.pdf");
 }
 function phase3ExportPeoplePDF(){
   var rows=[];
@@ -4180,6 +4185,66 @@ function ssLoginSmile(name){
 
 
 /* =========================================================
+   DATA-SAFE MODULE PDF EXPORTS
+   Exports existing records only. Never deletes or rewrites storage.
+   Inventory PDF includes BOTH Master Inventory entries and live Plant stock.
+   ========================================================= */
+function ssModuleFieldSummary(rec){
+  var f=rec&&rec.meta&&rec.meta.fields?rec.meta.fields:{};
+  var out=[];
+  Object.keys(f).forEach(function(k){var v=f[k];if(String(v==null?"":v).trim()!==""){var label=k.replace(/^ssmw_[^_]+_/,'').replace(/^mw_[^_]+_/,'Field ');out.push(label+": "+String(v));}});
+  return out.join(" | ")||String((rec&&rec.notes)||"—");
+}
+function ssModuleRows(id){
+  var rows=[];
+  var records=(MASTER_RECORDS||[]).filter(function(x){return x&&x.module===id;}).slice().reverse();
+  records.forEach(function(x,i){
+    rows.push([i+1,x.ref||"-",x.name||"-",x.status||"Pending",pmMoney(x.amount||0),ssModuleFieldSummary(x)]);
+  });
+  var pushLive=function(ref,name,status,amount,details){rows.push([rows.length+1,ref,name,status,pmMoney(amount||0),details]);};
+  if(id==="inventory" && Array.isArray(PM_MAT)){
+    PM_MAT.forEach(function(x){var b=pmMaterialBalance(x);pushLive("STOCK-"+(x.id||rows.length+1),x.name||"-","Live Stock",0,"Unit: "+(x.unit||"MT")+" | Opening: "+b.opening+" | Received: "+b.received+" | Consumed: "+b.consumed+" | Current: "+b.balance+" | Reorder: "+b.reorder);});
+  }
+  if(id==="production" && Array.isArray(PM_ORDERS)){
+    PM_ORDERS.forEach(function(x){pushLive(x.order||("ORDER-"+(x.id||rows.length+1)),x.customer||"-",x.status||"Pending",0,"Site: "+(x.site||"-")+" | Grade: "+(x.grade||"-")+" | Qty: "+(x.qty||0)+" m³ | Schedule: "+(x.schedule||"-"));});
+  }
+  if(id==="machinery" && Array.isArray(PM_FLEET)){
+    PM_FLEET.forEach(function(x){pushLive(x.vehicle||("FLEET-"+(x.id||rows.length+1)),x.driver||"-",x.status||"Available",0,"Capacity: "+(x.cap||x.capacity||"-")+" | Trips: "+(x.trips||0)+" | Last: "+(x.last||"-"));});
+    (PM_MAINT||[]).forEach(function(x){pushLive("MAINT-"+(x.id||rows.length+1),x.equipment||"-",x.status||"Open",0,"Issue: "+(x.issue||"-")+" | Priority: "+(x.priority||"-")+" | Next: "+(x.next||"-"));});
+  }
+  if(id==="labour" && Array.isArray(PM_STAFF)){
+    PM_STAFF.forEach(function(x){pushLive("STAFF-"+(x.id||rows.length+1),x.name||"-",x.status||"Active",0,"Role: "+(x.role||"-")+" | Department: "+(x.dept||"-")+" | Shift: "+(x.shift||"-")+" | Phone: "+(x.phone||"-"));});
+  }
+  if(id==="finance" && Array.isArray(PM_BILL)){
+    PM_BILL.forEach(function(x){pushLive(x.invoice||x.bill||("BILL-"+(x.id||rows.length+1)),x.customer||x.party||"-",x.status||"Pending",Number(x.amount||x.total||0),"Paid: "+(x.paid||0)+" | Outstanding: "+(x.outstanding||0)+" | Date: "+(x.date||x.dt||"-"));});
+  }
+  if(id==="hr" && Array.isArray(SS_HR_EMPLOYEES)){
+    SS_HR_EMPLOYEES.forEach(function(x){pushLive(x.empId||x.id||("EMP-"+(x.id||rows.length+1)),x.name||"-",x.status||"Active",Number(x.salary||0),"Department: "+(x.dept||"-")+" | Role: "+(x.role||"-")+" | Phone: "+(x.phone||"-")+" | Joining: "+(x.join||"-"));});
+  }
+  return rows;
+}
+
+function exportMasterModulePDF(id,fileName){
+  if(!reportCan()){toast("Admin/Master access required","error");return;}
+  id=String(id||"finance");
+  var m=MASTER_MODULES.find(function(x){return x.id===id;})||{name:id,icon:"📄"};
+  var rows=ssModuleRows(id);
+  if(!rows.length)rows=[[1,"—","No existing entries","—",pmMoney(0),"No records found in this module."]];
+  saveReportPDF(m.name+" — Complete Records",fileName||(""+m.name.replace(/[^a-z0-9]+/gi,"_")+"_Records.pdf"),["#","Reference","Name / Party","Status","Amount","Entry Details"],rows,true);
+}
+function exportAdminPlantPDF(){
+  var body=[];
+  PM_ORDERS.forEach(function(x){body.push(["Order",x.order||"-",x.customer||"-",x.site||"-",x.grade||"-",x.qty||0,x.status||"-"]);});
+  PM_FLEET.forEach(function(x){body.push(["Fleet",x.vehicle||"-",x.driver||"-","Capacity "+(x.capacity||x.cap||"-"),"Trips "+(x.trips||0),x.status||"-",x.last||"-"]);});
+  PM_MAT.forEach(function(x){var b=pmMaterialBalance(x);body.push(["Material",x.name||"-","Opening "+b.opening,"Received "+b.received,"Consumed "+b.consumed,"Balance "+b.balance,"Reorder "+(x.reorder||0)]);});
+  PM_MAINT.forEach(function(x){body.push(["Maintenance",x.equipment||"-",x.issue||"-",x.type||"-",x.priority||"-",x.status||"-",x.remarks||"-"]);});
+  /* Also include Master ERP records that belong to Plant/Inventory modules. */
+  (MASTER_RECORDS||[]).filter(function(x){return x.module==="inventory"||x.module==="production"||x.module==="machinery";}).forEach(function(x){body.push(["ERP "+x.module,x.ref||"-",x.name||"-",x.status||"Pending",pmMoney(x.amount||0),ssModuleFieldSummary(x),x.notes||"-"]);});
+  if(!body.length)body.push(["—","No plant records","—","—","—","No records found","—"]);
+  saveReportPDF("RMC Plant Operations Report","Admin_Plant_Operations_Report.pdf",["Type","Item","Detail 1","Detail 2","Detail 3","Status / Balance","Remarks"],body,true);
+}
+
+/* =========================================================
    MASTER MODULE OPEN FIX — DIRECT, ROBUST WORKSPACES
    ========================================================= */
 function ssMasterModuleFallback(id){
@@ -4198,7 +4263,7 @@ function ssMasterModuleFallback(id){
     approvals:{title:"Approvals & Compliance",icon:"✅",help:"Central approval desk for purchases, quotations, invoices and inspections.",fields:["Request No.","Requested By","Approval Type","Amount","Due Date","Approval Level","Decision","Status","Compliance / Reference","Reviewer","Decision Date","Notes"]}
   };
   var c=data[id]||data.finance;
-  var body='<div class="ss-module-head"><div class="ss-module-icon">'+c.icon+'</div><div><b>'+pmEsc(c.title)+'</b><small>'+pmEsc(c.help)+'</small></div></div><div class="master-workspace-grid">';
+  var body='<div class="ss-module-head"><div class="ss-module-icon">'+c.icon+'</div><div><b>'+pmEsc(c.title)+'</b><small>'+pmEsc(c.help)+'</small></div><button type="button" class="btn ba bsm" onclick="exportMasterModulePDF('+JSON.stringify(id)+')">📄 Download Old Entries PDF</button></div><div class="master-workspace-grid">';
   c.fields.forEach(function(label,i){
     var fid="ssmw_"+id+"_"+i, type="text";
     if(/Amount|Budget|Cost|Quantity|Headcount|Days|Progress %|KPI|Variance|Rate|Wage|Value|Retention/.test(label))type="number";
@@ -4304,6 +4369,7 @@ masterRenderModules=function(){
       if(!match)return;
       var id=match[1];
       card.onclick=function(e){
+        if(e.target.closest && e.target.closest("button,a,input,select"))return;
         e.preventDefault();
         e.stopPropagation();
         window.masterOpenModule(id);
