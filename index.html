@@ -2205,9 +2205,25 @@ function applyRoleAccess(){
 }
 function applyPlantAccess(){
   var app=document.getElementById("app");if(!app)return;
-  if(CU&&CU.accountKind==="plant"){
-    app.classList.add("plant-mode");
+  app.classList.remove("plant-mode");
+  if(CU&&CU.accountKind==="plant") app.classList.add("plant-mode");
+}
+
+// ===== PLANT MANAGER NAVIGATION =====
+function swPlantTab(btn,tid){
+  if(!CU||CU.accountKind!=="plant"){toast("Plant Manager access required","error");return;}
+  var allowed=["pm-dashboard","pm-orders","pm-fleet","pm-staff","pm-quality","pm-materials","pm-billing","pm-maint"];
+  if(allowed.indexOf(tid)<0){toast("Plant section not found","error");return;}
+  document.querySelectorAll(".plant-panel").forEach(function(p){p.classList.remove("act");});
+  document.querySelectorAll(".tb.plant-only").forEach(function(b){b.classList.remove("act");});
+  var panel=document.getElementById(tid);
+  if(panel)panel.classList.add("act");
+  if(btn&&btn.classList)btn.classList.add("act");
+  else{
+    var tab=document.querySelector('.tb[onclick*="'+tid+'"]');
+    if(tab)tab.classList.add("act");
   }
+  if(typeof pmRenderAll==="function")pmRenderAll();
 }
 function doLogout(){
   if(!confirm('Logout?'))return;
@@ -3475,7 +3491,9 @@ if(typeof masterLoad==="function")masterLoad();
 // ===== INIT =====
 function initApp(){
   document.getElementById("attDate").value=new Date().toISOString().slice(0,10);
-  popDD();applyF();rStats();rStg();rOS();rWL();rQt();popAttFilter();showReminders();applyRoleAccess();applyPlantAccess();masterInit();phase1Render();renderAdminReportCentre();
+  popDD();applyF();rStats();rStg();rOS();rWL();rQt();popAttFilter();showReminders();applyRoleAccess();applyPlantAccess();
+  if(CU&&CU.accountKind==="plant"&&typeof pmInit==="function"){pmInit();swPlantTab(null,"pm-dashboard");}
+  masterInit();phase1Render();renderAdminReportCentre();
 }
 document.addEventListener("DOMContentLoaded",function(){
   var first=document.querySelector('.role-tab');if(first)setRole('admin',first);
