@@ -690,6 +690,20 @@ td{padding:9px 10px}
 .master-report-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.master-report-card{padding:15px;border:1px solid #e5e7eb;border-radius:15px;background:linear-gradient(145deg,#fff,#fafafa);box-shadow:0 7px 22px rgba(15,23,42,.06)}.master-report-card strong{display:block;font-size:.84rem}.master-report-card span{display:block;color:#64748b;font-size:.69rem;margin:4px 0 11px;line-height:1.4}.master-report-card .btn{width:100%}
 .master-access-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin:0 0 14px;border-radius:15px;background:linear-gradient(90deg,#111827,#2b0b13);color:#fff;box-shadow:0 10px 28px rgba(15,23,42,.14)}.master-access-strip strong{font-size:.82rem}.master-access-strip small{display:block;opacity:.7;font-size:.66rem;margin-top:2px}
 @media(max-width:700px){.master-hero{padding:22px 18px}.master-title{font-size:1.45rem}.master-grid{grid-template-columns:1fr}.master-access-strip{align-items:flex-start;flex-direction:column}}
+
+/* MASTER ERP v3 — module-specific workspace UI */
+.master-workspace-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.master-workspace-card{border:1px solid #e8eaf0;border-radius:14px;padding:13px;background:linear-gradient(145deg,#fff,#fafbfc);box-shadow:0 6px 18px rgba(15,23,42,.05)}
+.master-workspace-card.full{grid-column:1/-1}
+.master-workspace-card .mw-title{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.7px;color:#991b1b;margin-bottom:8px}
+.master-workspace-card .mw-help{font-size:.68rem;color:#64748b;line-height:1.5;margin-bottom:10px}
+.master-workspace-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#fff1f2;color:#991b1b;border:1px solid #fecdd3;font-size:.67rem;font-weight:900}
+.master-workspace-meta{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 14px}
+.master-module.finance{--mw:#dc2626}.master-module.hr{--mw:#7c3aed}.master-module.purchase{--mw:#2563eb}.master-module.inventory{--mw:#d97706}.master-module.production{--mw:#059669}.master-module.machinery{--mw:#475569}.master-module.labour{--mw:#ea580c}.master-module.contractor{--mw:#0891b2}.master-module.planning{--mw:#4f46e5}.master-module.projects{--mw:#9333ea}.master-module.mis{--mw:#0f766e}.master-module.approvals{--mw:#be123c}
+.master-module{border-top:3px solid var(--mw,#c8102e)}
+.master-module:hover{border-color:var(--mw,#fecaca)}
+@media(max-width:650px){.master-workspace-grid{grid-template-columns:1fr}.master-workspace-card.full{grid-column:auto}}
+
 </style>
 </head>
 <body>
@@ -2316,7 +2330,7 @@ function masterRenderKpis(){
 }
 function masterRenderModules(){
   var el=document.getElementById('masterModules');if(!el)return;
-  el.innerHTML=MASTER_MODULES.map(function(m){var count=MASTER_RECORDS.filter(function(x){return x.module===m.id;}).length;return "<div class='master-module' onclick='masterOpenModule("+JSON.stringify(m.id)+")'><div class='mi'>"+m.icon+"</div><h3>"+m.name+"</h3><p>"+m.desc+"</p><div class='mm-foot'><span>Open workspace &#8594;</span><span class='mm-badge'>"+count+" records</span></div></div>";}).join('');
+  el.innerHTML=MASTER_MODULES.map(function(m){var count=MASTER_RECORDS.filter(function(x){return x.module===m.id;}).length;return "<div class='master-module "+m.id+"' onclick='masterOpenModule("+JSON.stringify(m.id)+")'><div class='mi'>"+m.icon+"</div><h3>"+m.name+"</h3><p>"+m.desc+"</p><div class='mm-foot'><span>Open workspace &#8594;</span><span class='mm-badge'>"+count+" records</span></div></div>";}).join('');
 }
 function masterPopulateFilter(){var s=document.getElementById('masterModuleFilter');if(!s)return;var old=s.value;s.innerHTML='<option value="">All Modules</option>'+MASTER_MODULES.map(function(m){return '<option value="'+m.id+'">'+m.name+'</option>';}).join('');s.value=old;}
 function masterRenderRecords(){
@@ -2336,35 +2350,51 @@ function masterOpenModule(id){
 function masterOpenModuleWorkspace(id){
   if(!masterCan())return;
   var m=MASTER_MODULES.find(function(a){return a.id===id;})||MASTER_MODULES[0];
-  var labels={
-    finance:['Invoice / Voucher No.','Party / Account','Amount','Transaction Date','Status','Notes'],
-    hr:['Employee Name','Employee ID','Department','Payroll Month','Gross Salary','Notes'],
-    purchase:['Purchase Request / PO No.','Vendor','Amount','Expected Delivery','Approval Status','Notes'],
-    inventory:['Material / Item','Store / Plant','Quantity','Unit','Movement Type','Notes'],
-    production:['Production Batch / Plan','Plant','Mix Grade','Quantity m³','Production Date','Notes'],
-    machinery:['Vehicle / Machine','Registration / Asset ID','Service Type','Service Date','Status','Notes'],
-    labour:['Labour / Team','Work Site','Attendance / Days','Wage Amount','Period','Notes'],
-    contractor:['Contractor Name','Work Order','Site / Project','Contract Value','Progress %','Notes'],
-    planning:['Plan / Estimate No.','Project / Site','Budget','Target Date','Variance','Notes'],
-    projects:['Project / Site Name','Project Code','Client','Budget','Target Date','Notes'],
-    mis:['Report Name','Period','Department / Plant','KPI / Value','Report Date','Notes'],
-    approvals:['Request No.','Requested By','Approval Type','Amount','Due Date','Notes']
+  var cfg={
+    finance:{title:'Finance & Accounts',icon:'💰',help:'Manage invoices, receipts, cash flow, receivables and commercial controls.',sections:[['Transaction','Invoice / Voucher No.','Party / Account','Amount','Transaction Date'],['Control','Transaction Type','Payment Mode','Status','Notes']]},
+    hr:{title:'HR & Payroll',icon:'👥',help:'Manage employee master data, attendance, payroll readiness, leave and workforce actions.',sections:[['Employee','Employee Name','Employee ID','Department','Designation'],['Payroll','Payroll Month','Gross Salary','Attendance / Days','Status'],['HR Notes','Leave / Attendance Note','Joining / Exit Date','Manager','Notes']]},
+    purchase:{title:'Purchase Management',icon:'🛒',help:'Create purchase requests, vendor records, quotations, POs and GRN-ready entries.',sections:[['Request','PR / PO No.','Vendor Name','Item / Material','Quantity'],['Commercial','Rate / Amount','Expected Delivery','Approval Status','GRN / Reference'],['Notes','Buyer / Department','Store / Plant','Priority','Notes']]},
+    inventory:{title:'Store & Inventory',icon:'📦',help:'Track material receipts, issues, transfers, opening stock, consumption and reorder levels.',sections:[['Item','Material / Item','Store / Plant','Quantity','Unit'],['Movement','Movement Type','Opening / Reference','Date','Reorder Level'],['Notes','Batch / Vehicle','Supplier','Status','Notes']]},
+    production:{title:'Plant & Production',icon:'🏭',help:'Control batching, production plans, plant status, output and dispatch-linked production.',sections:[['Production','Batch / Plan No.','Plant','Mix Grade','Quantity m³'],['Schedule','Production Date','Shift','Plant Status','Dispatch Reference'],['Notes','Operator','Output / Remarks','Status','Notes']]},
+    machinery:{title:'Machinery & Vehicles',icon:'🔧',help:'Manage fleet, machinery, service schedules, permits, breakdowns and maintenance.',sections:[['Asset','Vehicle / Machine','Registration / Asset ID','Operator / Driver','Location'],['Service','Service Type','Service Date','Next Service','Status'],['Notes','Breakdown / Job Card','Cost','Vendor / Workshop','Notes']]},
+    labour:{title:'Labour Management',icon:'👷',help:'Manage labour deployment, attendance, productivity and wage-ready records.',sections:[['Workforce','Labour / Team','Work Site','Trade / Role','Headcount'],['Attendance','Period / Date','Attendance / Days','Wage Amount','Status'],['Notes','Supervisor','Productivity','Shift','Notes']]},
+    contractor:{title:'Contractor Management',icon:'🤝',help:'Track contractors, work orders, progress, certification and payment status.',sections:[['Contract','Contractor Name','Work Order','Site / Project','Contract Value'],['Progress','Progress %','Start Date','Target Date','Payment Status'],['Notes','Contact','Certification','Retention / Due','Notes']]},
+    planning:{title:'Planning & Estimation',icon:'📋',help:'Build budgets, estimates, resource plans, targets and variance controls.',sections:[['Plan','Plan / Estimate No.','Project / Site','Budget','Target Date'],['Resources','Material Plan','Manpower Plan','Equipment Plan','Variance'],['Notes','Prepared By','Revision','Approval Status','Notes']]},
+    projects:{title:'Project Management',icon:'🏗️',help:'Manage project sites, milestones, tasks, progress, resources and project health.',sections:[['Project','Project / Site Name','Project Code','Client','Budget'],['Schedule','Start Date','Target Date','Progress %','Health'],['Notes','Project Manager','Milestone / Task','Risk','Notes']]},
+    mis:{title:'Management Information System',icon:'📊',help:'Create management reports and consolidate KPIs across sales, plant, stock, people and finance.',sections:[['Report','Report Name','Reporting Period','Department / Plant','KPI / Value'],['Control','Report Date','Prepared By','Status','Variance'],['Notes','Management Comment','Action Owner','Due Date','Notes']]},
+    approvals:{title:'Approvals & Compliance',icon:'✅',help:'Central approval desk for purchase, quotations, invoices, inspections and operational requests.',sections:[['Request','Request No.','Requested By','Approval Type','Amount'],['Decision','Due Date','Approval Level','Decision','Status'],['Notes','Compliance / Reference','Reviewer','Decision Date','Notes']]}
   };
-  var f=labels[id]||['Reference','Name / Party','Amount','Date','Status','Notes'];
-  var fields=[
-    pmField(f[0],"mx1",''),pmField(f[1],"mx2",''),pmField(f[2],"mx3",0,"number"),pmField(f[3],"mx4",''),pmField(f[4],"mx5",''),pmField(f[5],"mx6",'','text',true)
-  ];
-  var html="<div class='master-access-strip'><div><strong>"+m.icon+" "+pmEsc(m.name)+" Workspace</strong><small>Master / Admin full access · module-specific entry form</small></div><span class='master-status ok'>ACTIVE</span></div>"+pmForm(fields);
-  pmModal("&#9733; "+m.name+" — Master Workspace",html,"Save "+m.name,"masterSaveModuleWorkspace");
+  var c=cfg[id]||cfg.finance, counter=0, fields=[];
+  c.sections.forEach(function(sec,si){
+    fields.push('<div class="master-workspace-card '+(sec[0]==='Notes'?'full':'')+'"><div class="mw-title">'+sec[0]+'</div><div class="mw-help">'+(si===0?c.help:'Enter the module-specific '+sec[0].toLowerCase()+' information.')+'</div><div class="master-workspace-grid">');
+    for(var i=1;i<sec.length;i++){
+      counter++;var label=sec[i],fid='mw_'+id+'_'+counter;
+      var full=/Notes|Comment|Plan|Description|Risk|Reference|Material Plan|Manpower Plan|Equipment Plan|Certification|Breakdown/.test(label);
+      if(/Amount|Salary|Budget|Value|Cost|Quantity|Headcount|Days|Progress %|KPI/.test(label)) fields.push(pmField(label,fid,'',"number"));
+      else if(/Date|Month|Period/.test(label)) fields.push(pmField(label,fid,'','date'));
+      else if(/Status|Decision|Approval|Payment Status|Health|Priority/.test(label)) fields.push(pmField(label,fid,'','select'));
+      else fields.push(pmField(label,fid,'','text',full));
+    }
+    fields.push('</div></div>');
+  });
+  var html='<div class="master-workspace-meta"><span class="master-workspace-badge">'+c.icon+' '+pmEsc(c.title)+'</span><span class="master-workspace-badge">MASTER / ADMIN</span><span class="master-workspace-badge">MODULE-SPECIFIC FORM</span></div><div class="master-workspace-grid">'+fields.join('')+'</div>';
+  pmModal(c.icon+' '+c.title+' — Master Workspace',html,'Save '+c.title,'masterSaveModuleWorkspace');
   window.masterWorkspaceModule=id;
+  window.masterWorkspaceConfig=c;
 }
 function masterSaveModuleWorkspace(){
   if(!masterCan())return;
-  var id=window.masterWorkspaceModule||"finance",m=MASTER_MODULES.find(function(a){return a.id===id;})||MASTER_MODULES[0];
-  var val=function(k){var e=document.getElementById(k);return e?e.value.trim():'';};
-  var d={module:id,ref:val('mx1')||'ERP-'+String(MASTER_RECORDS.length+1).padStart(4,'0'),name:val('mx2')||m.name,status:'Pending',amount:Number(val('mx3'))||0,notes:val('mx6'),meta:{field1:val('mx1'),field2:val('mx2'),field3:val('mx3'),field4:val('mx4'),field5:val('mx5')}};
-  MASTER_RECORDS.push(Object.assign({id:MASTER_RECORDS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1},d));
-  masterSave();closeModal();masterRenderAll();window.masterWorkspaceModule='';toast(m.name+' record saved','success');
+  var id=window.masterWorkspaceModule||'finance',m=MASTER_MODULES.find(function(a){return a.id===id;})||MASTER_MODULES[0],cfg=window.masterWorkspaceConfig||{};
+  var vals={};var inputs=document.querySelectorAll('[id^="mw_'+id+'_"]');
+  inputs.forEach(function(e){vals[e.id]=e.value||'';});
+  var arr=Array.from(inputs).map(function(e){return e.value||'';}).filter(function(v){return String(v).trim()!=='';});
+  var ref=arr[0]||('ERP-'+String(MASTER_RECORDS.length+1).padStart(4,'0'));
+  var name=arr[1]||m.name;
+  var amount=0;arr.forEach(function(v){var n=Number(v);if(v!==''&&Number.isFinite(n)&&n>amount)amount=n;});
+  var notes=arr.slice(-2).join(' | ')||'—';
+  var d={module:id,ref:ref,name:name,status:'Pending',amount:amount,notes:notes,meta:{fields:vals,createdBy:CU?CU.uname:'master',createdAt:new Date().toISOString()}};
+  d.id=MASTER_RECORDS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1;
+  MASTER_RECORDS.push(d);masterSave();closeModal();masterRenderAll();window.masterWorkspaceModule='';window.masterWorkspaceConfig=null;toast(m.name+' record saved successfully','success');
 }
 function masterOpenRecord(id,moduleContext){
   if(!masterCan()){toast('Master/Admin access required','error');return;}var x=id?MASTER_RECORDS.find(function(a){return Number(a.id)===Number(id);}):{};x=x||{};var selectedModule=moduleContext||x.module||((document.getElementById('masterModuleFilter')||{}).value)||'finance';
