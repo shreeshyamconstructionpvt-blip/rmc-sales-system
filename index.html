@@ -2261,10 +2261,10 @@ function swTab(btn,tid){
 }
 // ===== STATS =====
 function rStats(){
-  var visits=(CU&&CU.accountKind==='staff')?R.filter(function(r){return r.sp===CU.name;}):CU&&CU.accountKind==='office'?[]:R;
+  var visits=(CU&&CU.accountKind==='staff')?R.filter(function(r){return r.sp===CU.name;}):CU&&CU.accountKind==='office'?[]:R; if(ssFreshMode())visits=[];
   var due=visits.filter(function(r){return r.rd&&dl(r.rd)>=0&&dl(r.rd)<=7;}).length;
   var totAr=visits.reduce(function(s,r){return s+(parseInt(r.ar)||0);},0);
-  var accQ=QT.filter(function(q){return q.sts==="Accepted";}).reduce(function(s,q){return s+(q.total||0);},0);
+  var accQ=ssFreshMode()?0:QT.filter(function(q){return q.sts==="Accepted";}).reduce(function(s,q){return s+(q.total||0);},0);
   if(CU&&CU.accountKind==='office'){
     var myWL=WL.filter(function(w){return w.nm===CU.name;});
     var pending=myWL.filter(function(w){return w.sts!=="Completed";}).length;
@@ -2812,7 +2812,7 @@ function pmLoad(){
       {id:pmIds.f++,vehicle:"RMC-02",driver:"Driver 02",cap:7,trips:0,status:"Available",last:"—"}
     ];
   }
-  if(!PM_MAT.length){
+  if(!PM_MAT.length && !ssFreshMode()){
     PM_MAT=[
       {id:pmIds.m++,name:"Cement",unit:"MT",opening:0,received:0,consumed:0,reorder:10},
       {id:pmIds.m++,name:"20mm Aggregate",unit:"MT",opening:0,received:0,consumed:0,reorder:30},
@@ -3209,7 +3209,7 @@ var MASTER_MODULES=[
 var MASTER_RECORDS=[];
 function masterLoad(){try{var x=JSON.parse(localStorage.getItem("RMC_MASTER_RECORDS")||"[]");if(Array.isArray(x))MASTER_RECORDS=x;}catch(e){MASTER_RECORDS=[];}}
 function masterSave(){try{localStorage.setItem("RMC_MASTER_RECORDS",JSON.stringify(MASTER_RECORDS));}catch(e){}}
-function masterEnsure(){masterLoad();if(!MASTER_RECORDS.length){MASTER_RECORDS=[
+function masterEnsure(){masterLoad();if(!MASTER_RECORDS.length && !ssFreshMode()){MASTER_RECORDS=[
   {id:1,module:"projects",ref:"PRJ-001",name:"RMC Operations — Kharkhoda",status:"Active",amount:0,notes:"Central plant/project workspace"},
   {id:2,module:"planning",ref:"PLAN-001",name:"Monthly Plant Plan",status:"Pending",amount:0,notes:"Production and resource planning"},
   {id:3,module:"approvals",ref:"APR-001",name:"Master Approval Desk",status:"Approved",amount:0,notes:"Centralized approvals"}
@@ -3218,7 +3218,7 @@ function masterCan(){return !!(CU&&(CU.accountKind==="master"||CU.accountKind===
 function masterInit(){if(!masterCan())return;masterEnsure();phase2Load();masterRenderAll();phase2Render();phase3Render();}
 function masterRenderAll(){masterRenderKpis();masterRenderModules();masterRenderRecords();masterRenderApprovals();phase1Render();if(typeof phase2Render==='function')phase2Render();if(typeof phase3Render==='function')phase3Render();}
 function masterRenderKpis(){
-  var sales=R.length,quotes=FQ.length,office=OS.length,plantOrders=PM_ORDERS.length,stock=PM_MAT.reduce(function(s,x){return s+Math.max(0,pmMaterialBalance(x).balance);},0),out=PM_BILL.reduce(function(s,x){return s+(Number(x.outstanding)||0);},0);
+  var sales=ssFreshMode()?0:R.length,quotes=ssFreshMode()?0:FQ.length,office=OS.length,plantOrders=ssFreshMode()?0:PM_ORDERS.length,stock=ssFreshMode()?0:PM_MAT.reduce(function(s,x){return s+Math.max(0,pmMaterialBalance(x).balance);},0),out=ssFreshMode()?0:PM_BILL.reduce(function(s,x){return s+(Number(x.outstanding)||0);},0);
   var k=[['&#128203;','Sales Visits',sales,'Existing sales data'],['&#128176;','Quotations',quotes,'Commercial pipeline'],['&#127970;','Office Staff',office,'People & office'],['&#127981;','Plant Orders',plantOrders,'RMC dispatch'],['&#128230;','Stock Units',stock.toLocaleString('en-IN',{maximumFractionDigits:2}),'Current plant stock'],['&#8377;','Outstanding',pmMoney(out),'Plant receivables']];
   var el=document.getElementById('masterKpis');if(!el)return;el.innerHTML=k.map(function(x){return "<div class='master-kpi'><div class='mk-label'>"+x[0]+" "+x[1]+"</div><div class='mk-num'>"+x[2]+"</div><div class='mk-hint'>"+x[3]+"</div></div>";}).join('');
 }
@@ -3308,6 +3308,43 @@ function masterSaveRecord(){
 }
 function masterSetStatus(id,status){var i=MASTER_RECORDS.findIndex(function(x){return x.id===id;});if(i<0)return;MASTER_RECORDS[i].status=status;masterSave();phase1Log('Approval '+status.toLowerCase(),MASTER_RECORDS[i].ref+' · '+MASTER_RECORDS[i].name,'approval');masterRenderAll();phase1Render();toast('Request '+status.toLowerCase(),'success');}
 function masterDeleteRecord(id){if(!masterCan())return;if(!confirm('Delete this ERP record?'))return;var removed=MASTER_RECORDS.find(function(x){return x.id===id;});MASTER_RECORDS=MASTER_RECORDS.filter(function(x){return x.id!==id;});masterSave();phase1Log('Deleted ERP record',removed?removed.ref:'Record '+id,'erp');masterRenderAll();phase1Render();}
+
+/* ===== FRESH START STATE GUARD =====
+   After a successful Fresh Start, do not re-seed the old hard-coded/demo
+   transaction arrays on the next page load. This is the key fix for KPIs
+   that were coming back after reset. */
+function ssFreshMode(){
+  return localStorage.getItem("SS_RMC_FRESH_START_MANUAL")==="DONE";
+}
+function ssApplyFreshState(){
+  if(!ssFreshMode())return;
+  /* Transactional data becomes genuinely empty. Staff master profiles remain. */
+  R.length=0;
+  QT.length=0;
+  FQ.length=0;
+  WL.length=0;
+  AT.length=0;
+  ERP_WORKFLOWS.length=0;
+  MASTER_RECORDS.length=0;
+  PM_ORDERS.length=0;
+  PM_FLEET.length=0;
+  PM_QC.length=0;
+  PM_BILL.length=0;
+  PM_MAINT.length=0;
+  PM_MAT.length=0;
+  try{localStorage.setItem("RMC_SL",JSON.stringify(R));}catch(e){}
+  try{localStorage.setItem("RMC_FQ",JSON.stringify(FQ));}catch(e){}
+  try{localStorage.setItem("RMC_WL",JSON.stringify(WL));}catch(e){}
+  try{localStorage.setItem("RMC_PM_ORDERS","[]");}catch(e){}
+  try{localStorage.setItem("RMC_PM_FLEET","[]");}catch(e){}
+  try{localStorage.setItem("RMC_PM_QC","[]");}catch(e){}
+  try{localStorage.setItem("RMC_PM_BILL","[]");}catch(e){}
+  try{localStorage.setItem("RMC_PM_MAINT","[]");}catch(e){}
+  try{localStorage.setItem("RMC_PM_MAT","[]");}catch(e){}
+  try{localStorage.setItem("RMC_MASTER_RECORDS","[]");}catch(e){}
+  try{localStorage.setItem("RMC_ERP_WORKFLOWS","[]");}catch(e){}
+}
+ssApplyFreshState();
 
 pmLoad();
 
@@ -3655,6 +3692,13 @@ function downloadMasterDailyPDF(){
       "RMC_HR_EMPLOYEES"          // Old HR employee profiles
     ];
     clearKeys.forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+      /* Clear in-memory hard-coded demo/old data too, otherwise the page can
+         immediately render the old arrays even though localStorage is empty. */
+      R.length=0; QT.length=0; FQ.length=0; WL.length=0; AT.length=0;
+      ERP_WORKFLOWS.length=0; MASTER_RECORDS.length=0;
+      PM_ORDERS.length=0; PM_FLEET.length=0; PM_QC.length=0;
+      PM_BILL.length=0; PM_MAINT.length=0; PM_MAT.length=0;
+
 
     // Reset raw materials to zero while keeping the material names/units.
     // This intentionally preserves the material master but removes old stock.
@@ -3770,6 +3814,12 @@ function runFreshStartReset(manual,authorized){
 
   localStorage.setItem("SS_RMC_FRESH_START_DATE","2026-09-01");
   localStorage.setItem("SS_RMC_FRESH_START_MANUAL","DONE");
+  /* Force zero-state in this running page as well as localStorage. */
+  R.length=0; QT.length=0; FQ.length=0; WL.length=0; AT.length=0;
+  MASTER_RECORDS.length=0; ERP_WORKFLOWS.length=0;
+  PM_ORDERS.length=0; PM_FLEET.length=0; PM_QC.length=0;
+  PM_BILL.length=0; PM_MAINT.length=0; PM_MAT.length=0;
+
 
   alert(
     "Fresh Start completed successfully.\n\n"+
