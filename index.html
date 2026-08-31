@@ -1017,6 +1017,173 @@ input:focus,select:focus,textarea:focus{
   .tc,.pm-mini,.master-panel,.erp-card{box-shadow:none!important;border:1px solid #ccc!important}
 }
 
+
+/* ===== FINAL PREMIUM TYPOGRAPHY & MOTION PASS ===== */
+html{font-size:16px}
+body{font-size:15px;line-height:1.55;letter-spacing:.05px}
+header{min-height:78px!important}
+.hl h1{font-size:1.08rem!important;font-weight:900!important}
+.hl small{font-size:.72rem!important}
+main{font-size:.94rem}
+h1,h2,h3,h4{letter-spacing:-.2px}
+.tch h2{font-size:1.08rem!important}
+.tc p,.tc td,.tc th,.pm-table td,.pm-table th,.master-table td,.master-table th{font-size:.78rem}
+.pm-title{font-size:2.05rem!important}
+.dashboard-welcome h2{font-size:1.72rem!important}
+.dashboard-welcome p{font-size:.86rem!important}
+.master-title{font-size:2.3rem!important}
+.master-kpi .v{font-size:1.65rem!important}
+.master-kpi .l{font-size:.68rem!important}
+.master-module .mn{font-size:.88rem!important}
+.master-module .md{font-size:.7rem!important;line-height:1.5}
+.erp-stat .e-label{font-size:.68rem!important}
+.erp-stat .e-value{font-size:1.6rem!important}
+.erp-stat .e-note{font-size:.68rem!important}
+.erp-card-head strong{font-size:.88rem!important}
+.erp-workflow-table{font-size:.78rem!important}
+.erp-workflow-table th{font-size:.68rem!important}
+.erp-workflow-table td{font-size:.75rem!important}
+.erp-stage .num{font-size:1.55rem!important}
+.erp-stage .name{font-size:.68rem!important}
+.erp-stage .hint{font-size:.61rem!important}
+.btn{font-size:.74rem!important;padding:10px 13px!important}
+.btn.bsm{font-size:.68rem!important;padding:8px 10px!important}
+.tb{font-size:.74rem!important;padding:10px 13px!important}
+input,select,textarea{font-size:.8rem!important}
+.fi label{font-size:.7rem!important}
+.login-box{max-width:470px!important}
+.login-logo h1{font-size:1.5rem!important}
+.login-logo p{font-size:.8rem!important}
+.login-box input{font-size:.88rem!important}
+.login-btn{font-size:.84rem!important}
+.role-tab{font-size:.74rem!important}
+
+/* Animated ambient lights */
+body:after{
+  content:"";position:fixed;inset:auto -10% -18% auto;width:460px;height:460px;border-radius:50%;
+  background:radial-gradient(circle,rgba(181,18,43,.07),transparent 68%);
+  pointer-events:none;z-index:-1;animation:ssAmbient 9s ease-in-out infinite alternate;
+}
+@keyframes ssAmbient{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(-70px,-45px,0) scale(1.12)}}
+
+/* Premium shimmer on hero surfaces */
+.master-hero:after,.pm-hero:after,.dashboard-welcome:after{
+  content:"";position:absolute;top:-35%;left:-25%;width:28%;height:170%;
+  transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.11),transparent);
+  animation:ssShimmer 7s ease-in-out infinite;pointer-events:none;
+}
+@keyframes ssShimmer{0%,55%{left:-35%;opacity:0}65%{opacity:1}100%{left:125%;opacity:0}}
+
+/* Cards gently enter as their containers render */
+.master-module,.master-kpi,.erp-stat,.erp-card,.pm-mini,.tc{
+  animation:ssCardIn .42s both cubic-bezier(.2,.75,.25,1);
+}
+.master-module:nth-child(2){animation-delay:.035s}.master-module:nth-child(3){animation-delay:.07s}
+.master-module:nth-child(4){animation-delay:.105s}.master-module:nth-child(5){animation-delay:.14s}
+.master-module:nth-child(6){animation-delay:.175s}.master-module:nth-child(7){animation-delay:.21s}
+.master-module:nth-child(8){animation-delay:.245s}.master-module:nth-child(9){animation-delay:.28s}
+@keyframes ssCardIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+/* Better stat number presence */
+.erp-stat .e-value,.master-kpi .v{transition:transform .25s,text-shadow .25s}
+.erp-stat:hover .e-value,.master-kpi:hover .v{transform:scale(1.035);text-shadow:0 5px 20px rgba(181,18,43,.13)}
+
+/* Floating action feel */
+.erp-phase-btn.active:after{
+  content:"";display:inline-block;width:6px;height:6px;border-radius:50%;margin-left:7px;
+  background:#fff;vertical-align:middle;box-shadow:0 0 0 4px rgba(255,255,255,.1);animation:ssDot 1.6s infinite;
+}
+@keyframes ssDot{50%{transform:scale(.7);opacity:.5}}
+
+/* Better responsive text */
+@media(max-width:700px){
+  body{font-size:14px}.master-title{font-size:1.75rem!important}.pm-title{font-size:1.6rem!important}
+  .dashboard-welcome h2{font-size:1.4rem!important}
+  .erp-stat .e-value{font-size:1.35rem!important}
+}
+@media(prefers-reduced-motion:reduce){
+  body:after,.master-hero:after,.pm-hero:after,.dashboard-welcome:after{animation:none!important}
+}
+
+
+/* =========================================================
+   SHREE SHYAM RMC ERP — ENTERPRISE VALUE EDITION
+   Executive-grade visual hierarchy, trust signals, motion,
+   command center surfaces and premium product polish.
+   Existing business logic/data preserved.
+   ========================================================= */
+:root{
+  --ss-red:#a80f2a;--ss-red2:#e21d42;--ss-black:#070a0f;
+  --ss-gold:#d7a13a;--ss-text:#111827;--ss-muted:#64748b;
+}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body:has(.master-hero){
+  background:
+    radial-gradient(circle at 8% 0%,rgba(168,15,42,.06),transparent 24%),
+    radial-gradient(circle at 92% 8%,rgba(215,161,58,.05),transparent 20%),
+    #f3f6fa;
+}
+.enterprise-ribbon{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:11px 15px;margin:0 0 13px;border-radius:14px;
+  color:#fff;background:linear-gradient(105deg,#070a0f,#151d2a 58%,#8d1028);
+  border:1px solid rgba(255,255,255,.08);box-shadow:0 12px 32px rgba(15,23,42,.14);
+}
+.enterprise-ribbon .er-left{display:flex;align-items:center;gap:10px}
+.enterprise-ribbon .er-mark{
+  width:31px;height:31px;border-radius:9px;display:grid;place-items:center;
+  background:linear-gradient(145deg,#d7a13a,#fff0ad);color:#171717;font-weight:1000;
+  box-shadow:0 7px 16px rgba(215,161,58,.22)
+}
+.enterprise-ribbon b{font-size:.76rem}.enterprise-ribbon small{display:block;color:#cbd5e1;font-size:.61rem;margin-top:2px}
+.enterprise-ribbon .er-right{display:flex;gap:7px;flex-wrap:wrap}
+.er-pill{padding:6px 9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);border-radius:999px;font-size:.59rem;font-weight:850}
+.er-pill.live:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#35d399;margin-right:5px;box-shadow:0 0 10px #35d399;animation:ssLive 1.6s infinite}
+@keyframes ssLive{50%{transform:scale(.65);opacity:.5}}
+
+.product-trust{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0;
+}
+.product-trust>div{
+  background:#fff;border:1px solid #e7ebf1;border-radius:13px;padding:10px 12px;
+  box-shadow:0 6px 20px rgba(15,23,42,.045);
+}
+.product-trust strong{display:block;font-size:.74rem}.product-trust span{font-size:.59rem;color:#64748b}
+@media(max-width:800px){.product-trust{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.product-trust{grid-template-columns:1fr}}
+
+.command-strip{
+  display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding:8px;
+  background:rgba(255,255,255,.86);border:1px solid #e3e8ef;border-radius:14px;
+  box-shadow:0 7px 22px rgba(15,23,42,.055);margin:12px 0;
+}
+.command-strip .cs-title{font-size:.65rem;font-weight:950;color:#334155;margin-right:auto;padding-left:5px}
+.command-strip button{
+  border:1px solid #e2e8f0;background:#fff;border-radius:9px;padding:8px 10px;
+  font-size:.63rem;font-weight:850;color:#475569;cursor:pointer;transition:.18s;
+}
+.command-strip button:hover{transform:translateY(-1px);color:#991b1b;border-color:#fecdd3;background:#fff7f8}
+
+.executive-callout{
+  position:relative;overflow:hidden;margin:12px 0;padding:17px 18px;border-radius:17px;
+  background:linear-gradient(120deg,#fff,#fff7f8 60%,#fffdf7);
+  border:1px solid #f1d7dc;box-shadow:0 9px 27px rgba(15,23,42,.06);
+}
+.executive-callout:after{
+  content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-75px;top:-85px;
+  border:1px solid rgba(168,15,42,.1);box-shadow:0 0 0 24px rgba(168,15,42,.025),0 0 0 48px rgba(168,15,42,.018);
+  animation:ssCallout 12s linear infinite;
+}
+@keyframes ssCallout{to{transform:rotate(360deg)}}
+.executive-callout b{font-size:.8rem}.executive-callout p{margin:4px 0 0;font-size:.65rem;color:#64748b;max-width:900px;line-height:1.6}
+
+.btn.ba{background:linear-gradient(135deg,#a80f2a,#e21d42)!important;color:#fff!important;border-color:#a80f2a!important}
+.btn.ba:hover{box-shadow:0 12px 28px rgba(168,15,42,.28)!important}
+
+@media(prefers-reduced-motion:reduce){
+  .enterprise-ribbon,.executive-callout,.er-pill.live:before{animation:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -1116,7 +1283,20 @@ input:focus,select:focus,textarea:focus{
 
   <!-- ===== MASTER ERP CONTROL CENTRE ===== -->
   <div class="tp" id="tp-master">
-    <div class="master-hero">
+    
+<div class="enterprise-ribbon">
+  <div class="er-left">
+    <div class="er-mark">SS</div>
+    <div><b>SHREE SHYAM RMC · ENTERPRISE CONTROL PLATFORM</b><small>Integrated RMC operations • commercial control • plant intelligence • management reporting</small></div>
+  </div>
+  <div class="er-right">
+    <span class="er-pill live">SYSTEM ONLINE</span>
+    <span class="er-pill">ROLE BASED</span>
+    <span class="er-pill">AUDIT READY</span>
+    <span class="er-pill">PDF REPORTING</span>
+  </div>
+</div>
+<div class="master-hero">
       <div class="master-kicker">&#9733; Enterprise RMC Master Control</div>
       <div class="master-title">Shree Shyam Integrated ERP Command Centre</div>
       <div class="master-sub">One master workspace for company administration, RMC plant operations, sales, procurement, inventory, finance, people, projects, machinery, quality and management reporting. Existing Visits, Office Work, Quotations and Plant Manager data remain connected.</div>
@@ -1141,10 +1321,27 @@ input:focus,select:focus,textarea:focus{
       </div>
     </div>
 
-    <div id="masterReportsInline"></div>
+    
+<div class="ss-master-pdf-wrap" style="margin:12px 0 15px;display:flex;justify-content:flex-end">
+  <button class="btn ba" onclick="downloadMasterDailyPDF()">📄 Master Daily PDF</button>
+</div>
+<div id="masterReportsInline"></div>
 
     <!-- ===== PHASE 2 + PHASE 3 ===== -->
-    <div class="erp-phase-nav">
+    
+<div class="command-strip">
+  <span class="cs-title">EXECUTIVE QUICK ACTIONS</span>
+  <button onclick="phase3Refresh()">↻ Refresh MIS</button>
+  <button onclick="downloadMasterDailyPDF()">📄 Master Daily PDF</button>
+  <button onclick="phase2Sync()">🔗 Sync Workflows</button>
+  <button onclick="phase3ExportExecutivePDF()">📈 Executive MIS</button>
+</div>
+
+<div class="executive-callout">
+  <b>Built as a premium RMC management product — not just a data-entry dashboard.</b>
+  <p>The system is structured around the capabilities buyers expect in modern RMC ERP: connected order-to-cash, procure-to-stock, production/QC/dispatch, fleet and maintenance, role-based control, executive MIS and downloadable management reporting.</p>
+</div>
+<div class="erp-phase-nav">
       <button class="erp-phase-btn active" onclick="switchERPPhase('p2',this)">🔗 Phase 2 · Connected Workflows</button>
       <button class="erp-phase-btn" onclick="switchERPPhase('p3',this)">🧠 Phase 3 · Intelligence & MIS</button>
     </div>
@@ -3192,6 +3389,57 @@ function phase3ExportFleetPDF(){
 }
 phase2Load();
 
+
+
+// ===== MASTER DAILY PDF — FULL CURRENT-DAY SNAPSHOT =====
+function ssTodayKey(){
+  var d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function ssDateOnly(v){
+  if(!v)return "";
+  var s=String(v);
+  return s.slice(0,10);
+}
+function ssRowsToday(arr,dateFields){
+  arr=Array.isArray(arr)?arr:[];
+  var today=ssTodayKey();
+  return arr.filter(function(x){
+    var vals=(dateFields||["dt","date","createdAt","updatedAt","at","ts"]).map(function(k){return x&&x[k];}).filter(Boolean);
+    return !vals.length || vals.some(function(v){return ssDateOnly(v)===today;});
+  });
+}
+function downloadMasterDailyPDF(){
+  if(typeof reportCan==="function" && !reportCan())return;
+  var d=ssTodayKey(),m=phase3Metrics();
+  var all=[
+    ["System Date",d],
+    ["Users / Accounts",m.users],
+    ["Sales Visits",m.visits],
+    ["Quotations",m.quotes],
+    ["Accepted Quotations",m.accepted],
+    ["Quotation Value",pmMoney(m.quoteValue)],
+    ["Accepted Value",pmMoney(m.acceptedValue)],
+    ["Plant Orders",PM_ORDERS.length],
+    ["Dispatched / Moved Orders",m.dispatched],
+    ["Raw Materials",PM_MAT.length],
+    ["Current Stock",m.stock.toLocaleString("en-IN")],
+    ["Low Stock Items",m.low],
+    ["Fleet",PM_FLEET.length],
+    ["Fleet Trips",m.totalTrips],
+    ["QC Records",m.qc],
+    ["QC Failures",m.qcFail],
+    ["Billing Records",PM_BILL.length],
+    ["Billed",pmMoney(m.billed)],
+    ["Paid",pmMoney(m.paid)],
+    ["Outstanding",pmMoney(m.outstanding)],
+    ["Open Maintenance",m.openMaint],
+    ["Office Work Entries",m.work],
+    ["Sales Staff",m.sales],
+    ["Office Staff",m.office]
+  ];
+  saveReportPDF("Shree Shyam RMC — Master Daily ERP Report","Master_Daily_ERP_Report_"+d+".pdf",["Today's Master Snapshot","Value"],all,false);
+}
 
 </script>
 </body>
