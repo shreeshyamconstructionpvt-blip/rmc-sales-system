@@ -1897,25 +1897,47 @@ loadUsers();
 function userExists(u){return !!USERS[String(u||"").trim().toLowerCase()];}
 
 function userHTML(){
-  var staffOpts=SL.map(function(s){return "<option>"+s.nm+"</option>";}).join("");
+  var staffOpts=SL.map(function(x){return "<option>"+x.nm+"</option>";}).join("");
+  var officeOpts=OS.map(function(x){return "<option>"+x.nm+"</option>";}).join("");
   return "<div class='fg'>"+
     "<div class='fi'><label>Login ID / Username *</label><input id='uun' autocomplete='off' placeholder='e.g. rahul'></div>"+
     "<div class='fi'><label>Password *</label><input id='upw' type='password' autocomplete='new-password' placeholder='Set login password'></div>"+
     "<div class='fi'><label>Full Name *</label><input id='unm' placeholder='Employee full name'></div>"+
-    "<div class='fi'><label>Account Role *</label><select id='url'><option value='staff'>Staff</option><option value='admin'>Admin</option></select></div>"+
-    "<div class='fi'><label>Link to Existing Sales Staff</label><select id='ulink'><option value=''>-- No existing staff --</option>"+staffOpts+"</select></div>"+
+    "<div class='fi'><label>Employee Type *</label><select id='utype' onchange='userTypeChanged()'>"+
+      "<option value='sales'>Sales Person</option><option value='office'>Office Staff</option><option value='admin'>Admin</option>"+
+    "</select></div>"+
+    "<div class='fi' id='ulinkWrap'><label>Link to Existing Sales Person</label><select id='ulink'><option value=''>-- Create New Sales Profile --</option>"+staffOpts+"</select></div>"+
+    "<div class='fi'><label>Job Role</label><input id='urole' placeholder='e.g. Sales Executive / Accountant'></div>"+
+    "<div class='fi'><label>Department</label><input id='udep' placeholder='e.g. Sales / Accounts'></div>"+
     "<div class='fi'><label>Phone</label><input id='uph' placeholder='Mobile number'></div>"+
-    "<div class='fi full'><label>Email</label><input id='uem' type='email' placeholder='Email address'></div>"+
-    "<div class='fi full' style='background:#f8fafc;border:1px solid var(--b);border-radius:9px;padding:10px;font-size:.76rem;color:var(--m)'>Staff accounts can log in and add their own visits. Admin accounts have full access. The Login ID is the username used on the login screen.</div>"+
+    "<div class='fi'><label>Email</label><input id='uem' type='email' placeholder='Email address'></div>"+
+    "<div class='fi'><label>Join Date</label><input id='ujd' type='date' value='"+new Date().toISOString().slice(0,10)+"'></div>"+
+    "<div class='fi'><label>Status</label><select id='ust'><option>Active</option><option>Inactive</option></select></div>"+
+    "<div class='fi full' id='userTypeHelp' style='background:#f8fafc;border:1px solid var(--b);border-radius:9px;padding:10px;font-size:.76rem;color:var(--m)'><strong>Sales Person:</strong> can log in and add/view their own customer visits only.</div>"+
+    "<div class='fi full' style='background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:10px;font-size:.76rem;color:#7c2d12'><strong>Office Staff:</strong> can log in, add their daily task/work and update their own work entries. They cannot edit another employee's work.</div>"+
     "</div>";
+}
+function userTypeChanged(){
+  var type=(document.getElementById('utype')||{}).value||'sales';
+  var linkWrap=document.getElementById('ulinkWrap');
+  var help=document.getElementById('userTypeHelp');
+  if(linkWrap)linkWrap.style.display=type==='sales'?'':'none';
+  if(help){
+    help.innerHTML=type==='office'
+      ? '<strong>Office Staff:</strong> can log in, add daily task/work and update their own work entries only.'
+      : type==='admin'
+      ? '<strong>Admin:</strong> full system access.'
+      : '<strong>Sales Person:</strong> can log in and add/view their own customer visits only.';
+  }
 }
 
 function openUserManagerModal(){
-  if(!canEdit()){toast("Admin only","error");return;}
-  document.getElementById("mt").textContent="Create Login User & Manage Staff Credentials";
+  if(!canEdit()){toast("Admin / Master only","error");return;}
+  document.getElementById("mt").textContent="Create New User — Sales Person / Office Staff";
   document.getElementById("mb2").innerHTML=userHTML()+"<div id='userListBox' style='margin-top:16px'></div>";
   document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Close</button><button class='btn bs' onclick='saveUser()'>&#128190; Create User</button>";
   renderUserList();
+  userTypeChanged();
   openModal();
 }
 
@@ -1924,469 +1946,57 @@ function saveUser(){
   var u=(document.getElementById("uun").value||"").trim().toLowerCase();
   var pw=(document.getElementById("upw").value||"").trim();
   var nm=(document.getElementById("unm").value||"").trim();
-  var role=document.getElementById("url").value;
-  var link=(document.getElementById("ulink").value||"").trim();
-  var ph=(document.getElementById("uph").value||"").trim();
-  var em=(document.getElementById("uem").value||"").trim();
+  var type=(document.getElementById("utype").value||"sales").trim();
+  var link=(document.getElementById("ulink")||{}).value||"";
+  var role=(document.getElementById("urole")||{}).value.trim();
+  var dep=(document.getElementById("udep")||{}).value.trim();
+  var ph=(document.getElementById("uph")||{}).value.trim();
+  var em=(document.getElementById("uem")||{}).value.trim();
+  var jd=(document.getElementById("ujd")||{}).value||new Date().toISOString().slice(0,10);
+  var st=(document.getElementById("ust")||{}).value||"Active";
 
   if(!/^[a-z0-9._-]{3,30}$/.test(u)){toast("Login ID must be 3-30 characters: letters, numbers, dot, _ or -","error");return;}
   if(pw.length<4){toast("Password must be at least 4 characters","error");return;}
   if(!nm){toast("Full name required","error");return;}
   if(userExists(u)){toast("Login ID already exists","error");return;}
 
-  USERS[u]={pass:pw,role:role,name:nm};
-  saveUsers();
+  if(type==='admin'){
+    USERS[u]={pass:pw,role:"admin",name:nm,type:"admin",phone:ph,email:em};
+    saveUsers();
+    toast("Admin user created: "+u,"success");
+    renderUserList();rStats();return;
+  }
 
-  // Staff users need a salesperson profile so their visits can be assigned correctly.
-  if(role==="staff" && !SL.some(function(s){return s.nm===nm;})){
-    SL.push({id:nSid++,nm:nm,rl:"Sales Executive",dp:"Sales",ph:ph,em:em,
-      jd:new Date().toISOString().slice(0,10),st:"Active",cl:"#1a56db"});
+  if(type==='sales'){
+    var salesProfile=link ? SL.filter(function(x){return x.nm===link;})[0] : null;
+    if(salesProfile){
+      salesProfile.ph=ph||salesProfile.ph;salesProfile.em=em||salesProfile.em;
+      salesProfile.rl=role||salesProfile.rl||"Sales Executive";
+      salesProfile.dp=dep||salesProfile.dp||"Sales";
+      salesProfile.st=st;salesProfile.loginId=u;
+    }else{
+      salesProfile={id:nSid++,nm:nm,rl:role||"Sales Executive",dp:dep||"Sales",ph:ph,em:em,jd:jd,st:st,cl:"#1a56db",loginId:u};
+      SL.push(salesProfile);
+    }
+    USERS[u]={pass:pw,role:"staff",type:"sales",name:nm,phone:ph,email:em};
     try{localStorage.setItem("RMC_SL",JSON.stringify(SL));}catch(e){}
+  }else if(type==='office'){
+    var officeProfile=OS.filter(function(x){return x.nm===nm;})[0];
+    if(officeProfile){
+      officeProfile.rl=role||officeProfile.rl||"Office Staff";
+      officeProfile.dp=dep||officeProfile.dp||"Office";
+      officeProfile.ph=ph||officeProfile.ph;officeProfile.em=em||officeProfile.em;
+      officeProfile.st=st;officeProfile.loginId=u;
+    }else{
+      officeProfile={id:nOid++,nm:nm,rl:role||"Office Staff",dp:dep||"Office",ph:ph,em:em,jd:jd,st:st,cl:"#64748b",loginId:u};
+      OS.push(officeProfile);
+    }
+    USERS[u]={pass:pw,role:"office",type:"office",name:nm,phone:ph,email:em};
+    try{localStorage.setItem("RMC_OS",JSON.stringify(OS));}catch(e){}
   }
-
-  toast("User created: "+u,"success");
-  renderUserList();rStg();popDD();rStats();
-  ["uun","upw","unm","uph","uem"].forEach(function(id){document.getElementById(id).value="";});
-  document.getElementById("ulink").value=link;
-}
-
-function renderUserList(){
-  var el=document.getElementById("userListBox");if(!el)return;
-  var keys=Object.keys(USERS).sort();
-  el.innerHTML="<div style='margin-top:18px;padding:14px 15px;border-radius:14px;background:linear-gradient(135deg,#fff7f7,#fff,#f8fafc);border:1px solid #e5e7eb;box-shadow:0 8px 24px rgba(15,23,42,.06)'>"+
-    "<div style='display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px'><div><div style='font-weight:850;font-size:.98rem;color:#111827'>&#128273; Staff Login Credentials</div><div style='font-size:.7rem;color:#64748b;margin-top:3px'>Admin can see, verify and update each staff member's Login ID and password here.</div></div><span style='font-size:.66rem;font-weight:800;padding:5px 8px;border-radius:999px;background:#fee2e2;color:#991b1b'>ADMIN ONLY</span></div>"+
-    "<div style='display:flex;flex-direction:column;gap:8px'>"+
-    keys.map(function(k){
-      var x=USERS[k],canDel=k!=="admin"&&k!=="master"&&(!CU||k!==CU.uname),kind=accountKind(x);
-      var profile=kind==="office"?OS.filter(function(s){return s.nm===x.name;})[0]:SL.filter(function(s){return s.nm===x.name;})[0];
-      var pid=(profile&&profile.id)||"";
-      return "<div style='display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(130px,1fr) minmax(150px,1fr) auto;align-items:center;gap:10px;padding:11px 12px;background:#fff;border:1px solid #e2e8f0;border-radius:12px'>"+
-        "<div><div style='font-size:.66rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em'>Employee</div><strong style='font-size:.82rem'>"+(x.name||"-")+"</strong><div style='font-size:.67rem;color:#64748b;margin-top:2px'>"+(kind==="master"?"Master Control":kind==="office"?"Office Staff":kind==="plant"?"Plant Manager":"Sales Staff")+" &middot; "+(x.role||"staff").toUpperCase()+"</div></div>"+
-        "<div><div style='font-size:.66rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em'>Login ID</div><div style='font-family:ui-monospace,monospace;font-weight:800;color:#111827;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:6px 8px;margin-top:3px'>"+k+"</div></div>"+
-        "<div><div style='font-size:.66rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.05em'>Password</div><div style='display:flex;gap:5px;margin-top:3px'><input id='pwview_"+k.replace(/[^a-z0-9_-]/gi,'_')+"' type='password' readonly value='"+(x.pass||"").replace(/&/g,'&amp;').replace(/"/g,'&quot;')+"' style='min-width:0;flex:1;font-family:ui-monospace,monospace;font-weight:800;padding:6px 8px;border:1px solid #e5e7eb;border-radius:8px;background:#f8fafc'><button class='ib' title='Show / hide password' onclick='toggleUserPass("+JSON.stringify(k)+")'>&#128065;</button></div></div>"+
-        "<div style='display:flex;gap:5px;justify-content:flex-end'><button class='ib' title='View full profile & credentials' onclick='openUserProfile("+JSON.stringify(k)+")'>&#128065;</button>"+
-        (pid?"<button class='ib' title='Edit staff profile + login' onclick='editLoginUser("+JSON.stringify(k)+")'>&#9999;</button>":"<button class='ib' title='Edit login account' onclick='editLoginUser("+JSON.stringify(k)+")'>&#9999;</button>")+
-        (canDel?"<button class='ib' title='Delete user' onclick='deleteUser("+JSON.stringify(k)+")'>&#128465;</button>":"")+
-        "</div></div>";
-    }).join("")+"</div></div>";
-}
-function toggleUserPass(u){
-  var id="pwview_"+String(u).replace(/[^a-z0-9_-]/gi,'_'),el=document.getElementById(id);
-  if(el)el.type=el.type==="password"?"text":"password";
-}
-
-function deleteUser(u){
-  if(!canEdit()||u==="admin"||u==="master"||(CU&&u===CU.uname)){toast("This account cannot be deleted","error");return;}
-  if(!confirm("Delete login account '"+u+"'?"))return;
-  delete USERS[u];
   saveUsers();
-  renderUserList();
-  toast("User deleted","success");
-}
-function openUserProfile(u){
-  if(!canEdit())return;
-  var a=USERS[u];if(!a)return;
-  var kind=accountKind(a);
-  var profile=kind==="office"?OS.filter(function(s){return s.nm===a.name;})[0]:SL.filter(function(s){return s.nm===a.name;})[0];
-  document.getElementById("mt").textContent="Staff Profile & Login Credentials";
-  document.getElementById("mb2").innerHTML=
-    "<div class='profile-hero'><div class='profile-avatar' style='background:"+(profile&&profile.cl||"#b91c2f")+"'>"+a.name.charAt(0)+"</div><div><div class='profile-name'>"+a.name+"</div><div class='profile-role'>"+(profile&&profile.rl||kind.toUpperCase())+" · "+(profile&&profile.dp||"")+"</div></div></div>"+
-    "<div class='profile-grid'>"+
-      "<div><span>Account Type</span><strong>"+(kind==="office"?"Office Staff":"Sales Staff")+"</strong></div>"+
-      "<div><span>Login ID</span><strong>"+u+"</strong></div>"+
-      "<div><span>Password</span><strong style='font-family:ui-monospace,monospace'>"+(a.pass||"-")+"</strong></div>"+
-      "<div><span>Phone</span><strong>"+(profile&&profile.ph||"-")+"</strong></div>"+
-      "<div><span>Email</span><strong>"+(profile&&profile.em||"-")+"</strong></div>"+
-      "<div><span>Status</span><strong>"+(profile&&profile.st||"Active")+"</strong></div>"+
-    "</div>";
-  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Close</button><button class='btn bs' onclick='editLoginUser(\""+u+"\")'>&#9999; Update Profile & Login</button>";
-  openModal();
-}
-function editLoginUser(u){
-  if(!canEdit())return;
-  var a=USERS[u];if(!a)return;
-  var kind=accountKind(a);
-  var profile=kind==="office"?OS.filter(function(s){return s.nm===a.name;})[0]:SL.filter(function(s){return s.nm===a.name;})[0];
-  if(kind==="office" && profile){edOS(profile.id);return;}
-  if(kind==="staff" && profile){edStaff(profile.id);return;}
-  document.getElementById("mt").textContent="Edit Login Account";
-  document.getElementById("mb2").innerHTML="<div class='fg'><div class='fi'><label>Login ID *</label><input id='euun' value='"+u+"'></div><div class='fi'><label>Password *</label><input id='eupw' type='text' value='"+(a.pass||"")+"'></div><div class='fi full'><label>Full Name *</label><input id='eunm' value='"+(a.name||"")+"'></div></div>";
-  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveLoginUser(\""+u+"\")'>Update</button>";
-  openModal();
-}
-function saveLoginUser(oldU){
-  if(!canEdit())return;
-  var u=document.getElementById("euun").value.trim().toLowerCase(),pw=document.getElementById("eupw").value.trim(),nm=document.getElementById("eunm").value.trim();
-  if(!/^[a-z0-9._-]{3,30}$/.test(u)||pw.length<4||!nm){toast("Enter a valid Login ID, password and name","error");return;}
-  if(u!==oldU&&userExists(u)){toast("Login ID already exists","error");return;}
-  var a=USERS[oldU];delete USERS[oldU];USERS[u]={pass:pw,role:a.role,type:a.type,name:nm};saveUsers();closeModal();renderUserList();toast("Login account updated","success");
-}
-
-
-function setRole(r,btn){
-  selectedLoginRole=r;
-  document.querySelectorAll('.role-tab').forEach(function(b){b.classList.remove('act');});
-  btn.classList.add('act');
-  document.getElementById('lHint').innerHTML = r==='admin'
-    ? '<strong>Admin:</strong> use your Admin Login ID and password'
-    : '<strong>Staff:</strong> use your Sales / Office Staff / Plant Manager Login ID and password';
-}
-function togglePassword(){
-  var inp=document.getElementById("lPass");
-  var btn=document.getElementById("togglePwd");
-  if(inp.type==="password"){inp.type="text";btn.innerHTML="&#128064;";}
-  else{inp.type="password";btn.innerHTML="&#128065;";}
-}
-function showLoginAccessModal(title,msg){
-  document.getElementById("lamTitle").textContent=title;
-  document.getElementById("lamText").textContent=msg;
-  document.getElementById("loginAccessModal").classList.add("open");
-}
-function closeLoginAccessModal(){
-  document.getElementById("loginAccessModal").classList.remove("open");
-  var btn=selectedLoginRole==="admin"
-    ? document.querySelector(".role-tab[onclick*=\"setRole('admin'\"]")
-    : document.querySelector(".role-tab[onclick*=\"setRole('staff'\"]");
-  if(btn)setRole(selectedLoginRole,btn);
-  document.getElementById("lPass").value="";
-  document.getElementById("lUser").focus();
-}
-function accountKind(account){
-  if(!account)return "staff";
-  if(account.role==="master")return "master";
-  if(account.role==="admin")return "admin";
-  if(account.role==="office" || account.type==="office")return "office";
-  if(account.role==="plant" || account.type==="plant")return "plant";
-  return "staff";
-}
-
-function applyPlantAccess(){
-  var app=document.getElementById("app");
-  if(!app)return;
-  var isPlant=CU&&(CU.accountKind==="plant"||CU.accountKind==="master");
-  app.classList.toggle("plant-mode",!!isPlant);
-  document.querySelectorAll(".plant-panel").forEach(function(p){p.classList.remove("act");});
-  if(isPlant){
-    if(CU.accountKind!=="master"){
-      var first=document.getElementById("pm-dashboard");if(first)first.classList.add("act");
-      document.querySelectorAll(".tabs .tb").forEach(function(b){b.classList.remove("act");});
-      var pt=document.querySelector(".tabs .tb.plant-only");if(pt)pt.classList.add("act");
-    }
-    pmInit();
-  }
-}
-function swMasterTab(btn,id){
-  if(!CU||CU.accountKind!=="master")return;
-  document.querySelectorAll(".plant-panel").forEach(function(p){p.classList.remove("act");});
-  swTab(btn,id);
-  masterRenderAll();
-}
-
-function swPlantTab(btn,id){
-  if(!CU||(CU.accountKind!=="plant"&&CU.accountKind!=="master")){return;}
-  document.querySelectorAll(".plant-panel").forEach(function(p){p.classList.remove("act");});
-  var el=document.getElementById(id);if(el)el.classList.add("act");
-  document.querySelectorAll(".tabs .tb").forEach(function(b){b.classList.remove("act");});
-  if(btn)btn.classList.add("act");
-  else{
-    var b=[].slice.call(document.querySelectorAll(".tabs .tb.plant-only")).find(function(x){return (x.getAttribute("onclick")||"").indexOf("'"+id+"'")>=0;});
-    if(b)b.classList.add("act");
-  }
-  pmRenderAll();
-}
-
-function doLogin(){
-  var u=document.getElementById('lUser').value.trim().toLowerCase();
-  var p=document.getElementById('lPass').value;
-  var err=document.getElementById('lErr');
-  if(!u||!p){err.style.display='block';err.textContent='Please enter username and password';return;}
-  var account=USERS[u];
-  if(account && account.pass===p){
-    var kind=accountKind(account);
-    if(selectedLoginRole==="admin" && kind!=="admin" && kind!=="master"){
-      showLoginAccessModal(
-        "Staff Account Detected",
-        kind==="office"
-          ? "You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials."
-          : kind==="plant"
-            ? "You are a Plant Manager user. Kindly select the Staff Login section and sign in with your Plant Manager credentials."
-            : "You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials."
-      );
-      return;
-    }
-    if(selectedLoginRole==="staff" && kind==="admin"){
-      showLoginAccessModal(
-        "Admin Account Detected",
-        "You are an Admin user. Kindly select the Admin Login section and sign in with your Admin credentials."
-      );
-      return;
-    }
-    CU=Object.assign({},account);CU.uname=u;CU.accountKind=kind;
-    err.style.display='none';
-    document.getElementById('loginPage').style.display='none';
-    document.getElementById('app').style.display='block';
-    document.getElementById('app').classList.remove('admin-mode','staff-mode','office-mode');
-    document.getElementById('app').classList.add(kind==='master'?'master-mode':kind==='admin'?'admin-mode':kind==='office'?'office-mode':'staff-mode');
-    document.getElementById('userBadge').innerHTML='&#128100; '+CU.name+' <span class="'+(kind==='admin'?'badge bb':kind==='office'?'staff-badge office-badge':kind==='plant'?'staff-badge plant-badge':'staff-badge')+'">'+(kind==='admin'?'ADMIN':kind==='office'?'OFFICE':kind==='plant'?'PLANT MANAGER':'STAFF')+'</span>';
-    var dw=document.getElementById('dwUser');if(dw)dw.textContent=CU.name;
-    document.getElementById('hSub').textContent=kind==='master'?'Master Control — Enterprise Full Access':kind==='admin'?'Admin Mode — Full Access':kind==='office'?'Office Staff Mode — My Work Only':kind==='plant'?'Plant Manager Mode — Operations Control':'Sales Staff Mode — My Visits Only';
-    applyRoleAccess();
-    applyPlantAccess();
-    initApp();
-    toast('Welcome, '+CU.name+'!','success'); setTimeout(function(){if(typeof ssLoginSmile==='function')ssLoginSmile(CU.name);},280);
-  }else{
-    err.style.display='block';err.textContent='Incorrect username or password';
-    document.getElementById('lPass').value='';
-  }
-}
-function applyRoleAccess(){
-  var app=document.getElementById("app");
-  if(!CU||!app)return;
-  document.querySelectorAll(".tp").forEach(function(p){p.classList.remove("act");});
-  document.querySelectorAll(".tb").forEach(function(b){b.classList.remove("act");});
-  var target=CU.accountKind==="master"?"tp-master":CU.accountKind==="admin"?"tp-1":CU.accountKind==="office"?"tp-4":"tp-1";
-  var panel=document.getElementById(target);
-  var tab=document.querySelector('.tb[onclick*="' + target + '"]');
-  if(panel)panel.classList.add("act");
-  if(tab)tab.classList.add("act");
-}
-
-function doLogout(){
-  if(!confirm('Logout?'))return;
-  CU=null;
-  document.getElementById('app').classList.remove('admin-mode');
-  document.getElementById('app').style.display='none';
-  document.getElementById('app').classList.remove('admin-mode','office-mode','master-mode','plant-mode','staff-mode');
-  document.getElementById('loginPage').style.display='flex';
-  document.getElementById('lUser').value='';document.getElementById('lPass').value='';
-  document.getElementById('lErr').style.display='none';
-}
-function canEdit(){return CU && (CU.accountKind==='admin' || CU.accountKind==='master');}
-function canAddVisit(){return CU && (CU.accountKind==='admin' || CU.accountKind==='staff');}
-function canOfficeWork(){return CU && (CU.accountKind==='admin' || CU.accountKind==='office');}
-function isMySalesName(n){return !!(CU && CU.accountKind==='staff' && String(n||'')===String(CU.name||''));}
-function isMyOfficeName(n){return !!(CU && CU.accountKind==='office' && String(n||'')===String(CU.name||''));}
-
-// ===== DATA =====
-var AT=[],nAid=1,attState={};
-var QT=[
-  {id:1,dt:"2026-08-22",cu:"RINKU AGGARWAR",cn:"9999747552",co:"PARDEEP",si:"MALHA MAJRA",gr:"M25",qty:200,rate:4800,total:960000,sts:"Sent",vt:"2026-09-10",nt:"Standard RMC quote"},
-  {id:2,dt:"2026-08-23",cu:"RAMBIR RATHI",cn:"9811960900",co:"YOGESH",si:"PLOT NO. 344 IMT",gr:"M10/M30",qty:500,rate:4500,total:2250000,sts:"Follow-up",vt:"2026-09-30",nt:"PCC and RCC both required"},
-  {id:3,dt:"2026-08-24",cu:"KEC/Maruti",cn:"7499922442",co:"Mr. Ravi",si:"IMT Kharkhoda",gr:"Multiple",qty:1000,rate:5200,total:5200000,sts:"Draft",vt:"2026-10-15",nt:"Multiple grades required"}
-];
-var nQid=4,FQ=[],sqf="dt",sqd=-1;
-var SL=[
-  {id:1,nm:"Parvinder Kumar",rl:"Sales Executive",dp:"Sales",ph:"9999000001",em:"parvinder@rmc.com",jd:"2025-01-01",st:"Active",cl:"#1a56db"},
-  {id:2,nm:"Pawan Kumar",    rl:"Sales Executive",dp:"Sales",ph:"9999000002",em:"pawan@rmc.com",    jd:"2025-01-01",st:"Active",cl:"#057a55"}
-];
-var nSid=3;
-try{
-  var savedSL=localStorage.getItem("RMC_SL");
-  if(savedSL){
-    var parsedSL=JSON.parse(savedSL);
-    if(Array.isArray(parsedSL)&&parsedSL.length){
-      SL=parsedSL;
-      nSid=Math.max.apply(null,SL.map(function(s){return Number(s.id)||0;}))+1;
-    }
-  }
-}catch(e){}
-var OS=[
-  {id:1,nm:"Rajesh Sharma",rl:"Office Manager",dp:"Admin",ph:"9998000001",st:"Active",cl:"#7c3aed"},
-  {id:2,nm:"Sunita Devi",  rl:"Accountant",   dp:"Finance",ph:"9998000002",st:"Active",cl:"#e02424"},
-  {id:3,nm:"Amit Verma",   rl:"Data Entry",   dp:"Admin",  ph:"9998000003",st:"Active",cl:"#f59e0b"}
-];
-var nOid=4;
-var WL=[
-  {id:1,nm:"Rajesh Sharma",dt:"2026-08-22",tk:"Monthly MIS Report",sts:"Completed",pr:"High",nt:"Sent to MD"},
-  {id:2,nm:"Sunita Devi",  dt:"2026-08-23",tk:"Invoice Processing",sts:"In Progress",pr:"Medium",nt:"30 invoices"},
-  {id:3,nm:"Amit Verma",   dt:"2026-08-24",tk:"Data Entry - Visits",sts:"Pending",pr:"Low",nt:""}
-];
-var nWid=4;
-// ALL 26 VISIT RECORDS FROM GOOGLE SHEET
-var R=[
-  {id:1, sp:"Parvinder Kumar",vd:"2026-08-22",cu:"NIKHIL & PARDEEP",   cc:"NA",         co:"PARDEEP",      cc2:"9555445836",si:"RELEMAC TECHNOLOGIES PVT LTD",sa:"MALHA MAJRA",  ar:"",     gr:"",       rd:"",           rm:"MADAN MUNSI 8938045177"},
-  {id:2, sp:"Parvinder Kumar",vd:"2026-08-22",cu:"RINKU AGGARWAR",    cc:"9999747552", co:"PARDEEP",      cc2:"9555445836",si:"MALHA MAJRA",                 sa:"MALHA MAJRA",  ar:"1000", gr:"M25",    rd:"2026-09-06", rm:"MADAN MUNSI 8938045177"},
-  {id:3, sp:"Parvinder Kumar",vd:"2026-08-22",cu:"ARYAN DAHIYA",      cc:"9868349897", co:"ARYAN DAHIYA", cc2:"9868349897",si:"MALHA MAJRA",                 sa:"MALHA MAJRA",  ar:"2000", gr:"M25",    rd:"2026-08-29", rm:"ONLY FLOORING"},
-  {id:4, sp:"Parvinder Kumar",vd:"2026-08-22",cu:"ANIL GUPTA",        cc:"",           co:"RAJAN",        cc2:"7879858395",si:"MALHA MAJRA",                 sa:"MALHA MAJRA",  ar:"1700", gr:"M25",    rd:"2026-08-29", rm:"RINKU 9992800401"},
-  {id:5, sp:"Parvinder Kumar",vd:"2026-08-22",cu:"ANIL GUPTA",        cc:"",           co:"RAJAN",        cc2:"7879858395",si:"MALHA MAJRA",                 sa:"MALHA MAJRA",  ar:"11000",gr:"M25",    rd:"",           rm:"FLORING & LANTER"},
-  {id:6, sp:"Parvinder Kumar",vd:"2026-08-22",cu:"RAJ KUMAR",         cc:"9818169834", co:"KAPIL",        cc2:"9973066337",si:"MALHA MAJRA",                 sa:"MALHA MAJRA",  ar:"10000",gr:"M25",    rd:"2026-09-11", rm:"NEAR RADHA SWAMI SATSANG NAHRI ROAD"},
-  {id:7, sp:"Pawan Kumar",    vd:"2026-08-21",cu:"NA",                cc:"NA",         co:"Chandan",      cc2:"7979802368",si:"Plot no. 27-28",               sa:"Sec-7 Rajdhani",ar:"",    gr:"",       rd:"",           rm:""},
-  {id:8, sp:"Pawan Kumar",    vd:"2026-08-21",cu:"NA",                cc:"NA",         co:"SONU",         cc2:"9991417151",si:"SHOWROOM",                     sa:"LABOU CHOWK KHARKHODA",ar:"1000",gr:"",rd:"",rm:""},
-  {id:9, sp:"Pawan Kumar",    vd:"2026-08-21",cu:"NA",                cc:"NA",         co:"ANKUR",        cc2:"8640000709",si:"SANT KABIR FARM HOUSE",         sa:"DELHI ROAD KHARKHODA",ar:"",gr:"",rd:"",rm:"OLD RMC DEALER DHOLPUR RMC PLANT"},
-  {id:10,sp:"Pawan Kumar",    vd:"2026-08-22",cu:"NA",                cc:"NA",         co:"NITIN GUPTA",  cc2:"9871066092",si:"PLOT NO. 2500",                 sa:"IMT KHARKHODA",ar:"800", gr:"",       rd:"",           rm:"WHEN REQURED CALL"},
-  {id:11,sp:"Pawan Kumar",    vd:"2026-08-22",cu:"NA",                cc:"NA",         co:"J K DUBEY",    cc2:"9971769836",si:"PLOT NO. 2503",                 sa:"IMT KHARKHODA",ar:"800", gr:"M25",    rd:"2026-08-28", rm:"LABOUR THEKEDAR TILAK RAJ 7289940157"},
-  {id:12,sp:"Pawan Kumar",    vd:"2026-08-22",cu:"NA",                cc:"NA",         co:"BIMAL PARSHAD",cc2:"7633894798",si:"POWAR HOUSE",                   sa:"IMT KHARKHODA",ar:"",    gr:"M40",    rd:"2026-09-02", rm:"SUPERVISOR DHANJAY 9570255627 QUOTATION GIVEN WITH GST 6077"},
-  {id:13,sp:"Pawan Kumar",    vd:"2026-08-23",cu:"RAMBIR RATHI",      cc:"9811960900", co:"YOGESH",       cc2:"8930348669",si:"PLOT NO. 344",                  sa:"IMT KHARKHODA",ar:"25000",gr:"M10/M30",rd:"2026-09-23",rm:"PCC AND RCC BOTH REQUIRED LAST RCC SUPPLIER LADRAWAN PLANT"},
-  {id:14,sp:"Pawan Kumar",    vd:"2026-08-23",cu:"NA",                cc:"NA",         co:"RAHISH ALI",   cc2:"9990373858",si:"PLOT NO. 761",                  sa:"IMT KHARKHODA",ar:"25000",gr:"M30",   rd:"",           rm:"2 FLOOR COMPLETED LABOUR CONT SHEKHAR 8739937374"},
-  {id:15,sp:"Pawan Kumar",    vd:"2026-08-23",cu:"SHAILASH",          cc:"",           co:"PREM PANDAY",  cc2:"9210137131",si:"PLOT NO. 320",                  sa:"IMT KHARKHODA",ar:"2000", gr:"",       rd:"",           rm:"2 FLOOR COMPLETED LABOUR CONT VAIDNATH 9910764412"},
-  {id:16,sp:"Pawan Kumar",    vd:"2026-08-21",cu:"NA",                cc:"NA",         co:"ANKUR",        cc2:"8640000709",si:"SANT KABIR FARM HOUSE",         sa:"DELHI ROAD KHARKHODA",ar:"",gr:"M25",rd:"",rm:"REQUIRED RMC 03 SEP 26"},
-  {id:17,sp:"Pawan Kumar",    vd:"2026-08-22",cu:"NA",                cc:"NA",         co:"NITIN GUPTA",  cc2:"9871066092",si:"PLOT NO. 2500",                 sa:"IMT KHARKHODA",ar:"800", gr:"M50",    rd:"2026-09-23", rm:"RMC REQUIRED 23-SEP-26 1ST LANTER 7 AND 3 LANTER 6"},
-  {id:18,sp:"Pawan Kumar",    vd:"2026-08-22",cu:"NA",                cc:"NA",         co:"J K DUBEY",    cc2:"9971769836",si:"PLOT NO. 2503",                 sa:"IMT KHARKHODA",ar:"800", gr:"M25",    rd:"2026-08-28", rm:"LABOUR THEKEDAR TILAK RAJ 7289940157 LATAK 12 RCC REQUIRED 03-SEP-26"},
-  {id:19,sp:"Pawan Kumar",    vd:"2026-08-22",cu:"NA",                cc:"NA",         co:"BIMAL PARSHAD",cc2:"7633894798",si:"POWAR HOUSE",                   sa:"IMT KHARKHODA",ar:"",    gr:"M40",    rd:"2026-09-02", rm:"SUPERVISOR DHANJAY 9570255627 QUOTATION GIVEN GST 6077 RMC REQUIRED 08-SEP-26"},
-  {id:20,sp:"Parvinder Kumar",vd:"2026-08-24",cu:"KEC/Maruti",        cc:"7499922442", co:"Mr. Ravi",     cc2:"7499922442",si:"IMT Kharkhoda",                 sa:"IMT Kharkhoda",ar:"",    gr:"Multiple",rd:"2026-10-01",rm:"Will require concrete in Oct 2026. Formalities to signoff SOP pending."},
-  {id:21,sp:"Parvinder Kumar",vd:"2026-08-24",cu:"NIKHIL & PARDEEP",  cc:"NA",         co:"PARDEEP",      cc2:"9555445836",si:"RELEMAC TECHNOLOGIES PVT LTD",sa:"MALHA MAJRA",  ar:"",     gr:"",       rd:"",           rm:"MADAN MUNSI 8938045177. Owner will meet at 9.30 in morning."},
-  {id:22,sp:"Parvinder Kumar",vd:"2026-08-24",cu:"RINKU AGGARWAR",    cc:"9999747552", co:"PARDEEP",      cc2:"9555445836",si:"MALHA MAJRA",                 sa:"MALHA MAJRA",  ar:"1000", gr:"M25",    rd:"2026-09-06", rm:"Discussion done with Rinku Ji. Price 5000 per cube, Pump extra."},
-  {id:23,sp:"Parvinder Kumar",vd:"2026-08-24",cu:"ARYAN DAHIYA",      cc:"9868349897", co:"ARYAN DAHIYA", cc2:"9868349897",si:"MALHA MAJRA",                 sa:"MALHA MAJRA",  ar:"2000", gr:"M25",    rd:"2026-08-29", rm:"Discussion done price shared, positive feedback."},
-  {id:24,sp:"Parvinder Kumar",vd:"2026-08-24",cu:"ANIL GUPTA",        cc:"",           co:"RAJAN",        cc2:"7879858395",si:"MALHA MAJRA",                 sa:"MALHA MAJRA",  ar:"1700", gr:"M25",    rd:"2026-08-29", rm:"RINKU 9992800401. Discussion done. Rinku is final authority."},
-  {id:25,sp:"Parvinder Kumar",vd:"2026-08-24",cu:"ANIL GUPTA",        cc:"",           co:"RAJAN",        cc2:"7879858395",si:"MALHA MAJRA",                 sa:"MALHA MAJRA",  ar:"11000",gr:"M25",    rd:"",           rm:"FLORING AND LANTER. Discussion done. Rinku final authority."},
-  {id:26,sp:"Parvinder Kumar",vd:"2026-08-24",cu:"RAJ KUMAR",         cc:"9818169834", co:"KAPIL",        cc2:"9973066337",si:"Nahri",                        sa:"Nahri",        ar:"10000",gr:"M25",    rd:"2026-09-11", rm:"Discussion done with Mr. RajKumar, price shared. Follow up closely."}
-];
-var nRid=27,FR=[],sf="vd",sd=-1,pg=1,pgsz=15,eid=null;
-// ===== UTILS =====
-function fd(d){if(!d)return"-";try{var p=d.split("-");return p[2]+"/"+p[1]+"/"+p[0];}catch(e){return d;}}
-function dl(d){if(!d)return 9999;var t=new Date(d),n=new Date();n.setHours(0,0,0,0);return Math.round((t-n)/864e5);}
-function gc(g){var m={"M10":"bb","M15":"bb","M20":"bg","M25":"bg","M30":"bor","M35":"bor","M40":"br","M45":"br","M50":"br","M10/M30":"bpu","Multiple":"bgy"};return m[g]||"bgy";}
-function toast(msg,type){var c=document.getElementById("tc2"),d=document.createElement("div");d.className="toast "+(type||"");d.textContent=msg;c.appendChild(d);setTimeout(function(){d.remove();},3000);}
-function openModal(){document.getElementById("mo").classList.add("open");}
-function closeModal(){document.getElementById("mo").classList.remove("open");eid=null;}
-function hoc(e){if(e.target===document.getElementById("mo"))closeModal();}
-function swTab(btn,tid){
-  if(!CU)return;
-  var allowed=CU.accountKind==='admin' ? ['tp-1','tp-2','tp-3','tp-4','tp-5','tp-6','tp-7'] :
-    CU.accountKind==='office' ? ['tp-4'] : ['tp-1','tp-2'];
-  if(allowed.indexOf(tid)<0){
-    toast("This section is restricted for your account","error");
-    applyRoleAccess();return;
-  }
-  document.querySelectorAll(".tb").forEach(function(b){b.classList.remove("act");});
-  document.querySelectorAll(".tp").forEach(function(p){p.classList.remove("act");});
-  btn.classList.add("act");
-  var p=document.getElementById(tid);if(p)p.classList.add("act");
-  if(tid==="tp-2")rUpcoming();
-  if(tid==="tp-3")rStg();
-  if(tid==="tp-4"){rOS();rWL();}
-  if(tid==="tp-5"){rAtt();rAttLog();}
-  if(tid==="tp-6")rQt();
-  if(tid==="tp-7")rAn();
-}
-// ===== STATS =====
-function rStats(){
-  var visits=(CU&&CU.accountKind==='staff')?R.filter(function(r){return r.sp===CU.name;}):CU&&CU.accountKind==='office'?[]:R; if(ssFreshMode())visits=[];
-  var due=visits.filter(function(r){return r.rd&&dl(r.rd)>=0&&dl(r.rd)<=7;}).length;
-  var totAr=visits.reduce(function(s,r){return s+(parseInt(r.ar)||0);},0);
-  var accQ=ssFreshMode()?0:QT.filter(function(q){return q.sts==="Accepted";}).reduce(function(s,q){return s+(q.total||0);},0);
-  if(CU&&CU.accountKind==='office'){
-    var myWL=WL.filter(function(w){return w.nm===CU.name;});
-    var pending=myWL.filter(function(w){return w.sts!=="Completed";}).length;
-    document.getElementById("sg").innerHTML=
-      "<div class='sc'><div class='sl'>My Work Entries</div><div class='sv'>"+myWL.length+"</div></div>"+
-      "<div class='sc a'><div class='sl'>Pending Work</div><div class='sv'>"+pending+"</div></div>"+
-      "<div class='sc s'><div class='sl'>My Status</div><div class='sv' style='font-size:1.25rem'>"+(getOfficeStatus(CU.name)||"Active")+"</div></div>";
-    return;
-  }
-  if(CU&&CU.accountKind==='staff'){
-    document.getElementById("sg").innerHTML=
-      "<div class='sc'><div class='sl'>My Visits</div><div class='sv'>"+visits.length+"</div></div>"+
-      "<div class='sc a'><div class='sl'>My Area</div><div class='sv'>"+Math.round(totAr/1000)+"K sqft</div></div>"+
-      "<div class='sc d'><div class='sl'>Due in 7 Days</div><div class='sv'>"+due+"</div></div>";
-    return;
-  }
-  document.getElementById("sg").innerHTML=
-    "<div class='sc'><div class='sl'>Total Visits</div><div class='sv'>"+R.length+"</div></div>"+
-    "<div class='sc a'><div class='sl'>Total Area</div><div class='sv'>"+Math.round(totAr/1000)+"K sqft</div></div>"+
-    "<div class='sc d'><div class='sl'>Due in 7 Days</div><div class='sv'>"+due+"</div></div>"+
-    "<div class='sc s'><div class='sl'>Sales Staff</div><div class='sv'>"+SL.length+"</div></div>"+
-    "<div class='sc pu'><div class='sl'>Office Staff</div><div class='sv'>"+OS.length+"</div></div>"+
-    "<div class='sc tl'><div class='sl'>Accepted Quotes</div><div class='sv'>"+Math.round(accQ/100000)+"L</div></div>";
-}
-function getOfficeStatus(name){
-  var s=OS.filter(function(x){return x.nm===name;})[0];
-  return s?s.st:"Active";
-}
-// ===== FILTERS & VISITS TABLE =====
-function popDD(){
-  // For staff, lock the salesperson filter to their own name
-  if(CU && CU.accountKind==='staff'){
-    var sp=document.getElementById("fsp");
-    sp.innerHTML='<option value="'+CU.name+'">'+CU.name+'</option>';
-    sp.value=CU.name;sp.disabled=true;
-    applyF();return;
-  }
-  var sp=document.getElementById("fsp"),gr=document.getElementById("fgr"),dt=document.getElementById("fdt");
-  var sps=[],grs=[],dts=[];
-  R.forEach(function(r){if(r.sp&&!sps.includes(r.sp))sps.push(r.sp);if(r.gr&&r.gr!=="NA"&&!grs.includes(r.gr))grs.push(r.gr);if(r.vd&&!dts.includes(r.vd))dts.push(r.vd);});
-  sps.sort().forEach(function(s){sp.innerHTML+="<option>"+s+"</option>";});
-  grs.sort().forEach(function(g){gr.innerHTML+="<option>"+g+"</option>";});
-  dts.sort().reverse().forEach(function(d){dt.innerHTML+="<option value='"+d+"'>"+fd(d)+"</option>";});
-}
-function applyF(){
-  var q=(document.getElementById("srch").value||"").toLowerCase();
-  var sp=document.getElementById("fsp").value,gr=document.getElementById("fgr").value,dt=document.getElementById("fdt").value;
-  // STAFF LOGIN: only show their own visits
-  var staffFilter=(CU && CU.accountKind==='staff')?CU.name:"";
-  FR=R.filter(function(r){
-    if(staffFilter && r.sp!==staffFilter)return false;
-    var m=!q||[r.sp,r.cu,r.co,r.si,r.sa,r.gr,r.rm].some(function(v){return String(v||"").toLowerCase().indexOf(q)>=0;});
-    return m&&(!sp||r.sp===sp)&&(!gr||r.gr===gr)&&(!dt||r.vd===dt);
-  });
-  FR.sort(function(a,b){var av=a[sf]||0,bv=b[sf]||0;return av<bv?-sd:av>bv?sd:0;});
-  pg=1;rTbl();
-}
-function clrF(){document.getElementById("srch").value="";document.getElementById("fsp").value="";document.getElementById("fgr").value="";document.getElementById("fdt").value="";applyF();}
-function srt(f){if(sf===f)sd*=-1;else{sf=f;sd=1;}applyF();}
-function rTbl(){
-  var tb=document.getElementById("tb"),rc=document.getElementById("rc");
-  var start=(pg-1)*pgsz,rows=FR.slice(start,start+pgsz);
-  rc.textContent="("+FR.length+" records)";
-  if(!rows.length){tb.innerHTML="<tr><td colspan='14' class='nd'>No records found.</td></tr>";rPg();return;}
-  var isA=canEdit();
-  tb.innerHTML=rows.map(function(r,i){
-    var daysL=r.rd?dl(r.rd):null;
-    var dBg=daysL!==null&&daysL<=7?"background:#fff8f0":daysL!==null&&daysL<0?"background:#fff5f5":"";var isNew=r.vd>=(new Date(Date.now()-3*864e5).toISOString().slice(0,10));
-    return "<tr style='"+dBg+"'><td style='color:var(--m);font-size:.73rem'>"+(start+i+1)+"</td>"+
-      "<td><span class='badge "+( r.sp.indexOf("Parvinder")>=0?"bb":"bg" )+"'>"+r.sp.split(" ")[0]+"</span></td>"+
-      "<td style='white-space:nowrap'>"+fd(r.vd)+"</td>"+
-      "<td><strong>"+(r.cu&&r.cu!=="NA"?r.cu:"-")+"</strong><br><small style='color:var(--m);font-size:.71rem'>"+(r.cc&&r.cc!=="NA"?r.cc:"")+"</small></td>"+
-      "<td>"+(r.cc&&r.cc!=="NA"?r.cc:"-")+"</td>"+
-      "<td><strong>"+(r.co||"-")+"</strong></td>"+
-      "<td style='font-size:.76rem'>"+(r.cc2||"-")+"</td>"+
-      "<td style='max-width:130px'><strong>"+(r.si||"-")+"</strong></td>"+
-      "<td style='max-width:110px;font-size:.76rem'>"+(r.sa||"-")+"</td>"+
-      "<td style='text-align:right'>"+(r.ar?Number(r.ar).toLocaleString():"-")+"</td>"+
-      "<td>"+(r.gr&&r.gr!=="NA"?"<span class='badge "+gc(r.gr)+"'>"+r.gr+"</span>":"-")+"</td>"+
-      "<td style='white-space:nowrap'>"+(r.rd?fd(r.rd)+( daysL!==null?"<br><span style='font-size:.68rem;color:"+(daysL<0?"#991b1b":daysL<=7?"#92400e":"var(--m)")+"'>"+(daysL<0?"Overdue":daysL===0?"Today":daysL+"d left")+"</span>":"-"):"-")+"</td>"+
-      "<td style='max-width:150px;font-size:.75rem'>"+(r.rm||"-")+"</td>"+
-      "<td><div class='ra'>"+
-        "<button class='ib' title='WhatsApp' onclick='waShare("+r.id+")' style='color:#25D366'>&#128241;</button>"+
-        (isA?"<button class='ib' title='Edit' onclick='openEditVisitModal("+r.id+")'>&#9999;</button><button class='ib' title='Delete' onclick='delR("+r.id+")'>&#128465;</button>":"")+
-      "</div></td></tr>";
-  }).join("");rPg();
-  document.getElementById("pd").textContent="Generated: "+new Date().toLocaleString("en-IN");
-}
-function rPg(){
-  var tot=Math.ceil(FR.length/pgsz),c=document.getElementById("pgb");
-  if(FR.length<=pgsz){c.innerHTML="<span class='pi'>"+FR.length+" records</span>";return;}
-  var btns="<span class='pi'>Page "+pg+" of "+tot+" | "+FR.length+" total</span><div class='pbs'>";
-  btns+="<button class='pb' "+(pg===1?"disabled":"")+" onclick='goPg(1)'>&#171;</button>";
-  btns+="<button class='pb' "+(pg===1?"disabled":"")+" onclick='goPg("+(pg-1)+")'>&#8249;</button>";
-  for(var i=Math.max(1,pg-2);i<=Math.min(tot,pg+2);i++)btns+="<button class='pb "+(i===pg?"act":"")+"' onclick='goPg("+i+")'>"+i+"</button>";
-  btns+="<button class='pb' "+(pg===tot?"disabled":"")+" onclick='goPg("+(pg+1)+")'>&#8250;</button>";
-  btns+="<button class='pb' "+(pg===tot?"disabled":"")+" onclick='goPg("+tot+")'>&#187;</button></div>";
-  c.innerHTML=btns;
-}
-function goPg(n){pg=n;rTbl();}
-// ===== UPCOMING =====
-function rUpcoming(){
-  var rows=R.filter(function(r){return (!CU||CU.accountKind==="admin"||CU.accountKind==="staff"&&r.sp===CU.name) && r.rd&&dl(r.rd)>=0&&dl(r.rd)<=60;}).sort(function(a,b){return dl(a.rd)-dl(b.rd);});
-  var tb=document.getElementById("utb");
-  if(!rows.length){tb.innerHTML="<tr><td colspan='10' class='nd'>No upcoming requirements in 60 days.</td></tr>";return;}
-  tb.innerHTML=rows.map(function(r){
-    var d=dl(r.rd);var bg=d<=3?"#fee2e2":d<=7?"#fff3cd":"";
-    return "<tr style='background:"+bg+"'><td>"+r.sp+"</td><td>"+(r.cu&&r.cu!=="NA"?r.cu:"-")+"</td><td><strong>"+r.co+"</strong></td><td>"+r.si+"</td><td>"+(r.ar?Number(r.ar).toLocaleString():"-")+"</td><td>"+(r.gr&&r.gr!=="NA"?"<span class='badge "+gc(r.gr)+"'>"+r.gr+"</span>":"-")+"</td><td>"+fd(r.rd)+"</td><td><strong style='color:"+(d<=3?"#991b1b":d<=7?"#92400e":"var(--s)")+"'>"+d+" days</strong></td><td style='font-size:.75rem'>"+(r.rm||"-")+"</td><td><button class='ib' onclick='waShare("+r.id+")' style='color:#25D366'>&#128241;</button></td></tr>";
-  }).join("");
-}
-// ===== REMINDERS =====
-function showReminders(){
-  var due=R.filter(function(r){return (!CU||CU.accountKind==="admin"||CU.accountKind==="staff"&&r.sp===CU.name) && r.rd&&dl(r.rd)>=0&&dl(r.rd)<=7;}).sort(function(a,b){return dl(a.rd)-dl(b.rd);});
-  if(!due.length)return;
-  document.getElementById("reminderText").innerHTML=due.map(function(r){return r.co+" | "+r.si+(r.gr?" | "+r.gr:"")+" — "+fd(r.rd)+" ("+dl(r.rd)+" days)";}).join("<br>");
-  document.getElementById("reminderBanner").style.display="flex";
-}
-// ===== WHATSAPP =====
-function waShare(id){
-  var r=R.filter(function(x){return x.id===id;})[0];if(!r)return;
-  var msg="*RMC Visit Report*\nSalesperson: "+r.sp+"\nVisit Date: "+fd(r.vd)+"\nContractor: "+r.co+(r.cc2?" ("+r.cc2+")":"")+"\nSite: "+r.si+"\nAddress: "+r.sa+"\n"+(r.ar?"Area: "+Number(r.ar).toLocaleString()+" sqft\n":"")+(r.gr&&r.gr!=="NA"?"Grade: "+r.gr+"\n":"")+(r.rd?"Required Date: "+fd(r.rd)+"\n":"")+(r.rm?"Remarks: "+r.rm+"\n":"")+"\n_Shree Shyam Construction_";
-  window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
+  toast((type==='office'?"Office Staff":"Sales Person")+" created successfully: "+u,"success");
+  renderUserList();rStg();rOS();popDD();rStats();
 }
 function waShareAll(){
   var msg="*RMC Sales Visit Summary*\nDate: "+new Date().toLocaleDateString("en-IN")+"\nTotal: "+FR.length+" records\n\n";
@@ -2403,10 +2013,10 @@ function waShareQt(id){
 // ===== VISIT FORMS =====
 function visitHTML(r){r=r||{};
   // For staff login, only show their own name in salesperson dropdown
-  var sps=(CU && CU.role==='staff')?[CU.name]:SL.map(function(s){return s.nm;});var grs=["M10","M15","M20","M25","M30","M35","M40","M45","M50","M10/M30","Multiple","NA"];
+  var sps=(CU && CU.accountKind==='staff')?[CU.name]:SL.map(function(s){return s.nm;});var grs=["M10","M15","M20","M25","M30","M35","M40","M45","M50","M10/M30","Multiple","NA"];
 return "<div class='fg'><div class='fi'><label>Salesperson *</label><select id='vsp'>"+(sps.length?sps.map(function(s){return"<option "+(r.sp===s?"selected":"")+">"+s+"</option>";}).join(""):"<option>Parvinder Kumar</option><option>Pawan Kumar</option>")+"</select></div><div class='fi'><label>Visit Date *</label><input id='vvd' type='date' value='"+(r.vd||new Date().toISOString().slice(0,10))+"'></div><div class='fi'><label>Customer/Company</label><input id='vcu' value='"+(r.cu||"")+"' placeholder='Customer name'></div><div class='fi'><label>Customer Contact</label><input id='vcc' value='"+(r.cc||"")+"' placeholder='Phone number'></div><div class='fi'><label>Contractor Name *</label><input id='vco' value='"+(r.co||"")+"' placeholder='Contractor name'></div><div class='fi'><label>Contractor No.</label><input id='vcc2' value='"+(r.cc2||"")+"' placeholder='Phone number'></div><div class='fi'><label>Site / Project *</label><input id='vsi' value='"+(r.si||"")+"' placeholder='Site or project name'></div><div class='fi full'><label>Site Address</label><input id='vsa' value='"+(r.sa||"")+"' placeholder='Full address'></div><div class='fi'><label>Area (sqft)</label><input id='var' type='number' value='"+(r.ar||"")+"' placeholder='e.g. 1000'></div><div class='fi'><label>Concrete Grade</label><select id='vgr'><option value=''>-- Select --</option>"+(grs.map(function(g){return"<option "+(r.gr===g?"selected":"")+">"+g+"</option>";})).join("")+"</select></div><div class='fi'><label>Required Date</label><input id='vrd' type='date' value='"+(r.rd||"")+"'></div><div class='fi full'><label>Remarks</label><textarea id='vrm'>"+(r.rm||"")+"</textarea></div></div>";}
 function openAddVisitModal(){if(!canAddVisit()){toast("Please login first","error");return;}eid=null;document.getElementById("mt").textContent="Add Visit";document.getElementById("mb2").innerHTML=visitHTML();document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveVisit()'>Save</button>";openModal();}
-function openEditVisitModal(id){if(!canEdit()){toast("Admin only","error");return;}var r=R.filter(function(x){return x.id===id;})[0];if(!r)return;eid=id;document.getElementById("mt").textContent="Edit Visit";document.getElementById("mb2").innerHTML=visitHTML(r);document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveVisit()'>Update</button>";openModal();}
+function openEditVisitModal(id){var r=R.filter(function(x){return x.id===id;})[0];if(!r)return;if(!(CU&&(CU.accountKind==='admin'||CU.accountKind==='staff'&&r.sp===CU.name))){toast("You can only update your own visit","error");return;}eid=id;document.getElementById("mt").textContent="Edit Visit";document.getElementById("mb2").innerHTML=visitHTML(r);document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveVisit()'>Update</button>";openModal();}
 function saveVisit(){if(!canAddVisit()){toast("Please login first","error");return;}var co=document.getElementById("vco").value.trim(),vd=document.getElementById("vvd").value;if(!co||!vd){toast("Contractor & Date required","error");return;}var d={sp:(CU&&CU.accountKind==="staff"?CU.name:document.getElementById("vsp").value),vd:vd,cu:document.getElementById("vcu").value.trim(),cc:document.getElementById("vcc").value.trim(),co:co,cc2:document.getElementById("vcc2").value.trim(),si:document.getElementById("vsi").value.trim(),sa:document.getElementById("vsa").value.trim(),ar:document.getElementById("var").value,gr:document.getElementById("vgr").value,rd:document.getElementById("vrd").value,rm:document.getElementById("vrm").value.trim()};if(eid){var ix=R.map(function(x){return x.id;}).indexOf(eid);if(ix<0){toast("Visit record not found","error");return;}R[ix]=Object.assign({},R[ix],d);toast("Updated!","success");}else{d.id=nRid++;R.push(d);toast("Visit added!","success");}ssSaveCore();closeModal();popDD();applyF();rStats();}
 function delR(id){if(!canEdit()){toast("Admin only","error");return;}if(!confirm("Delete this visit?"))return;R=R.filter(function(x){return x.id!==id;});ssSaveCore();applyF();popDD();rStats();toast("Deleted","error");}
 // ===== STAFF FORMS =====
@@ -2689,20 +2299,35 @@ try{
   }
 }catch(e){}
 // ===== WORK LOG =====
+function officeWorkForm(w){
+  w=w||{};
+  var source=CU.accountKind==='office'?OS.filter(function(s){return s.nm===CU.name;}):OS;
+  var osOpts=source.map(function(s){return"<option "+(w.nm===s.nm?"selected":"")+">"+s.nm+"</option>";}).join("");
+  return "<div class='fg'>"+
+    "<div class='fi'><label>Staff *</label><select id='wnm' "+(CU.accountKind==='office'?"disabled":"")+">"+osOpts+"</select></div>"+
+    "<div class='fi'><label>Date *</label><input id='wdt' type='date' value='"+(w.dt||new Date().toISOString().slice(0,10))+"'></div>"+
+    "<div class='fi full'><label>Daily Task / Work Description *</label><textarea id='wtk' placeholder='Enter today's work, task or activity...' style='min-height:100px;resize:vertical'>"+(w.tk||"")+"</textarea></div>"+
+    "<div class='fi'><label>Status</label><select id='wst'><option "+(w.sts==='Pending'||!w.sts?'selected':'')+">Pending</option><option "+(w.sts==='In Progress'?'selected':'')+">In Progress</option><option "+(w.sts==='Completed'?'selected':'')+">Completed</option></select></div>"+
+    "<div class='fi'><label>Priority</label><select id='wpr'><option "+(w.pr==='Low'?'selected':'')+">Low</option><option "+(w.pr==='Medium'||!w.pr?'selected':'')+">Medium</option><option "+(w.pr==='High'?'selected':'')+">High</option></select></div>"+
+    "<div class='fi full'><label>Notes / Update Details</label><textarea id='wnt' placeholder='Add update notes...'>"+(w.nt||"")+"</textarea></div>"+
+    "</div>";
+}
 function openAddWLModal(){
   if(!canOfficeWork()){toast("Office Work is available only to Admin and Office Staff","error");return;}
   eid=null;
-  var source=CU.accountKind==='office'?OS.filter(function(s){return s.nm===CU.name;}):OS;
-  var osOpts=source.map(function(s){return"<option>"+s.nm+"</option>";}).join("");
-  document.getElementById("mt").textContent=CU.accountKind==='office'?"Add My Work Entry":"Add Work Log";
-  document.getElementById("mb2").innerHTML="<div class='fg'>"+
-    "<div class='fi'><label>Staff *</label><select id='wnm' "+(CU.accountKind==='office'?"disabled":"")+">"+osOpts+"</select></div>"+
-    "<div class='fi'><label>Date *</label><input id='wdt' type='date' value='"+new Date().toISOString().slice(0,10)+"'></div>"+
-    "<div class='fi full'><label>Task / Work Description *</label><textarea id='wtk' placeholder='Enter work description...' style='min-height:90px;resize:vertical'></textarea></div>"+
-    "<div class='fi'><label>Status</label><select id='wst'><option>Pending</option><option>In Progress</option><option>Completed</option></select></div>"+
-    "<div class='fi'><label>Priority</label><select id='wpr'><option>Low</option><option selected>Medium</option><option>High</option></select></div>"+
-    "<div class='fi full'><label>Notes</label><textarea id='wnt'></textarea></div></div>";
-  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveWL()'>Save</button>";
+  document.getElementById("mt").textContent=CU.accountKind==='office'?"Add My Daily Work":"Add Office Staff Work";
+  document.getElementById("mb2").innerHTML=officeWorkForm({});
+  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveWL()'>Save Daily Work</button>";
+  openModal();
+}
+function openEditWLModal(id){
+  if(!canOfficeWork())return;
+  var w=WL.filter(function(x){return x.id===id;})[0];if(!w)return;
+  if(CU.accountKind!=='admin' && w.nm!==CU.name){toast("You can only update your own daily work","error");return;}
+  eid=id;
+  document.getElementById("mt").textContent="Update Daily Work — "+w.nm;
+  document.getElementById("mb2").innerHTML=officeWorkForm(w);
+  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveWL()'>&#128190; Update Work</button>";
   openModal();
 }
 function saveWL(){
@@ -2711,14 +2336,14 @@ function saveWL(){
   var nm=document.getElementById("wnm").value;
   if(CU.accountKind==='office' && nm!==CU.name){toast("You can only save your own work entry","error");return;}
   var dt=document.getElementById("wdt").value,sts=document.getElementById("wst").value,pr=document.getElementById("wpr").value,nt=document.getElementById("wnt").value.trim();
-  var existIdx=WL.findIndex(function(w){return w.nm===nm&&w.dt===dt;});
+  var existIdx=(eid!=null)?WL.findIndex(function(w){return w.id===eid;}):-1;
   if(existIdx>=0){
     if(CU.accountKind!=='admin' && WL[existIdx].nm!==CU.name){toast("You cannot update another employee's work","error");return;}
     WL[existIdx]={id:WL[existIdx].id,nm:nm,dt:dt,tk:tk,sts:sts,pr:pr,nt:nt};
-    toast("Work entry updated","info");
+    toast("Daily work updated","success");
   }else{
     WL.push({id:nWid++,nm:nm,dt:dt,tk:tk,sts:sts,pr:pr,nt:nt});
-    toast("Work entry added","success");
+    toast("Daily work added","success");
   }
   ssSaveCore();
   closeModal();rWL();rStats();
@@ -2736,7 +2361,7 @@ function rWL(){
   var sortedWL=[].concat(WL).filter(function(w){return !CU||CU.accountKind==='admin'||CU.accountKind==='office'&&w.nm===CU.name;}).sort(function(a,b){return b.dt.localeCompare(a.dt);});
   tb.innerHTML=sortedWL.map(function(w,i){
     var editable=CU&&CU.accountKind==='admin'||CU&&CU.accountKind==='office'&&w.nm===CU.name;
-    return "<tr><td style='color:var(--m);font-size:.73rem'>"+(i+1)+"</td><td><strong>"+w.nm+"</strong></td><td>"+fd(w.dt)+"</td><td>"+w.tk+"</td><td><span class='badge "+(stC[w.sts]||"bgy")+"'>"+w.sts+"</span></td><td><span class='badge "+(prC[w.pr]||"bgy")+"'>"+w.pr+"</span></td><td style='font-size:.75rem'>"+(w.nt||"-")+"</td><td>"+(editable?"<button class='ib' onclick='delWL("+w.id+")'>&#128465;</button>":"")+"</td></tr>";
+    return "<tr><td style='color:var(--m);font-size:.73rem'>"+(i+1)+"</td><td><strong>"+w.nm+"</strong></td><td>"+fd(w.dt)+"</td><td>"+w.tk+"</td><td><span class='badge "+(stC[w.sts]||"bgy")+"'>"+w.sts+"</span></td><td><span class='badge "+(prC[w.pr]||"bgy")+"'>"+w.pr+"</span></td><td style='font-size:.75rem'>"+(w.nt||"-")+"</td><td>"+(editable?"<button class='ib' title='Update work' onclick='openEditWLModal("+w.id+")'>&#9999;</button><button class='ib' title='Delete work' onclick='delWL("+w.id+")'>&#128465;</button>":"")+"</td></tr>";
   }).join("");
 }
 // ===== ATTENDANCE =====
