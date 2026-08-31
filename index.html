@@ -1353,6 +1353,16 @@ body{--gold:#c91435}
 .btn.bs:hover{background:#087443!important}
 .btn.ba:hover{filter:brightness(.96) saturate(1.1)}
 
+
+.master-module .mm-foot{position:relative}
+.master-module .mm-new{
+  display:inline-flex;align-items:center;gap:4px;margin-left:7px;
+  border:1px solid #f0a9b7;background:#fff7f8;color:#b4233d;
+  border-radius:8px;padding:5px 7px;font-size:.55rem;font-weight:900;
+  cursor:pointer;transition:.16s;
+}
+.master-module .mm-new:hover{background:#b4233d;color:#fff;transform:translateY(-1px)}
+
 </style>
 </head>
 <body>
@@ -3211,7 +3221,7 @@ function masterRenderKpis(){
 }
 function masterRenderModules(){
   var el=document.getElementById('masterModules');if(!el)return;
-  el.innerHTML=MASTER_MODULES.map(function(m){var count=MASTER_RECORDS.filter(function(x){return x.module===m.id;}).length;return "<div class='master-module "+m.id+"' onclick='masterOpenModule("+JSON.stringify(m.id)+")'><div class='mi'>"+m.icon+"</div><h3>"+m.name+"</h3><p>"+m.desc+"</p><div class='mm-foot'><span>Open workspace &#8594;</span><span class='mm-badge'>"+count+" records</span></div></div>";}).join('');
+  el.innerHTML=MASTER_MODULES.map(function(m){var count=MASTER_RECORDS.filter(function(x){return x.module===m.id;}).length;return "<div class='master-module "+m.id+"' onclick='masterOpenModule("+JSON.stringify(m.id)+")' tabindex='0'><div class='mi'>"+m.icon+"</div><h3>"+m.name+"</h3><p>"+m.desc+"</p><div class='mm-foot'><span>Open workspace &#8594;</span><span class='mm-badge'>"+count+" records</span><button class='mm-new' onclick='event.stopPropagation();masterOpenModule("+JSON.stringify(m.id)+")'>＋ New Entry</button></div></div>";}).join('');
 }
 function masterPopulateFilter(){var s=document.getElementById('masterModuleFilter');if(!s)return;var old=s.value;s.innerHTML='<option value="">All Modules</option>'+MASTER_MODULES.map(function(m){return '<option value="'+m.id+'">'+m.name+'</option>';}).join('');s.value=old;}
 function masterRenderRecords(){
@@ -3962,6 +3972,80 @@ masterRenderModules=function(){
   ssOldMasterRenderModules();
   ssBindMasterModuleClicks();
 };
+
+
+/* =========================================================
+   FINAL MASTER NAVIGATION PATCH
+   Every module card + Add Record now opens a working form.
+   ========================================================= */
+(function(){
+  var _originalMasterOpenRecord = window.masterOpenRecord;
+
+  window.masterOpenModule = function(id){
+    if(!masterCan()){toast("Master/Admin access required","error");return;}
+    id=String(id||"finance");
+    var filter=document.getElementById("masterModuleFilter");
+    if(filter){filter.value=id;masterRenderRecords();}
+    if(id==="hr" && typeof ssHROpenWorkspace==="function"){
+      ssHROpenWorkspace();
+      return;
+    }
+    if(typeof ssMasterModuleFallback==="function"){
+      ssMasterModuleFallback(id);
+      return;
+    }
+    if(typeof window.masterOpenModuleWorkspace==="function"){
+      window.masterOpenModuleWorkspace(id);
+      return;
+    }
+    toast("Module workspace is unavailable. Please refresh the page.","error");
+  };
+
+  /* The Integrated ERP Records + Add Record button respects the selected module. */
+  window.masterOpenRecord = function(id,moduleContext){
+    if(!masterCan()){toast("Master/Admin access required","error");return;}
+    var selected=moduleContext ||
+      ((document.getElementById("masterModuleFilter")||{}).value||"");
+    if(!id && selected){
+      if(selected==="hr" && typeof ssHROpenWorkspace==="function"){
+        ssHROpenWorkspace(); return;
+      }
+      if(typeof ssMasterModuleFallback==="function"){
+        ssMasterModuleFallback(selected); return;
+      }
+    }
+    return _originalMasterOpenRecord.apply(this,arguments);
+  };
+
+  /* Re-bind cards after every Master render, including future refreshes. */
+  function bind(){
+    var box=document.getElementById("masterModules");
+    if(!box)return;
+    box.querySelectorAll(".master-module").forEach(function(card){
+      var match=card.className.match(/\b(finance|hr|purchase|inventory|production|machinery|labour|contractor|planning|projects|mis|approvals)\b/);
+      if(!match)return;
+      var id=match[1];
+      card.onclick=function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        window.masterOpenModule(id);
+      };
+      card.onkeydown=function(e){
+        if(e.key==="Enter"||e.key===" "){
+          e.preventDefault();
+          window.masterOpenModule(id);
+        }
+      };
+    });
+  }
+
+  var _oldRender=window.masterRenderModules;
+  window.masterRenderModules=function(){
+    _oldRender.apply(this,arguments);
+    bind();
+  };
+  setTimeout(bind,0);
+})();
 
 </script>
 </body>
