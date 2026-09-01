@@ -1874,110 +1874,78 @@ body{--gold:#c91435}
 </main>
 </div>
 <script>
-// ===== SUPABASE CLOUD LOGIN BRIDGE =====
-// Cloud authentication for Staff / Sales / Office / Plant accounts.
-// IMPORTANT: this browser uses only the publishable/anon key. Never put a
-// Supabase service-role key in a public HTML file.
+// ===== SUPABASE CLOUD LOGIN BRIDGE (V5) =====
+// IMPORTANT: A public HTML file can sign users in, but it CANNOT safely create
+// arbitrary Auth users with the Supabase service-role key. User provisioning
+// must be done by Supabase Dashboard or a protected Edge Function.
 var SS_SUPABASE_URL = "https://xihbqwhsqlpgrysttwth.supabase.co";
 var SS_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
-// Use the project's own Supabase hostname as the Auth email alias. This avoids
-// dependence on an unconfigured custom Auth domain.
-var SS_AUTH_DOMAIN = "xihbqwhsqlpgrysttwth.supabase.co";
-var SS_OLD_AUTH_DOMAIN = "auth.shreeshyamconstruction.com";
-var SS_LEGACY_AUTH_DOMAIN = "auth.shreeshyam.invalid";
 var SS_SB = null;
-var SS_SB_TEMP = null;
+var SS_SB_READY = false;
 try{
   if(window.supabase && window.supabase.createClient){
     SS_SB = window.supabase.createClient(SS_SUPABASE_URL, SS_SUPABASE_PUBLISHABLE_KEY, {
-      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:"shree_shyam_rmc_auth_v4"}
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:"shree_shyam_rmc_auth_v5"}
     });
-    // One non-persistent client is reused for provisioning attempts. Creating a
-    // new GoTrueClient for every staff account causes the browser warning shown
-    // in DevTools and can make Auth requests behave unpredictably.
-    SS_SB_TEMP = window.supabase.createClient(SS_SUPABASE_URL, SS_SUPABASE_PUBLISHABLE_KEY, {
-      auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:"shree_shyam_rmc_signup_v4"}
-    });
+    SS_SB_READY = true;
   }
-}catch(e){ console.warn("Supabase init failed",e); }
-function ssCloudEmail(loginId,domain){
+}catch(e){ console.error("SHREE SHYAM SUPABASE INIT ERROR",e); }
+function ssSleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
+function ssCloudEmailCandidates(loginId,account){
   var u=String(loginId||"").trim().toLowerCase();
-  return u+"@"+(domain||SS_AUTH_DOMAIN);
+  var list=[];
+  var real=String((account&&account.email)||"").trim().toLowerCase();
+  if(real && real.indexOf("@")>0) list.push(real);
+  // Legacy aliases are retained for accounts that were actually provisioned
+  // with them. We no longer create new accounts with these aliases.
+  list.push(u+"@xihbqwhsqlpgrysttwth.supabase.co");
+  list.push(u+"@auth.shreeshyamconstruction.com");
+  return list.filter(function(v,i,a){return a.indexOf(v)===i;});
 }
 function ssAuthErrorMessage(e){
   var m=String((e&&e.message)||e||"Unknown Supabase error");
-  if(/email.*confirm|confirm.*email/i.test(m))return "Email confirmation is enabled in Supabase Auth. Turn OFF Confirm email, then retry.";
-  if(/rate limit|too many requests|429/i.test(m))return "Supabase Auth rate limit reached. Bulk signup from a browser is temporarily blocked. Use the server-side user provisioning function (recommended) or wait for the rate limit to reset.";
-  if(/invalid.*email|email.*invalid/i.test(m))return "Supabase rejected the Auth email alias. Check Authentication settings.";
+  if(/failed to fetch|network|fetch/i.test(m))return "Unable to connect to Supabase. Check internet connection, Supabase project status, and browser extensions/ad-blockers.";
+  if(/invalid.*login|invalid.*credentials|user.*not.*found/i.test(m))return "Cloud account not found or password is incorrect. The staff account must first be created in Supabase Auth.";
+  if(/rate limit|too many requests|429/i.test(m))return "Supabase Auth rate limit is active. Do not retry repeatedly; wait for the limit to reset.";
+  if(/email.*confirm|confirm.*email/i.test(m))return "Email confirmation is enabled for this Supabase Auth account. Confirm the account or disable email confirmation in Auth settings.";
   return m;
 }
-async function ssSleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
-async function ssCloudCreateUser(loginId,account){
-  var c=SS_SB_TEMP;
-  if(!c)return {ok:false,error:"Supabase client unavailable"};
-  var email=ssCloudEmail(loginId,SS_AUTH_DOMAIN);
-  try{
-    var r=await c.auth.signUp({
-      email:email,
-      password:String(account.pass||""),
-      options:{data:{login_id:String(loginId),name:account.name||"",role:account.role||"staff",type:account.type||account.role||"staff",phone:account.phone||"",email:account.email||""}}
-    });
-    if(r.error){
-      var msg=String(r.error.message||"");
-      if(/already registered|already exists|user already|duplicate/i.test(msg))return {ok:true,existing:true};
-      return {ok:false,error:ssAuthErrorMessage(r.error),status:r.error.status||0};
-    }
-    if(r.data && r.data.user && !r.data.session){
-      return {ok:false,needsConfirmation:true,error:"Email confirmation is enabled in Supabase Auth. Turn OFF Confirm email in Authentication → Providers → Email, then retry."};
-    }
-    return {ok:true,existing:false};
-  }catch(e){return {ok:false,error:ssAuthErrorMessage(e),status:e&&e.status||0};}
-}
 async function ssCloudLogin(loginId,password){
-  if(!SS_SB)return {ok:false,error:"Cloud login unavailable"};
-  var domains=[SS_AUTH_DOMAIN,SS_OLD_AUTH_DOMAIN,SS_LEGACY_AUTH_DOMAIN];
-  var lastError="Cloud login failed";
-  for(var i=0;i<domains.length;i++){
+  if(!SS_SB || !SS_SB_READY)return {ok:false,error:"Supabase client could not be initialized."};
+  var local=USERS[String(loginId||"").trim().toLowerCase()]||{};
+  var candidates=ssCloudEmailCandidates(loginId,local);
+  var last="Cloud account not found";
+  for(var i=0;i<candidates.length;i++){
     try{
-      var r=await SS_SB.auth.signInWithPassword({email:ssCloudEmail(loginId,domains[i]),password:password});
+      var r=await SS_SB.auth.signInWithPassword({email:candidates[i],password:password});
       if(!r.error){
         var u=r.data&&r.data.user,md=(u&&u.user_metadata)||{};
-        return {ok:true,account:{pass:password,role:md.role||"staff",type:md.type||md.role||"staff",name:md.name||loginId,phone:md.phone||"",email:md.email||""}};
+        return {ok:true,account:{pass:password,role:md.role||local.role||"staff",type:md.type||local.type||md.role||"staff",name:md.name||local.name||loginId,phone:md.phone||local.phone||"",email:md.email||local.email||candidates[i]}};
       }
-      lastError=String(r.error.message||lastError);
-    }catch(e){lastError=ssAuthErrorMessage(e);}
+      last=r.error;
+      // Invalid credentials on one candidate should not cause a noisy request
+      // storm. Continue only to the next known candidate.
+    }catch(e){last=e;}
   }
-  return {ok:false,error:ssAuthErrorMessage(lastError)};
+  return {ok:false,error:ssAuthErrorMessage(last)};
 }
+function ssCloudStatusToast(msg,type){try{toast(msg,type||"success");}catch(e){console.log(msg);}}
+// V5 deliberately does NOT bulk-call /auth/v1/signup. Repeated browser signup
+// calls caused the HTTP 429 shown in DevTools. Provision staff accounts using
+// Supabase Auth Dashboard or a protected Edge Function, then use this HTML for login.
 async function ssCloudMigrateUsers(){
-  if(!SS_SB_TEMP)return {ok:false,created:0,existing:0,failed:0,pending:0,errors:["Supabase client unavailable"]};
-  var keys=Object.keys(USERS||{}),created=0,existing=0,failed=0,pending=0,rateLimited=0,errors=[];
-  for(var i=0;i<keys.length;i++){
-    var k=keys[i],a=USERS[k];
-    if(!a || !a.pass || k==="admin" || k==="master")continue;
-    // Do not hammer Auth. Supabase explicitly rate-limits Auth endpoints.
-    // A pause also prevents repeated signup calls from the same browser.
-    if(i>0)await ssSleep(2500);
-    try{
-      var r=await ssCloudCreateUser(k,a);
-      if(r.ok){if(r.existing)existing++;else created++;}
-      else if(r.needsConfirmation){pending++;errors.push(k+": "+r.error);}
-      else {failed++;if(r.status===429)rateLimited++;errors.push(k+": "+r.error);}
-      // Once the project says 429, stop immediately. Retrying seven more users
-      // only makes the rate-limit window worse.
-      if(r.status===429){
-        for(var j=i+1;j<keys.length;j++){
-          var nk=keys[j],na=USERS[nk];
-          if(na && na.pass && nk!=="admin" && nk!=="master")errors.push(nk+": skipped because Supabase returned HTTP 429 rate limit.");
-        }
-        break;
-      }
-    }catch(e){failed++;errors.push(k+": "+ssAuthErrorMessage(e));}
-  }
-  return {ok:failed===0 && pending===0,created:created,existing:existing,pending:pending,failed:failed,rateLimited:rateLimited,errors:errors};
+  return {ok:false,created:0,existing:0,failed:0,pending:0,rateLimited:0,errors:[
+    "Browser-side bulk user creation is disabled in V5 to prevent Supabase Auth 429 rate-limit errors.",
+    "Create the staff Auth accounts once in Supabase Auth (or use a protected Edge Function), then staff can log in from any device."
+  ]};
 }
-function ssCloudStatusToast(msg,type){try{toast(msg,type||"success");}catch(e){}}
-
+async function syncAllUsersToCloud(){
+  if(!canEdit()){toast("Admin / Master only","error");return;}
+  var box=document.getElementById("userListBox");
+  var msg="Cloud connection is available for LOGIN, but browser-side bulk user creation is disabled to prevent Auth rate-limit errors. Create the users in Supabase Auth or connect a protected provisioning function.";
+  toast(msg,"error");
+  if(box)box.insertAdjacentHTML("afterbegin","<div style='margin-bottom:12px;padding:14px;border:1px solid #fed7aa;background:#fff7ed;border-radius:10px;color:#9a3412;font-size:.84rem'><strong>Cloud user setup required</strong><br>Login is connected to your Supabase project. This public HTML does not use a secret/service-role key and therefore cannot safely create Auth users. Create each employee once in Supabase Authentication → Users, using the employee's real email address, then the same Login ID/password can be used on mobile and other computers. Bulk browser signup has been disabled because Supabase was returning HTTP 429.</div>");
+}
 // ===== USER ACCOUNTS =====
 var USERS = {
   admin:     {pass:"admin@123", role:"admin", name:"Administrator"},
@@ -2046,30 +2014,10 @@ function openUserManagerModal(){
   if(!canEdit()){toast("Admin / Master only","error");return;}
   document.getElementById("mt").textContent="Create New User — Sales Person / Office Staff";
   document.getElementById("mb2").innerHTML=userHTML()+"<div id='userListBox' style='margin-top:16px'></div>";
-  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Close</button><button class='btn bw' onclick='syncAllUsersToCloud()'>&#9729; Sync Users to Cloud</button><button class='btn bs' onclick='saveUser()'>&#128190; Create User</button>";
+  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Close</button><button class='btn bw' onclick='syncAllUsersToCloud()'>&#9729; Cloud Login Setup</button><button class='btn bs' onclick='saveUser()'>&#128190; Create User</button>";
   renderUserList();
   userTypeChanged();
   openModal();
-}
-
-async function syncAllUsersToCloud(){
-  if(!canEdit()){toast("Admin / Master only","error");return;}
-  if(!SS_SB_TEMP){toast("Supabase is not available. Check internet connection.","error");return;}
-  toast("Starting controlled cloud sync...","success");
-  var r=await ssCloudMigrateUsers();
-  var msg="Cloud sync: "+r.created+" created, "+r.existing+" already existed";
-  if(r.pending)msg+=", "+r.pending+" awaiting confirmation";
-  if(r.failed)msg+=", "+r.failed+" failed";
-  if(r.rateLimited)msg+=" (rate limit)";
-  if(r.failed || r.pending){
-    toast(msg,"error");
-    console.error("SHREE SHYAM CLOUD SYNC DETAILS",r.errors||[]);
-    var box=document.getElementById("userListBox");
-    if(box && r.errors && r.errors.length){
-      var safe=r.errors.map(function(x){return String(x).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}).join("<br>");
-      box.insertAdjacentHTML("afterbegin","<div style='margin-bottom:12px;padding:14px;border:1px solid #fecaca;background:#fff1f2;border-radius:10px;color:#991b1b;font-size:.84rem'><strong>Cloud sync diagnosis</strong><br>"+safe+"<br><br><strong>Important:</strong> Supabase limits Auth signup requests. Do not repeatedly press Sync. For reliable Admin-created staff accounts, use the server-side provisioning method rather than exposing a secret key in this HTML.</div>");
-    }
-  }else{toast(msg+".","success");}
 }
 
 async function saveUser(){
@@ -2091,13 +2039,8 @@ async function saveUser(){
   if(!nm){toast("Full name required","error");return;}
   if(userExists(u)){toast("Login ID already exists","error");return;}
 
-  // Create the same login in Supabase Auth. This makes the account usable on mobile/other PCs.
-  var cloudAccount={pass:pw,role:type==='office'?"office":type==='sales'?"staff":"admin",type:type,name:nm,phone:ph,email:em};
-  var cloudResult=await ssCloudCreateUser(u,cloudAccount);
-  if(!cloudResult.ok){
-    toast("Cloud account could not be created: "+cloudResult.error+" Local account was NOT created.","error");
-    return;
-  }
+  // Save the ERP profile locally. Cloud Auth provisioning is intentionally
+  // separate: a public HTML file must not attempt privileged Auth creation.
 
   if(type==='admin'){
     USERS[u]={pass:pw,role:"admin",name:nm,type:"admin",phone:ph,email:em};
@@ -2315,21 +2258,8 @@ async function doLogin(){
   CU=Object.assign({},account);CU.uname=u;CU.accountKind=kind;
   if(err)err.style.display='none';
 
-  // If this login succeeded from the legacy local account, immediately try to
-  // create its cloud account. This makes the next login work on any device.
-  if(localFallback && SS_SB && kind!=="admin" && kind!=="master"){
-    ssCloudCreateUser(u,{pass:p,role:account.role||"staff",type:account.type||account.role||"staff",name:account.name||u,phone:account.phone||"",email:account.email||""}).then(function(r){
-      if(r && r.needsConfirmation) ssCloudStatusToast("Cloud account needs email confirmation to be disabled in Supabase Auth.","error");
-    }).catch(function(){});
-  }
   try{localStorage.setItem("RMC_LAST_CLOUD_LOGIN",JSON.stringify({u:u,at:new Date().toISOString()}));}catch(e){}
 
-  // Master/Admin login is the safe migration point for accounts already created locally.
-  if((kind==='master'||kind==='admin') && SS_SB){
-    ssCloudMigrateUsers().then(function(r){
-      if(r && r.failed) ssCloudStatusToast("Cloud sync: "+r.created+" created, "+r.existing+" already existed, "+r.failed+" failed. Check Supabase Auth email confirmation setting.","error");
-    }).catch(function(){});
-  }
 
   var lp=document.getElementById('loginPage'),app=document.getElementById('app');
   if(lp)lp.style.display='none';
