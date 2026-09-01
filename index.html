@@ -6,7 +6,6 @@
 <title>Shree Shyam RMC ERP | Enterprise Management System</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--p:#c8102e;--a:#f59e0b;--d:#b91c1c;--s:#057a55;--pu:#7c3aed;--tl:#0891b2;--bg:#f5f5f5;--card:#fff;--b:#e2e8f0;--t:#1a1a1a;--m:#64748b;--r:10px;--sh:0 2px 16px rgba(0,0,0,.10)}
@@ -1520,7 +1519,7 @@ body{--gold:#c91435}
     
 <div class="command-strip">
   <span class="cs-title">EXECUTIVE QUICK ACTIONS</span>
-<button class="btn" style="background:#dcfce7;color:#166534;border:1px solid #86efac" onclick="alert('Data Safety Lock: automatic and manual data reset is disabled.')">🛡️ Data Safety ON</button>
+<button class="btn ba" onclick="askFreshStartPassword()">🔐 Fresh Start Reset</button>
 
   <button onclick="phase3Refresh()">↻ Refresh MIS</button>
   <button onclick="downloadMasterDailyPDF()">📄 Master Daily PDF</button>
@@ -1874,72 +1873,6 @@ body{--gold:#c91435}
 </main>
 </div>
 <script>
-// ===== SUPABASE CLOUD LOGIN BRIDGE =====
-// Uses Supabase Auth so staff accounts can authenticate on other computers and mobiles.
-// The publishable key is safe for browser use; never place a service-role/secret key here.
-var SS_SUPABASE_URL = "https://xihbqwhsqlpgrysttwth.supabase.co";
-var SS_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
-var SS_SB = null;
-try{
-  if(window.supabase && window.supabase.createClient){
-    SS_SB = window.supabase.createClient(SS_SUPABASE_URL, SS_SUPABASE_PUBLISHABLE_KEY, {
-      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storageKey:"shree_shyam_rmc_auth_v1"}
-    });
-  }
-}catch(e){ console.warn("Supabase init failed",e); }
-function ssCloudEmail(loginId){
-  var u=String(loginId||"").trim().toLowerCase();
-  return u+"@auth.shreeshyam.invalid";
-}
-function ssCloudClient(){
-  try{
-    if(window.supabase && window.supabase.createClient){
-      return window.supabase.createClient(SS_SUPABASE_URL, SS_SUPABASE_PUBLISHABLE_KEY, {
-        auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:"shree_shyam_signup_temp"}
-      });
-    }
-  }catch(e){}
-  return null;
-}
-async function ssCloudCreateUser(loginId,account){
-  var c=ssCloudClient();
-  if(!c)return {ok:false,error:"Supabase client unavailable"};
-  try{
-    var r=await c.auth.signUp({
-      email:ssCloudEmail(loginId),
-      password:String(account.pass||""),
-      options:{data:{login_id:String(loginId),name:account.name||"",role:account.role||"staff",type:account.type||account.role||"staff",phone:account.phone||"",email:account.email||""}}
-    });
-    if(r.error){
-      // Already registered is not a failure for migration.
-      var msg=String(r.error.message||"");
-      if(/already registered|already exists|user already/i.test(msg)) return {ok:true,existing:true};
-      return {ok:false,error:msg};
-    }
-    return {ok:true,existing:false};
-  }catch(e){return {ok:false,error:e.message||String(e)};}
-}
-async function ssCloudLogin(loginId,password){
-  if(!SS_SB)return {ok:false,error:"Cloud login unavailable"};
-  try{
-    var r=await SS_SB.auth.signInWithPassword({email:ssCloudEmail(loginId),password:password});
-    if(r.error)return {ok:false,error:r.error.message||"Cloud login failed"};
-    var u=r.data&&r.data.user;
-    var md=(u&&u.user_metadata)||{};
-    return {ok:true,account:{pass:password,role:md.role||"staff",type:md.type||md.role||"staff",name:md.name||loginId,phone:md.phone||"",email:md.email||""}};
-  }catch(e){return {ok:false,error:e.message||String(e)};}
-}
-async function ssCloudMigrateUsers(){
-  if(!SS_SB)return;
-  var keys=Object.keys(USERS||{});
-  for(var i=0;i<keys.length;i++){
-    var k=keys[i],a=USERS[k];
-    if(!a || !a.pass || k==="admin" || k==="master")continue;
-    try{ await ssCloudCreateUser(k,a); }catch(e){}
-  }
-}
-function ssCloudStatusToast(msg,type){try{toast(msg,type||"success");}catch(e){}}
-
 // ===== USER ACCOUNTS =====
 var USERS = {
   admin:     {pass:"admin@123", role:"admin", name:"Administrator"},
@@ -2014,7 +1947,7 @@ function openUserManagerModal(){
   openModal();
 }
 
-async function saveUser(){
+function saveUser(){
   if(!canEdit())return;
   var u=(document.getElementById("uun").value||"").trim().toLowerCase();
   var pw=(document.getElementById("upw").value||"").trim();
@@ -2032,14 +1965,6 @@ async function saveUser(){
   if(pw.length<4){toast("Password must be at least 4 characters","error");return;}
   if(!nm){toast("Full name required","error");return;}
   if(userExists(u)){toast("Login ID already exists","error");return;}
-
-  // Create the same login in Supabase Auth. This makes the account usable on mobile/other PCs.
-  var cloudAccount={pass:pw,role:type==='office'?"office":type==='sales'?"staff":"admin",type:type,name:nm,phone:ph,email:em};
-  var cloudResult=await ssCloudCreateUser(u,cloudAccount);
-  if(!cloudResult.ok){
-    toast("Cloud account could not be created: "+cloudResult.error+". Local account was NOT created.","error");
-    return;
-  }
 
   if(type==='admin'){
     USERS[u]={pass:pw,role:"admin",name:nm,type:"admin",phone:ph,email:em};
@@ -2210,72 +2135,66 @@ function accountKind(account){
   if(account.role==="plant" || account.type==="plant")return "plant";
   return "staff";
 }
-async function doLogin(){
+function doLogin(){
   var u=(document.getElementById('lUser').value||'').trim().toLowerCase();
   var p=document.getElementById('lPass').value||'';
   var err=document.getElementById('lErr');
   if(!u||!p){if(err){err.style.display='block';err.textContent='Please enter username and password';}return;}
+  var account=USERS[u];
+  if(account && account.pass===p){
+    var kind=accountKind(account);
 
-  // First try Supabase so the same staff ID works from any device/browser.
-  var cloud=await ssCloudLogin(u,p);
-  var account=null;
-  if(cloud.ok){
-    account=Object.assign({},USERS[u]||{},cloud.account);
-    // Keep the cloud account in the current session without overwriting its password with anything else.
-    USERS[u]=Object.assign({},USERS[u]||{},cloud.account,{pass:p});
-  }else{
-    // Backward-compatible local fallback for existing local accounts on this browser.
-    account=USERS[u];
-    if(!(account && account.pass===p)){
-      if(err){err.style.display='block';err.textContent='Incorrect username or password';}
-      var pass=document.getElementById('lPass');if(pass)pass.value='';
+    if(selectedLoginRole==="admin" && kind!=="admin" && kind!=="master"){
+      showLoginAccessModal("Staff Account Detected",
+        kind==="office"
+          ? "You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials."
+          : kind==="plant"
+          ? "You are a Plant Manager user. Kindly use the correct staff/plant login section."
+          : "You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials.");
       return;
     }
-  }
+    if(selectedLoginRole==="staff" && (kind==="admin"||kind==="master")){
+      showLoginAccessModal(kind==="master"?"Master Account Detected":"Admin Account Detected",
+        kind==="master"
+          ? "You are a Master user. Kindly select the Admin Login section and sign in with your Master credentials."
+          : "You are an Admin user. Kindly select the Admin Login section and sign in with your Admin credentials.");
+      return;
+    }
 
-  var kind=accountKind(account);
-  if(selectedLoginRole==="admin" && kind!=="admin" && kind!=="master"){
-    showLoginAccessModal("Staff Account Detected",
-      kind==="office"
-        ? "You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials."
-        : kind==="plant"
-        ? "You are a Plant Manager user. Kindly use the correct staff/plant login section."
-        : "You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials.");
-    if(SS_SB)try{await SS_SB.auth.signOut();}catch(e){}
-    return;
-  }
-  if(selectedLoginRole==="staff" && (kind==="admin"||kind==="master")){
-    showLoginAccessModal(kind==="master"?"Master Account Detected":"Admin Account Detected",
-      kind==="master"
-        ? "You are a Master user. Kindly select the Admin Login section and sign in with your Master credentials."
-        : "You are an Admin user. Kindly select the Admin Login section and sign in with your Admin credentials.");
-    if(SS_SB)try{await SS_SB.auth.signOut();}catch(e){}
-    return;
-  }
+    CU=Object.assign({},account);
+    CU.uname=u;CU.accountKind=kind;
+    if(err)err.style.display='none';
 
-  CU=Object.assign({},account);CU.uname=u;CU.accountKind=kind;
-  if(err)err.style.display='none';
-  try{localStorage.setItem("RMC_LAST_CLOUD_LOGIN",JSON.stringify({u:u,at:new Date().toISOString()}));}catch(e){}
+    var lp=document.getElementById('loginPage'),app=document.getElementById('app');
+    if(lp)lp.style.display='none';
+    if(app){
+      app.style.display='block';
+      app.classList.remove('admin-mode','staff-mode','office-mode','plant-mode','master-mode');
+      app.classList.add(kind==='master'?'master-mode':kind==='admin'?'admin-mode':kind==='office'?'office-mode':kind==='plant'?'plant-mode':'staff-mode');
+    }
 
-  // Master/Admin login is the safe migration point for accounts already created locally.
-  if((kind==='master'||kind==='admin') && SS_SB){
-    ssCloudMigrateUsers().catch(function(){});
-  }
+    var ub=document.getElementById('userBadge');
+    if(ub)ub.innerHTML='&#128100; '+CU.name+
+      ' <span class="'+(kind==='master'?'badge bpu':kind==='admin'?'badge bb':kind==='office'?'staff-badge office-badge':kind==='plant'?'plant-badge':'staff-badge')+'">'+
+      (kind==='master'?'MASTER':kind==='admin'?'ADMIN':kind==='office'?'OFFICE':kind==='plant'?'PLANT':'SALES')+'</span>';
 
-  var lp=document.getElementById('loginPage'),app=document.getElementById('app');
-  if(lp)lp.style.display='none';
-  if(app){
-    app.style.display='block';
-    app.classList.remove('admin-mode','staff-mode','office-mode','plant-mode','master-mode');
-    app.classList.add(kind==='master'?'master-mode':kind==='admin'?'admin-mode':kind==='office'?'office-mode':kind==='plant'?'plant-mode':'staff-mode');
+    var dw=document.getElementById('dwUser');if(dw)dw.textContent=CU.name;
+    var hs=document.getElementById('hSub');
+    if(hs)hs.textContent=kind==='master'?'Master Control — Full Enterprise Access':
+      kind==='admin'?'Admin Mode — Full Access':
+      kind==='office'?'Office Staff Mode — My Work Only':
+      kind==='plant'?'Plant Manager Mode — Plant Operations & Dispatch':
+      'Sales Staff Mode — My Visits Only';
+
+    applyRoleAccess();
+    applyPlantAccess();
+    initApp();
+    if(typeof ssLoginSmile==="function")ssLoginSmile(CU.name);
+    else toast('Welcome, '+CU.name+'!','success');
+  }else{
+    if(err){err.style.display='block';err.textContent='Incorrect username or password';}
+    var pass=document.getElementById('lPass');if(pass)pass.value='';
   }
-  var ub=document.getElementById('userBadge');
-  if(ub)ub.innerHTML='&#128100; '+CU.name+' <span class="'+(kind==='master'?'badge bpu':kind==='admin'?'badge bb':kind==='office'?'staff-badge office-badge':kind==='plant'?'plant-badge':'staff-badge')+'">'+(kind==='master'?'MASTER':kind==='admin'?'ADMIN':kind==='office'?'OFFICE':kind==='plant'?'PLANT':'SALES')+'</span>';
-  var dw=document.getElementById('dwUser');if(dw)dw.textContent=CU.name;
-  var hs=document.getElementById('hSub');
-  if(hs)hs.textContent=kind==='master'?'Master Control — Full Enterprise Access':kind==='admin'?'Admin Mode — Full Access':kind==='office'?'Office Staff Mode — My Work Only':kind==='plant'?'Plant Manager Mode — Plant Operations & Dispatch':'Sales Staff Mode — My Visits Only';
-  applyRoleAccess();applyPlantAccess();initApp();
-  if(typeof ssLoginSmile==='function')ssLoginSmile(CU.name);else toast('Welcome, '+CU.name+'!','success');
 }
 function applyRoleAccess(){
   var app=document.getElementById("app");if(!CU||!app)return;
@@ -2320,8 +2239,6 @@ function doLogout(){
   if(lp)lp.style.display='flex';
   var u=document.getElementById('lUser'),p=document.getElementById('lPass'),e=document.getElementById('lErr');
   if(u)u.value='';if(p)p.value='';if(e)e.style.display='none';
-
-  if(SS_SB)try{SS_SB.auth.signOut();}catch(e){}
 }
 function canEdit(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'));}
 function canAddVisit(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'||CU.accountKind==='staff'));}
@@ -3488,8 +3405,7 @@ function masterDeleteRecord(id){if(!masterCan())return;if(!confirm('Delete this 
    transaction arrays on the next page load. This is the key fix for KPIs
    that were coming back after reset. */
 function ssFreshMode(){
-  /* DATA-SAFETY LOCK: Fresh Start is permanently disabled in production. */
-  return false;
+  return localStorage.getItem("SS_RMC_FRESH_START_MANUAL")==="DONE";
 }
 
 /* Core transactional persistence.
@@ -3895,9 +3811,62 @@ function downloadMasterDailyPDF(){
 
 
 // =========================================================
-// DATA SAFETY: AUTOMATIC FRESH START REMOVED
+// SHREE SHYAM — FRESH START 01-09-2026
+// Clears historical transactional/demo records once on/after
+// 1 September 2026. Account identities and module/master
+// definitions are retained so the system remains usable.
 // =========================================================
-/* Production build: no date-based deletion of business records. */
+(function(){
+  var FRESH_START_KEY="SS_RMC_FRESH_START_2026_09_01";
+  var FRESH_START_DATE="2026-09-01";
+  var today=new Date();
+  var iso=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+
+  // This runs automatically only from the requested fresh-start date.
+  if(iso>=FRESH_START_DATE && localStorage.getItem(FRESH_START_KEY)!=="DONE"){
+    var clearKeys=[
+      "RMC_VISITS",             // Sales visit records
+      "RMC_FQ",                 // Legacy quotation cache
+      "RMC_QUOTATIONS",         // Quotations
+      "RMC_WL",                 // Legacy office-work cache
+      "RMC_OFFICE_WORK",        // Office work
+      "RMC_ATTENDANCE",         // Attendance
+      "RMC_PM_ORDERS",          // Plant orders / dispatch
+      "RMC_PM_FLEET",           // Fleet/trip history
+      "RMC_PM_QC",              // QC history
+      "RMC_PM_BILL",            // Billing history
+      "RMC_PM_MAINT",           // Maintenance history
+      "RMC_PHASE1_ACTIVITY",    // Old activity/audit records
+      "RMC_ERP_WORKFLOWS",      // Old connected workflows
+      "RMC_MASTER_RECORDS",      // Old master/management records
+      "RMC_HR_EMPLOYEES"          // Old HR employee profiles
+    ];
+    clearKeys.forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
+      /* In-memory arrays are cleared later by ssApplyFreshState(), after
+         all module arrays have been declared. */
+
+
+    // Reset raw materials to zero while keeping the material names/units.
+    // This intentionally preserves the material master but removes old stock.
+    try{
+      var mats=JSON.parse(localStorage.getItem("RMC_PM_MAT")||"[]");
+      if(!Array.isArray(mats))mats=[];
+      mats=mats.map(function(m){
+        m=m||{};
+        return Object.assign({},m,{
+          opening:0, openingStock:0, received:0, consumed:0, balance:0, current:0
+        });
+      });
+      if(mats.length) localStorage.setItem("RMC_PM_MAT",JSON.stringify(mats));
+      else localStorage.removeItem("RMC_PM_MAT");
+    }catch(e){}
+
+    localStorage.setItem(FRESH_START_KEY,"DONE");
+    localStorage.setItem("SS_RMC_FRESH_START_MANUAL","DONE");
+    localStorage.setItem("SS_RMC_FRESH_START_DATE",FRESH_START_DATE);
+  }
+})();
+
 
 function ssMasterSessionForReset(){
   /* Master Control is the only place where the Fresh Start button is rendered.
@@ -3909,13 +3878,103 @@ function ssMasterSessionForReset(){
 }
 
 function askFreshStartPassword(){
-  alert("Data Safety Lock is ON. Fresh Start Reset is disabled in this production build so existing staff, sales and plant records cannot be deleted.");
-  return;
+  if(!ssMasterSessionForReset()){
+    alert("Please open Master Control and use Fresh Start Reset from the Master login.");
+    return;
+  }
+
+  var entered=window.prompt(
+    "MASTER FRESH START\n\nEnter the authorized password to continue:"
+  );
+  if(entered===null)return;
+
+  if(entered!=="Indiahsr@786"){
+    alert("Incorrect password.\n\nFresh Start was NOT performed.");
+    return;
+  }
+
+  runFreshStartReset(true,true);
 }
 
 function runFreshStartReset(manual,authorized){
-  alert("Data Safety Lock is ON. No application data was deleted.");
-  return;
+  if(manual && !ssMasterSessionForReset()){
+    alert("Master Control access required.");
+    return;
+  }
+  if(manual && !authorized){
+    askFreshStartPassword();
+    return;
+  }
+
+  var ok=manual ? confirm(
+    "FINAL CONFIRMATION\n\n"+
+    "Fresh Start will clear the existing transactional/demo data so the system can be used fresh from 01/09/2026.\n\n"+
+    "This includes Visits, Quotations, Office Work, Plant Orders, Fleet, QC, Billing, Maintenance, Workflows, Master ERP records, HR employee records and old activity.\n\n"+
+    "Your Master/Admin login accounts will NOT be deleted.\n\nContinue?"
+  ) : true;
+  if(!ok)return;
+
+  /* Clear application data, but NEVER remove RMC_USERS so the same Master login
+     remains available after the reset. */
+  var resetKeys=["RMC_VISITS",
+    
+    "RMC_FQ","RMC_QUOTATIONS",
+    "RMC_WL","RMC_OFFICE_WORK",
+    "RMC_PM_ORDERS",
+    "RMC_PM_FLEET",
+    "RMC_PM_QC",
+    "RMC_PM_BILL",
+    "RMC_PM_MAINT",
+    "RMC_PHASE1_ACTIVITY",
+    "RMC_ERP_WORKFLOWS",
+    "RMC_MASTER_RECORDS",
+    "RMC_HR_EMPLOYEES",
+    "RMC_PM_SETTINGS",
+    "RMC_PM_ATTENDANCE",
+    "RMC_ATTENDANCE",
+    "RMC_PHASE2",
+    "RMC_PHASE3",
+    "RMC_MIS",
+    "RMC_REPORTS",
+    "RMC_NOTIFICATIONS","RMC_ATTENDANCE_STATE"
+  ];
+  resetKeys.forEach(function(k){
+    try{localStorage.removeItem(k)}catch(e){}
+  });
+
+  /* Keep the material definitions, but reset every stock quantity to zero. */
+  try{
+    var raw=localStorage.getItem("RMC_PM_MAT");
+    if(raw){
+      var mats=JSON.parse(raw);
+      if(Array.isArray(mats)){
+        mats=mats.map(function(m){
+          return Object.assign({},m,{
+            opening:0,openingStock:0,received:0,consumed:0,
+            balance:0,current:0,currentStock:0
+          });
+        });
+        localStorage.setItem("RMC_PM_MAT",JSON.stringify(mats));
+      }
+    }
+  }catch(e){}
+
+  localStorage.setItem("SS_RMC_FRESH_START_DATE","2026-09-01");
+  localStorage.setItem("SS_RMC_FRESH_START_MANUAL","DONE");
+  /* Force zero-state in this running page as well as localStorage. */
+  R.length=0; QT.length=0; FQ.length=0; WL.length=0; AT.length=0;
+  MASTER_RECORDS.length=0; ERP_WORKFLOWS.length=0;
+  PM_ORDERS.length=0; PM_FLEET.length=0; PM_QC.length=0;
+  PM_BILL.length=0; PM_MAINT.length=0; PM_MAT.length=0;
+
+
+  alert(
+    "Fresh Start completed successfully.\n\n"+
+    "All selected old transactional data has been cleared.\n"+
+    "Master/Admin login accounts remain active.\n\n"+
+    "The system is ready for fresh use from 01/09/2026."
+  );
+  location.reload();
 }
 
 // =========================================================
@@ -4332,9 +4391,6 @@ masterRenderModules=function(){
   setTimeout(bind,0);
 })();
 
-</script>
-<script>
-(function(){try{window.__RMC_DATA_SAFETY__={enabled:true,automaticReset:false,manualReset:false,version:"2026-09-01-data-safe"};}catch(e){}})();
 </script>
 </body>
 </html>
