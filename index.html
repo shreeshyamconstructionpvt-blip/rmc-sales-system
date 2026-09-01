@@ -6,7 +6,6 @@
 <title>Shree Shyam RMC ERP | Enterprise Management System</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--p:#c8102e;--a:#f59e0b;--d:#b91c1c;--s:#057a55;--pu:#7c3aed;--tl:#0891b2;--bg:#f5f5f5;--card:#fff;--b:#e2e8f0;--t:#1a1a1a;--m:#64748b;--r:10px;--sh:0 2px 16px rgba(0,0,0,.10)}
@@ -1874,78 +1873,6 @@ body{--gold:#c91435}
 </main>
 </div>
 <script>
-// ===== SUPABASE CLOUD LOGIN BRIDGE (V5) =====
-// IMPORTANT: A public HTML file can sign users in, but it CANNOT safely create
-// arbitrary Auth users with the Supabase service-role key. User provisioning
-// must be done by Supabase Dashboard or a protected Edge Function.
-var SS_SUPABASE_URL = "https://xihbqwhsqlpgrysttwth.supabase.co";
-var SS_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
-var SS_SB = null;
-var SS_SB_READY = false;
-try{
-  if(window.supabase && window.supabase.createClient){
-    SS_SB = window.supabase.createClient(SS_SUPABASE_URL, SS_SUPABASE_PUBLISHABLE_KEY, {
-      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:"shree_shyam_rmc_auth_v5"}
-    });
-    SS_SB_READY = true;
-  }
-}catch(e){ console.error("SHREE SHYAM SUPABASE INIT ERROR",e); }
-function ssSleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
-function ssCloudEmailCandidates(loginId,account){
-  var u=String(loginId||"").trim().toLowerCase();
-  var list=[];
-  var real=String((account&&account.email)||"").trim().toLowerCase();
-  if(real && real.indexOf("@")>0) list.push(real);
-  // Legacy aliases are retained for accounts that were actually provisioned
-  // with them. We no longer create new accounts with these aliases.
-  list.push(u+"@xihbqwhsqlpgrysttwth.supabase.co");
-  list.push(u+"@auth.shreeshyamconstruction.com");
-  return list.filter(function(v,i,a){return a.indexOf(v)===i;});
-}
-function ssAuthErrorMessage(e){
-  var m=String((e&&e.message)||e||"Unknown Supabase error");
-  if(/failed to fetch|network|fetch/i.test(m))return "Unable to connect to Supabase. Check internet connection, Supabase project status, and browser extensions/ad-blockers.";
-  if(/invalid.*login|invalid.*credentials|user.*not.*found/i.test(m))return "Cloud account not found or password is incorrect. The staff account must first be created in Supabase Auth.";
-  if(/rate limit|too many requests|429/i.test(m))return "Supabase Auth rate limit is active. Do not retry repeatedly; wait for the limit to reset.";
-  if(/email.*confirm|confirm.*email/i.test(m))return "Email confirmation is enabled for this Supabase Auth account. Confirm the account or disable email confirmation in Auth settings.";
-  return m;
-}
-async function ssCloudLogin(loginId,password){
-  if(!SS_SB || !SS_SB_READY)return {ok:false,error:"Supabase client could not be initialized."};
-  var local=USERS[String(loginId||"").trim().toLowerCase()]||{};
-  var candidates=ssCloudEmailCandidates(loginId,local);
-  var last="Cloud account not found";
-  for(var i=0;i<candidates.length;i++){
-    try{
-      var r=await SS_SB.auth.signInWithPassword({email:candidates[i],password:password});
-      if(!r.error){
-        var u=r.data&&r.data.user,md=(u&&u.user_metadata)||{};
-        return {ok:true,account:{pass:password,role:md.role||local.role||"staff",type:md.type||local.type||md.role||"staff",name:md.name||local.name||loginId,phone:md.phone||local.phone||"",email:md.email||local.email||candidates[i]}};
-      }
-      last=r.error;
-      // Invalid credentials on one candidate should not cause a noisy request
-      // storm. Continue only to the next known candidate.
-    }catch(e){last=e;}
-  }
-  return {ok:false,error:ssAuthErrorMessage(last)};
-}
-function ssCloudStatusToast(msg,type){try{toast(msg,type||"success");}catch(e){console.log(msg);}}
-// V5 deliberately does NOT bulk-call /auth/v1/signup. Repeated browser signup
-// calls caused the HTTP 429 shown in DevTools. Provision staff accounts using
-// Supabase Auth Dashboard or a protected Edge Function, then use this HTML for login.
-async function ssCloudMigrateUsers(){
-  return {ok:false,created:0,existing:0,failed:0,pending:0,rateLimited:0,errors:[
-    "Browser-side bulk user creation is disabled in V5 to prevent Supabase Auth 429 rate-limit errors.",
-    "Create the staff Auth accounts once in Supabase Auth (or use a protected Edge Function), then staff can log in from any device."
-  ]};
-}
-async function syncAllUsersToCloud(){
-  if(!canEdit()){toast("Admin / Master only","error");return;}
-  var box=document.getElementById("userListBox");
-  var msg="Cloud connection is available for LOGIN, but browser-side bulk user creation is disabled to prevent Auth rate-limit errors. Create the users in Supabase Auth or connect a protected provisioning function.";
-  toast(msg,"error");
-  if(box)box.insertAdjacentHTML("afterbegin","<div style='margin-bottom:12px;padding:14px;border:1px solid #fed7aa;background:#fff7ed;border-radius:10px;color:#9a3412;font-size:.84rem'><strong>Cloud user setup required</strong><br>Login is connected to your Supabase project. This public HTML does not use a secret/service-role key and therefore cannot safely create Auth users. Create each employee once in Supabase Authentication → Users, using the employee's real email address, then the same Login ID/password can be used on mobile and other computers. Bulk browser signup has been disabled because Supabase was returning HTTP 429.</div>");
-}
 // ===== USER ACCOUNTS =====
 var USERS = {
   admin:     {pass:"admin@123", role:"admin", name:"Administrator"},
@@ -2014,13 +1941,13 @@ function openUserManagerModal(){
   if(!canEdit()){toast("Admin / Master only","error");return;}
   document.getElementById("mt").textContent="Create New User — Sales Person / Office Staff";
   document.getElementById("mb2").innerHTML=userHTML()+"<div id='userListBox' style='margin-top:16px'></div>";
-  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Close</button><button class='btn bw' onclick='syncAllUsersToCloud()'>&#9729; Cloud Login Setup</button><button class='btn bs' onclick='saveUser()'>&#128190; Create User</button>";
+  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Close</button><button class='btn bs' onclick='saveUser()'>&#128190; Create User</button>";
   renderUserList();
   userTypeChanged();
   openModal();
 }
 
-async function saveUser(){
+function saveUser(){
   if(!canEdit())return;
   var u=(document.getElementById("uun").value||"").trim().toLowerCase();
   var pw=(document.getElementById("upw").value||"").trim();
@@ -2038,9 +1965,6 @@ async function saveUser(){
   if(pw.length<4){toast("Password must be at least 4 characters","error");return;}
   if(!nm){toast("Full name required","error");return;}
   if(userExists(u)){toast("Login ID already exists","error");return;}
-
-  // Save the ERP profile locally. Cloud Auth provisioning is intentionally
-  // separate: a public HTML file must not attempt privileged Auth creation.
 
   if(type==='admin'){
     USERS[u]={pass:pw,role:"admin",name:nm,type:"admin",phone:ph,email:em};
@@ -2211,70 +2135,66 @@ function accountKind(account){
   if(account.role==="plant" || account.type==="plant")return "plant";
   return "staff";
 }
-async function doLogin(){
+function doLogin(){
   var u=(document.getElementById('lUser').value||'').trim().toLowerCase();
   var p=document.getElementById('lPass').value||'';
   var err=document.getElementById('lErr');
   if(!u||!p){if(err){err.style.display='block';err.textContent='Please enter username and password';}return;}
+  var account=USERS[u];
+  if(account && account.pass===p){
+    var kind=accountKind(account);
 
-  // Cloud-first login. If the account was created before cloud migration,
-  // allow the existing local account on the original machine to sign in and
-  // automatically sync that account to Supabase for future devices.
-  var cloud=await ssCloudLogin(u,p);
-  var account=null,localFallback=false;
-  if(cloud.ok){
-    account=Object.assign({},USERS[u]||{},cloud.account);
-    USERS[u]=Object.assign({},USERS[u]||{},cloud.account,{pass:p});
-  }else{
-    account=USERS[u];
-    if(!(account && account.pass===p)){
-      if(err){err.style.display='block';err.textContent='Incorrect username/password. If this is a newly created staff account, ask Admin/Master to sync the account to Cloud.';}
-      var pass=document.getElementById('lPass');if(pass)pass.value='';
+    if(selectedLoginRole==="admin" && kind!=="admin" && kind!=="master"){
+      showLoginAccessModal("Staff Account Detected",
+        kind==="office"
+          ? "You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials."
+          : kind==="plant"
+          ? "You are a Plant Manager user. Kindly use the correct staff/plant login section."
+          : "You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials.");
       return;
     }
-    localFallback=true;
+    if(selectedLoginRole==="staff" && (kind==="admin"||kind==="master")){
+      showLoginAccessModal(kind==="master"?"Master Account Detected":"Admin Account Detected",
+        kind==="master"
+          ? "You are a Master user. Kindly select the Admin Login section and sign in with your Master credentials."
+          : "You are an Admin user. Kindly select the Admin Login section and sign in with your Admin credentials.");
+      return;
+    }
+
+    CU=Object.assign({},account);
+    CU.uname=u;CU.accountKind=kind;
+    if(err)err.style.display='none';
+
+    var lp=document.getElementById('loginPage'),app=document.getElementById('app');
+    if(lp)lp.style.display='none';
+    if(app){
+      app.style.display='block';
+      app.classList.remove('admin-mode','staff-mode','office-mode','plant-mode','master-mode');
+      app.classList.add(kind==='master'?'master-mode':kind==='admin'?'admin-mode':kind==='office'?'office-mode':kind==='plant'?'plant-mode':'staff-mode');
+    }
+
+    var ub=document.getElementById('userBadge');
+    if(ub)ub.innerHTML='&#128100; '+CU.name+
+      ' <span class="'+(kind==='master'?'badge bpu':kind==='admin'?'badge bb':kind==='office'?'staff-badge office-badge':kind==='plant'?'plant-badge':'staff-badge')+'">'+
+      (kind==='master'?'MASTER':kind==='admin'?'ADMIN':kind==='office'?'OFFICE':kind==='plant'?'PLANT':'SALES')+'</span>';
+
+    var dw=document.getElementById('dwUser');if(dw)dw.textContent=CU.name;
+    var hs=document.getElementById('hSub');
+    if(hs)hs.textContent=kind==='master'?'Master Control — Full Enterprise Access':
+      kind==='admin'?'Admin Mode — Full Access':
+      kind==='office'?'Office Staff Mode — My Work Only':
+      kind==='plant'?'Plant Manager Mode — Plant Operations & Dispatch':
+      'Sales Staff Mode — My Visits Only';
+
+    applyRoleAccess();
+    applyPlantAccess();
+    initApp();
+    if(typeof ssLoginSmile==="function")ssLoginSmile(CU.name);
+    else toast('Welcome, '+CU.name+'!','success');
+  }else{
+    if(err){err.style.display='block';err.textContent='Incorrect username or password';}
+    var pass=document.getElementById('lPass');if(pass)pass.value='';
   }
-
-  var kind=accountKind(account);
-  if(selectedLoginRole==="admin" && kind!=="admin" && kind!=="master"){
-    showLoginAccessModal("Staff Account Detected",
-      kind==="office"
-        ? "You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials."
-        : kind==="plant"
-        ? "You are a Plant Manager user. Kindly use the correct staff/plant login section."
-        : "You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials.");
-    if(SS_SB)try{await SS_SB.auth.signOut();}catch(e){}
-    return;
-  }
-  if(selectedLoginRole==="staff" && (kind==="admin"||kind==="master")){
-    showLoginAccessModal(kind==="master"?"Master Account Detected":"Admin Account Detected",
-      kind==="master"
-        ? "You are a Master user. Kindly select the Admin Login section and sign in with your Master credentials."
-        : "You are an Admin user. Kindly select the Admin Login section and sign in with your Admin credentials.");
-    if(SS_SB)try{await SS_SB.auth.signOut();}catch(e){}
-    return;
-  }
-
-  CU=Object.assign({},account);CU.uname=u;CU.accountKind=kind;
-  if(err)err.style.display='none';
-
-  try{localStorage.setItem("RMC_LAST_CLOUD_LOGIN",JSON.stringify({u:u,at:new Date().toISOString()}));}catch(e){}
-
-
-  var lp=document.getElementById('loginPage'),app=document.getElementById('app');
-  if(lp)lp.style.display='none';
-  if(app){
-    app.style.display='block';
-    app.classList.remove('admin-mode','staff-mode','office-mode','plant-mode','master-mode');
-    app.classList.add(kind==='master'?'master-mode':kind==='admin'?'admin-mode':kind==='office'?'office-mode':kind==='plant'?'plant-mode':'staff-mode');
-  }
-  var ub=document.getElementById('userBadge');
-  if(ub)ub.innerHTML='&#128100; '+CU.name+' <span class="'+(kind==='master'?'badge bpu':kind==='admin'?'badge bb':kind==='office'?'staff-badge office-badge':kind==='plant'?'plant-badge':'staff-badge')+'">'+(kind==='master'?'MASTER':kind==='admin'?'ADMIN':kind==='office'?'OFFICE':kind==='plant'?'PLANT':'SALES')+'</span>';
-  var dw=document.getElementById('dwUser');if(dw)dw.textContent=CU.name;
-  var hs=document.getElementById('hSub');
-  if(hs)hs.textContent=kind==='master'?'Master Control — Full Enterprise Access':kind==='admin'?'Admin Mode — Full Access':kind==='office'?'Office Staff Mode — My Work Only':kind==='plant'?'Plant Manager Mode — Plant Operations & Dispatch':'Sales Staff Mode — My Visits Only';
-  applyRoleAccess();applyPlantAccess();initApp();
-  if(typeof ssLoginSmile==='function')ssLoginSmile(CU.name);else toast('Welcome, '+CU.name+'!','success');
 }
 function applyRoleAccess(){
   var app=document.getElementById("app");if(!CU||!app)return;
@@ -2319,8 +2239,6 @@ function doLogout(){
   if(lp)lp.style.display='flex';
   var u=document.getElementById('lUser'),p=document.getElementById('lPass'),e=document.getElementById('lErr');
   if(u)u.value='';if(p)p.value='';if(e)e.style.display='none';
-
-  if(SS_SB)try{SS_SB.auth.signOut();}catch(e){}
 }
 function canEdit(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'));}
 function canAddVisit(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'||CU.accountKind==='staff'));}
