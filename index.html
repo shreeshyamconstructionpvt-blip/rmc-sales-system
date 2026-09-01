@@ -1874,7 +1874,7 @@ body{--gold:#c91435}
 </main>
 </div>
 <script>
-// ===== SUPABASE CLOUD LOGIN BRIDGE (V8) =====
+// ===== SUPABASE CLOUD LOGIN BRIDGE (V10) =====
 // IMPORTANT: this public GitHub Pages app uses only the publishable key.
 // It NEVER contains a Supabase secret/service-role key.
 // Login uses the main client; account creation uses a separate, memory-only
@@ -1958,7 +1958,7 @@ async function ssProvisionOneUser(loginId,password,account){
 }
 async function syncAllUsersToCloud(){
   if(!canEdit()){toast("Admin / Master only","error");return;}
-  toast("Cloud bulk sync is disabled. Create users one at a time. If Supabase Auth is rate-limited, the local ERP account is still created safely and cloud provisioning can be retried later.","success");
+  toast("Cloud bulk sync is disabled. Create users one at a time. A Supabase Auth rate limit never blocks the local ERP account or a valid local login.","success");
 }
 // ===== USER ACCOUNTS =====
 var USERS = {
@@ -2250,49 +2250,60 @@ async function doLogin(){
   var err=document.getElementById('lErr');
   if(!u||!p){if(err){err.style.display='block';err.textContent='Please enter username and password';}return;}
 
-  // Cloud-first login. If the account was created before cloud migration,
-  // allow the existing local account on the original machine to sign in and
-  // automatically sync that account to Supabase for future devices.
-  var cloud=await ssCloudLogin(u,p);
-  var account=null,localFallback=false;
-  if(cloud.ok){
-    account=Object.assign({},USERS[u]||{},cloud.account);
-    USERS[u]=Object.assign({},USERS[u]||{},cloud.account,{pass:p});
+  /*
+   * V10 LOGIN RULE:
+   * 1) If the account exists in the ERP on this browser, validate it locally FIRST.
+   *    This prevents a Supabase 429/rate-limit from blocking a valid employee login.
+   * 2) Only when there is no local account do we contact Supabase.
+   * 3) If cloud login succeeds, cache the account locally for faster future logins.
+   * This fixes the previous cloud-first failure where a valid newly-created ID was
+   * rejected simply because Supabase Auth was temporarily rate-limited.
+   */
+  var account=USERS[u];
+  var localFallback=false;
+  var cloud=null;
+
+  if(account && account.pass===p){
+    localFallback=true;
   }else{
-    account=USERS[u];
-    if(!(account && account.pass===p)){
-      if(err){err.style.display='block';err.textContent='Incorrect username/password. If this is a newly created account, verify the Login ID and password in Admin → Manage Users. Cloud login may be temporarily pending if Supabase Auth is rate-limited.';}
+    cloud=await ssCloudLogin(u,p);
+    if(cloud.ok){
+      account=Object.assign({},USERS[u]||{},cloud.account,{pass:p});
+      USERS[u]=account;
+      saveUsers();
+    }else{
+      if(err){
+        err.style.display='block';
+        err.textContent=cloud.error || 'Incorrect username/password.';
+      }
       var pass=document.getElementById('lPass');if(pass)pass.value='';
       return;
     }
-    localFallback=true;
   }
 
   var kind=accountKind(account);
-  if(selectedLoginRole==="admin" && kind!=="admin" && kind!=="master"){
-    showLoginAccessModal("Staff Account Detected",
-      kind==="office"
-        ? "You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials."
-        : kind==="plant"
-        ? "You are a Plant Manager user. Kindly use the correct staff/plant login section."
-        : "You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials.");
+  if(selectedLoginRole==='admin' && kind!=='admin' && kind!=='master'){
+    showLoginAccessModal('Staff Account Detected',
+      kind==='office'
+        ? 'You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials.'
+        : kind==='plant'
+        ? 'You are a Plant Manager user. Kindly use the correct Staff Login section and sign in with your Plant Manager credentials.'
+        : 'You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials.');
     if(SS_SB)try{await SS_SB.auth.signOut();}catch(e){}
     return;
   }
-  if(selectedLoginRole==="staff" && (kind==="admin"||kind==="master")){
-    showLoginAccessModal(kind==="master"?"Master Account Detected":"Admin Account Detected",
-      kind==="master"
-        ? "You are a Master user. Kindly select the Admin Login section and sign in with your Master credentials."
-        : "You are an Admin user. Kindly select the Admin Login section and sign in with your Admin credentials.");
+  if(selectedLoginRole==='staff' && (kind==='admin'||kind==='master')){
+    showLoginAccessModal(kind==='master'?'Master Account Detected':'Admin Account Detected',
+      kind==='master'
+        ? 'You are a Master user. Kindly select the Admin Login section and sign in with your Master credentials.'
+        : 'You are an Admin user. Kindly select the Admin Login section and sign in with your Admin credentials.');
     if(SS_SB)try{await SS_SB.auth.signOut();}catch(e){}
     return;
   }
 
   CU=Object.assign({},account);CU.uname=u;CU.accountKind=kind;
   if(err)err.style.display='none';
-
-  try{localStorage.setItem("RMC_LAST_CLOUD_LOGIN",JSON.stringify({u:u,at:new Date().toISOString()}));}catch(e){}
-
+  try{localStorage.setItem('RMC_LAST_CLOUD_LOGIN',JSON.stringify({u:u,at:new Date().toISOString(),mode:localFallback?'local':'cloud'}));}catch(e){}
 
   var lp=document.getElementById('loginPage'),app=document.getElementById('app');
   if(lp)lp.style.display='none';
@@ -2308,6 +2319,9 @@ async function doLogin(){
   if(hs)hs.textContent=kind==='master'?'Master Control — Full Enterprise Access':kind==='admin'?'Admin Mode — Full Access':kind==='office'?'Office Staff Mode — My Work Only':kind==='plant'?'Plant Manager Mode — Plant Operations & Dispatch':'Sales Staff Mode — My Visits Only';
   applyRoleAccess();applyPlantAccess();initApp();
   if(typeof ssLoginSmile==='function')ssLoginSmile(CU.name);else toast('Welcome, '+CU.name+'!','success');
+  if(localFallback && ssCloudRateBlocked()){
+    setTimeout(function(){toast('Welcome, '+CU.name+'! Cloud Auth is temporarily rate-limited, but your ERP login is working normally.','info');},250);
+  }
 }
 function applyRoleAccess(){
   var app=document.getElementById("app");if(!CU||!app)return;
