@@ -1519,7 +1519,7 @@ body{--gold:#c91435}
     
 <div class="command-strip">
   <span class="cs-title">EXECUTIVE QUICK ACTIONS</span>
-<button class="btn ba" onclick="askFreshStartPassword()">🔐 Fresh Start Reset</button>
+<button class="btn" style="background:#dcfce7;color:#166534;border:1px solid #86efac" onclick="alert('Data Safety Lock: automatic and manual data reset is disabled.')">🛡️ Data Safety ON</button>
 
   <button onclick="phase3Refresh()">↻ Refresh MIS</button>
   <button onclick="downloadMasterDailyPDF()">📄 Master Daily PDF</button>
@@ -3405,7 +3405,8 @@ function masterDeleteRecord(id){if(!masterCan())return;if(!confirm('Delete this 
    transaction arrays on the next page load. This is the key fix for KPIs
    that were coming back after reset. */
 function ssFreshMode(){
-  return localStorage.getItem("SS_RMC_FRESH_START_MANUAL")==="DONE";
+  /* DATA-SAFETY LOCK: Fresh Start is permanently disabled in production. */
+  return false;
 }
 
 /* Core transactional persistence.
@@ -3811,62 +3812,9 @@ function downloadMasterDailyPDF(){
 
 
 // =========================================================
-// SHREE SHYAM — FRESH START 01-09-2026
-// Clears historical transactional/demo records once on/after
-// 1 September 2026. Account identities and module/master
-// definitions are retained so the system remains usable.
+// DATA SAFETY: AUTOMATIC FRESH START REMOVED
 // =========================================================
-(function(){
-  var FRESH_START_KEY="SS_RMC_FRESH_START_2026_09_01";
-  var FRESH_START_DATE="2026-09-01";
-  var today=new Date();
-  var iso=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
-
-  // This runs automatically only from the requested fresh-start date.
-  if(iso>=FRESH_START_DATE && localStorage.getItem(FRESH_START_KEY)!=="DONE"){
-    var clearKeys=[
-      "RMC_VISITS",             // Sales visit records
-      "RMC_FQ",                 // Legacy quotation cache
-      "RMC_QUOTATIONS",         // Quotations
-      "RMC_WL",                 // Legacy office-work cache
-      "RMC_OFFICE_WORK",        // Office work
-      "RMC_ATTENDANCE",         // Attendance
-      "RMC_PM_ORDERS",          // Plant orders / dispatch
-      "RMC_PM_FLEET",           // Fleet/trip history
-      "RMC_PM_QC",              // QC history
-      "RMC_PM_BILL",            // Billing history
-      "RMC_PM_MAINT",           // Maintenance history
-      "RMC_PHASE1_ACTIVITY",    // Old activity/audit records
-      "RMC_ERP_WORKFLOWS",      // Old connected workflows
-      "RMC_MASTER_RECORDS",      // Old master/management records
-      "RMC_HR_EMPLOYEES"          // Old HR employee profiles
-    ];
-    clearKeys.forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});
-      /* In-memory arrays are cleared later by ssApplyFreshState(), after
-         all module arrays have been declared. */
-
-
-    // Reset raw materials to zero while keeping the material names/units.
-    // This intentionally preserves the material master but removes old stock.
-    try{
-      var mats=JSON.parse(localStorage.getItem("RMC_PM_MAT")||"[]");
-      if(!Array.isArray(mats))mats=[];
-      mats=mats.map(function(m){
-        m=m||{};
-        return Object.assign({},m,{
-          opening:0, openingStock:0, received:0, consumed:0, balance:0, current:0
-        });
-      });
-      if(mats.length) localStorage.setItem("RMC_PM_MAT",JSON.stringify(mats));
-      else localStorage.removeItem("RMC_PM_MAT");
-    }catch(e){}
-
-    localStorage.setItem(FRESH_START_KEY,"DONE");
-    localStorage.setItem("SS_RMC_FRESH_START_MANUAL","DONE");
-    localStorage.setItem("SS_RMC_FRESH_START_DATE",FRESH_START_DATE);
-  }
-})();
-
+/* Production build: no date-based deletion of business records. */
 
 function ssMasterSessionForReset(){
   /* Master Control is the only place where the Fresh Start button is rendered.
@@ -3878,103 +3826,13 @@ function ssMasterSessionForReset(){
 }
 
 function askFreshStartPassword(){
-  if(!ssMasterSessionForReset()){
-    alert("Please open Master Control and use Fresh Start Reset from the Master login.");
-    return;
-  }
-
-  var entered=window.prompt(
-    "MASTER FRESH START\n\nEnter the authorized password to continue:"
-  );
-  if(entered===null)return;
-
-  if(entered!=="Indiahsr@786"){
-    alert("Incorrect password.\n\nFresh Start was NOT performed.");
-    return;
-  }
-
-  runFreshStartReset(true,true);
+  alert("Data Safety Lock is ON. Fresh Start Reset is disabled in this production build so existing staff, sales and plant records cannot be deleted.");
+  return;
 }
 
 function runFreshStartReset(manual,authorized){
-  if(manual && !ssMasterSessionForReset()){
-    alert("Master Control access required.");
-    return;
-  }
-  if(manual && !authorized){
-    askFreshStartPassword();
-    return;
-  }
-
-  var ok=manual ? confirm(
-    "FINAL CONFIRMATION\n\n"+
-    "Fresh Start will clear the existing transactional/demo data so the system can be used fresh from 01/09/2026.\n\n"+
-    "This includes Visits, Quotations, Office Work, Plant Orders, Fleet, QC, Billing, Maintenance, Workflows, Master ERP records, HR employee records and old activity.\n\n"+
-    "Your Master/Admin login accounts will NOT be deleted.\n\nContinue?"
-  ) : true;
-  if(!ok)return;
-
-  /* Clear application data, but NEVER remove RMC_USERS so the same Master login
-     remains available after the reset. */
-  var resetKeys=["RMC_VISITS",
-    
-    "RMC_FQ","RMC_QUOTATIONS",
-    "RMC_WL","RMC_OFFICE_WORK",
-    "RMC_PM_ORDERS",
-    "RMC_PM_FLEET",
-    "RMC_PM_QC",
-    "RMC_PM_BILL",
-    "RMC_PM_MAINT",
-    "RMC_PHASE1_ACTIVITY",
-    "RMC_ERP_WORKFLOWS",
-    "RMC_MASTER_RECORDS",
-    "RMC_HR_EMPLOYEES",
-    "RMC_PM_SETTINGS",
-    "RMC_PM_ATTENDANCE",
-    "RMC_ATTENDANCE",
-    "RMC_PHASE2",
-    "RMC_PHASE3",
-    "RMC_MIS",
-    "RMC_REPORTS",
-    "RMC_NOTIFICATIONS","RMC_ATTENDANCE_STATE"
-  ];
-  resetKeys.forEach(function(k){
-    try{localStorage.removeItem(k)}catch(e){}
-  });
-
-  /* Keep the material definitions, but reset every stock quantity to zero. */
-  try{
-    var raw=localStorage.getItem("RMC_PM_MAT");
-    if(raw){
-      var mats=JSON.parse(raw);
-      if(Array.isArray(mats)){
-        mats=mats.map(function(m){
-          return Object.assign({},m,{
-            opening:0,openingStock:0,received:0,consumed:0,
-            balance:0,current:0,currentStock:0
-          });
-        });
-        localStorage.setItem("RMC_PM_MAT",JSON.stringify(mats));
-      }
-    }
-  }catch(e){}
-
-  localStorage.setItem("SS_RMC_FRESH_START_DATE","2026-09-01");
-  localStorage.setItem("SS_RMC_FRESH_START_MANUAL","DONE");
-  /* Force zero-state in this running page as well as localStorage. */
-  R.length=0; QT.length=0; FQ.length=0; WL.length=0; AT.length=0;
-  MASTER_RECORDS.length=0; ERP_WORKFLOWS.length=0;
-  PM_ORDERS.length=0; PM_FLEET.length=0; PM_QC.length=0;
-  PM_BILL.length=0; PM_MAINT.length=0; PM_MAT.length=0;
-
-
-  alert(
-    "Fresh Start completed successfully.\n\n"+
-    "All selected old transactional data has been cleared.\n"+
-    "Master/Admin login accounts remain active.\n\n"+
-    "The system is ready for fresh use from 01/09/2026."
-  );
-  location.reload();
+  alert("Data Safety Lock is ON. No application data was deleted.");
+  return;
 }
 
 // =========================================================
@@ -4391,6 +4249,9 @@ masterRenderModules=function(){
   setTimeout(bind,0);
 })();
 
+</script>
+<script>
+(function(){try{window.__RMC_DATA_SAFETY__={enabled:true,automaticReset:false,manualReset:false,version:"2026-09-01-data-safe"};}catch(e){}})();
 </script>
 </body>
 </html>
