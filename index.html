@@ -1874,7 +1874,7 @@ body{--gold:#c91435}
 </main>
 </div>
 <script>
-// ===== SUPABASE CLOUD LOGIN BRIDGE (V10) =====
+// ===== SUPABASE CLOUD LOGIN BRIDGE (V12) =====
 // IMPORTANT: this public GitHub Pages app uses only the publishable key.
 // It NEVER contains a Supabase secret/service-role key.
 // Login uses the main client; account creation uses a separate, memory-only
@@ -1912,6 +1912,15 @@ async function ssCloudLogin(loginId,password){
   var local=USERS[String(loginId||"").trim().toLowerCase()]||{};
   var email=ssCloudEmail(loginId,local);
   try{
+    // Resolve the Login ID on the server and repair an unconfirmed Auth user
+    // before attempting the actual password sign-in. This makes the same
+    // Login ID work on a fresh PC/mobile without relying on localStorage.
+    try{
+      var repair=await SS_SB.functions.invoke("repair-login",{body:{loginId:String(loginId||"").trim().toLowerCase(),password:String(password||"")}});
+      if(!repair.error&&repair.data&&repair.data.ok&&repair.data.email){
+        email=String(repair.data.email).trim().toLowerCase();
+      }
+    }catch(re){ /* normal sign-in below will return the authoritative error */ }
     var r=await SS_SB.auth.signInWithPassword({email:email,password:password});
     if(!r.error){
       var u=r.data&&r.data.user,md=(u&&u.user_metadata)||{};
@@ -2255,7 +2264,7 @@ async function doLogin(){
   if(!u||!p){if(err){err.style.display='block';err.textContent='Please enter username and password';}return;}
 
   /*
-   * V10 LOGIN RULE:
+   * V12 LOGIN RULE:
    * 1) If the account exists in the ERP on this browser, validate it locally FIRST.
    *    This prevents a Supabase 429/rate-limit from blocking a valid employee login.
    * 2) Only when there is no local account do we contact Supabase.
