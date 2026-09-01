@@ -1928,31 +1928,35 @@ function ssCloudRateBlockMessage(){
   return "Supabase Auth is rate-limited right now. New local ID can still be created, and cloud setup can be retried in about "+mins+" minute(s).";
 }
 async function ssProvisionOneUser(loginId,password,account){
-  if(!SS_SIGNUP||!SS_SB_READY)return {ok:false,error:"Supabase client could not be initialized. Reload the page and try again."};
+  if(!SS_SB||!SS_SB_READY)return {ok:false,error:"Supabase client could not be initialized. Reload the page and try again."};
   if(SS_PROVISION_BUSY)return {ok:false,error:"Cloud user creation is already running. Please wait."};
   if(String(password||"").length<6)return {ok:false,error:"Password must be at least 6 characters."};
   SS_PROVISION_BUSY=true;
   try{
-    var email=ssCloudEmail(loginId,account);
-    // signUp is intentionally performed on the isolated, non-persistent client.
-    // It cannot replace the logged-in Admin/Master session.
-    var r=await SS_SIGNUP.auth.signUp({
-      email:email,
-      password:password,
-      options:{
-        data:{login_id:loginId,name:account.name||loginId,role:account.role||"staff",type:account.type||account.role||"staff",phone:account.phone||"",email:email}
+    var sessionResult=await SS_SB.auth.getSession();
+    var session=sessionResult&&sessionResult.data&&sessionResult.data.session;
+    if(session&&session.access_token){
+      var payload={loginId:String(loginId||"").trim().toLowerCase(),password:String(password||""),name:account&&account.name||loginId,role:account&&account.role||"staff",type:account&&account.type||account.role||"staff",phone:account&&account.phone||"",email:account&&account.email||""};
+      var fn=await SS_SB.functions.invoke("provision-user",{body:payload});
+      if(!fn.error&&fn.data){
+        if(fn.data.ok)return {ok:true,existing:!!fn.data.existing,created:!!fn.data.created,email:fn.data.email||ssCloudEmail(loginId,account)};
+        return {ok:false,error:fn.data.error||"Cloud provisioning failed."};
       }
-    });
+      if(fn.error){
+        var fm=String((fn.error&&fn.error.message)||fn.error||"");
+        if(!/404|not found|failed to fetch|network/i.test(fm))return {ok:false,error:fm||"Cloud provisioning failed."};
+      }
+    }
+    var email=ssCloudEmail(loginId,account);
+    var r=await SS_SIGNUP.auth.signUp({email:email,password:password,options:{data:{login_id:loginId,name:account.name||loginId,role:account.role||"staff",type:account.type||account.role||"staff",phone:account.phone||"",email:email}}});
     if(r.error){
-      var m=String(r.error.message||r.error),low=m.toLowerCase();
+      var m=String(r.error.message||r.error);
       if(/already registered|already exists|user already/i.test(m))return {ok:true,existing:true,email:email};
-      if(/rate limit|too many requests|429/i.test(m)){ SS_CLOUD_RATE_BLOCK_UNTIL=Date.now()+10*60*1000; return {ok:false,rateLimited:true,error:ssAuthErrorMessage(r.error)}; }
+      if(/rate limit|too many requests|429/i.test(m)){SS_CLOUD_RATE_BLOCK_UNTIL=Date.now()+10*60*1000;return {ok:false,rateLimited:true,error:ssAuthErrorMessage(r.error)};}
       return {ok:false,error:ssAuthErrorMessage(r.error)};
     }
-    var user=r.data&&r.data.user,confirmed=!!(r.data&&r.data.session);
-    // Never leave the temporary signup session around.
-    try{await SS_SIGNUP.auth.signOut({scope:"local"});}catch(e){}
-    return {ok:true,created:true,confirmed:confirmed,email:email,user:user||null};
+    var confirmed=!!(r.data&&r.data.session);try{await SS_SIGNUP.auth.signOut({scope:"local"});}catch(e){}
+    return {ok:true,created:true,confirmed:confirmed,email:email,user:(r.data&&r.data.user)||null};
   }catch(e){return {ok:false,error:ssAuthErrorMessage(e)};}
   finally{SS_PROVISION_BUSY=false;}
 }
