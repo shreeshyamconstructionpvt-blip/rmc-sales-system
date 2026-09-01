@@ -1875,39 +1875,49 @@ body{--gold:#c91435}
 </div>
 <script>
 // ===== SUPABASE CLOUD LOGIN BRIDGE =====
-// Production-safe cloud authentication bridge.
-// Staff IDs are mapped to a syntactically valid Auth email alias so the same
-// Login ID + password can authenticate from different browsers/devices.
+// Cloud authentication for Staff / Sales / Office / Plant accounts.
+// IMPORTANT: this browser uses only the publishable/anon key. Never put a
+// Supabase service-role key in a public HTML file.
 var SS_SUPABASE_URL = "https://xihbqwhsqlpgrysttwth.supabase.co";
 var SS_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
-var SS_AUTH_DOMAIN = "auth.shreeshyamconstruction.com";
+// Use the project's own Supabase hostname as the Auth email alias. This avoids
+// dependence on an unconfigured custom Auth domain.
+var SS_AUTH_DOMAIN = "xihbqwhsqlpgrysttwth.supabase.co";
+var SS_OLD_AUTH_DOMAIN = "auth.shreeshyamconstruction.com";
 var SS_LEGACY_AUTH_DOMAIN = "auth.shreeshyam.invalid";
 var SS_SB = null;
 try{
   if(window.supabase && window.supabase.createClient){
     SS_SB = window.supabase.createClient(SS_SUPABASE_URL, SS_SUPABASE_PUBLISHABLE_KEY, {
-      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:"shree_shyam_rmc_auth_v2"}
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:"shree_shyam_rmc_auth_v3"}
     });
   }
 }catch(e){ console.warn("Supabase init failed",e); }
-function ssCloudEmail(loginId,legacy){
+function ssCloudEmail(loginId,domain){
   var u=String(loginId||"").trim().toLowerCase();
-  return u+"@"+(legacy?SS_LEGACY_AUTH_DOMAIN:SS_AUTH_DOMAIN);
+  return u+"@"+(domain||SS_AUTH_DOMAIN);
 }
 function ssCloudClient(){
   try{
     if(window.supabase && window.supabase.createClient){
       return window.supabase.createClient(SS_SUPABASE_URL, SS_SUPABASE_PUBLISHABLE_KEY, {
-        auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:"shree_shyam_signup_temp_v2"}
+        auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:"shree_shyam_signup_temp_v3"}
       });
     }
   }catch(e){}
   return null;
 }
+function ssAuthErrorMessage(e){
+  var m=String((e&&e.message)||e||"Unknown Supabase error");
+  if(/email.*confirm|confirm.*email/i.test(m))return "Email confirmation is enabled in Supabase Auth. Turn OFF Confirm email, then sync again.";
+  if(/rate limit|too many requests/i.test(m))return "Supabase rate limit reached. Wait a few minutes and retry.";
+  if(/invalid.*email|email.*invalid/i.test(m))return "Supabase rejected the Auth email alias. This version uses the project's Supabase domain; check Authentication settings.";
+  return m;
+}
 async function ssCloudCreateUser(loginId,account){
   var c=ssCloudClient();
   if(!c)return {ok:false,error:"Supabase client unavailable"};
-  var email=ssCloudEmail(loginId,false);
+  var email=ssCloudEmail(loginId,SS_AUTH_DOMAIN);
   try{
     var r=await c.auth.signUp({
       email:email,
@@ -1916,20 +1926,23 @@ async function ssCloudCreateUser(loginId,account){
     });
     if(r.error){
       var msg=String(r.error.message||"");
-      if(/already registered|already exists|user already/i.test(msg)){
+      // If an account was previously created by an older version, do not
+      // treat it as a hard failure. Login will also try the older aliases.
+      if(/already registered|already exists|user already|duplicate/i.test(msg)){
         return {ok:true,existing:true};
       }
-      return {ok:false,error:msg};
+      return {ok:false,error:ssAuthErrorMessage(r.error)};
     }
     if(r.data && r.data.user && !r.data.session){
-      return {ok:false,needsConfirmation:true,error:"Supabase email confirmation is enabled. Disable email confirmation in Supabase Auth, then create the user again."};
+      return {ok:false,needsConfirmation:true,error:"Email confirmation is enabled in Supabase Auth. Turn OFF Confirm email in Authentication → Providers → Email, then sync again."};
     }
     return {ok:true,existing:false};
-  }catch(e){return {ok:false,error:e.message||String(e)};}
+  }catch(e){return {ok:false,error:ssAuthErrorMessage(e)};}
 }
 async function ssCloudLogin(loginId,password){
   if(!SS_SB)return {ok:false,error:"Cloud login unavailable"};
-  var domains=[false,true];
+  // New canonical alias first, then both aliases used by previous builds.
+  var domains=[SS_AUTH_DOMAIN,SS_OLD_AUTH_DOMAIN,SS_LEGACY_AUTH_DOMAIN];
   var lastError="Cloud login failed";
   for(var i=0;i<domains.length;i++){
     try{
@@ -1939,23 +1952,24 @@ async function ssCloudLogin(loginId,password){
         return {ok:true,account:{pass:password,role:md.role||"staff",type:md.type||md.role||"staff",name:md.name||loginId,phone:md.phone||"",email:md.email||""}};
       }
       lastError=String(r.error.message||lastError);
-    }catch(e){lastError=e.message||String(e);}
+    }catch(e){lastError=ssAuthErrorMessage(e);}
   }
-  return {ok:false,error:lastError};
+  return {ok:false,error:ssAuthErrorMessage(lastError)};
 }
 async function ssCloudMigrateUsers(){
-  if(!SS_SB)return {ok:false,created:0,existing:0,failed:0};
-  var keys=Object.keys(USERS||{}),created=0,existing=0,failed=0,errors=[];
+  if(!SS_SB)return {ok:false,created:0,existing:0,failed:0,errors:["Supabase client unavailable"]};
+  var keys=Object.keys(USERS||{}),created=0,existing=0,failed=0,pending=0,errors=[];
   for(var i=0;i<keys.length;i++){
     var k=keys[i],a=USERS[k];
     if(!a || !a.pass || k==="admin" || k==="master")continue;
     try{
       var r=await ssCloudCreateUser(k,a);
       if(r.ok){if(r.existing)existing++;else created++;}
+      else if(r.needsConfirmation){pending++;errors.push(k+": "+r.error);}
       else {failed++;errors.push(k+": "+r.error);}
-    }catch(e){failed++;errors.push(k+": "+(e.message||String(e)));}
+    }catch(e){failed++;errors.push(k+": "+ssAuthErrorMessage(e));}
   }
-  return {ok:failed===0,created:created,existing:existing,failed:failed,errors:errors};
+  return {ok:failed===0 && pending===0,created:created,existing:existing,pending:pending,failed:failed,errors:errors};
 }
 function ssCloudStatusToast(msg,type){try{toast(msg,type||"success");}catch(e){}}
 
@@ -2038,8 +2052,19 @@ async function syncAllUsersToCloud(){
   if(!SS_SB){toast("Supabase is not available. Check internet connection.","error");return;}
   toast("Syncing staff accounts to Cloud...","success");
   var r=await ssCloudMigrateUsers();
-  if(r.failed){toast("Cloud sync finished: "+r.created+" created, "+r.existing+" already existed, "+r.failed+" failed. If confirmation is enabled, disable it in Supabase Auth.","error");}
-  else{toast("Cloud sync complete: "+r.created+" created, "+r.existing+" already existed.","success");}
+  var msg="Cloud sync: "+r.created+" created, "+r.existing+" already existed";
+  if(r.pending)msg+=", "+r.pending+" awaiting confirmation";
+  if(r.failed)msg+=", "+r.failed+" failed";
+  if(r.failed || r.pending){
+    toast(msg+". Open the browser console for exact account errors.","error");
+    console.error("SHREE SHYAM CLOUD SYNC DETAILS",r.errors||[]);
+    // Also show a compact, readable diagnostic list inside the user manager.
+    var box=document.getElementById("userListBox");
+    if(box && r.errors && r.errors.length){
+      var safe=r.errors.map(function(x){return String(x).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}).join("<br>");
+      box.insertAdjacentHTML("afterbegin","<div style='margin-bottom:12px;padding:12px;border:1px solid #fecaca;background:#fff1f2;border-radius:10px;color:#991b1b;font-size:.82rem'><strong>Cloud sync details</strong><br>"+safe+"</div>");
+    }
+  }else{toast(msg+".","success");}
 }
 
 async function saveUser(){
@@ -2065,7 +2090,7 @@ async function saveUser(){
   var cloudAccount={pass:pw,role:type==='office'?"office":type==='sales'?"staff":"admin",type:type,name:nm,phone:ph,email:em};
   var cloudResult=await ssCloudCreateUser(u,cloudAccount);
   if(!cloudResult.ok){
-    toast("Cloud account could not be created: "+cloudResult.error+". Local account was NOT created.","error");
+    toast("Cloud account could not be created: "+cloudResult.error+" Local account was NOT created.","error");
     return;
   }
 
