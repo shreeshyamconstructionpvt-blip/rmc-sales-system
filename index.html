@@ -2926,6 +2926,25 @@ async function runUniversalOCR(file){
 
 // ===== PLANT MANAGER DATA =====
 var PM_ORDERS=[], PM_FLEET=[], PM_STAFF=[], PM_QC=[], PM_MAT=[], PM_BILL=[], PM_MAINT=[];
+
+/* ===== MASTER PDF STABILITY =====
+   Keep these globals defined even when the optional integrated-ERP module has
+   no records yet. The PDF must never fail because an optional dataset is absent. */
+var MASTER_RECORDS = (function(){
+  try{
+    var raw=localStorage.getItem("RMC_MASTER_RECORDS");
+    var parsed=raw?JSON.parse(raw):[];
+    return Array.isArray(parsed)?parsed:[];
+  }catch(e){return [];}
+})();
+function masterRecordsSave(){
+  try{localStorage.setItem("RMC_MASTER_RECORDS",JSON.stringify(MASTER_RECORDS));}catch(e){}
+}
+function ssTodayKey(){
+  var d=new Date();
+  function p(n){return String(n).padStart(2,"0");}
+  return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());
+}
 var pmIds={o:1,f:1,s:1,q:1,m:1,b:1,x:1};
 
 function pmLoad(){
@@ -3506,7 +3525,7 @@ function exportAdminPlantPDF(){
   y=ssPlantPdfSection(d,'05. Raw Material Stock & Consumption',['#','Material','Unit','Opening','Received','Consumed','Current','Reorder','Status','Saved'],(PM_MAT||[]).map(function(x,i){var z=pmMaterialBalance(x);return[i+1,x.name||'-',x.unit||'-',z.opening,z.received,z.consumed,z.balance,z.reorder,(Number(z.balance)<=Number(z.reorder)?'REORDER':'OK'),ssPdfSavedAt(x)];}),y);
   y=ssPlantPdfSection(d,'06. Billing & Payments',['#','Invoice','Customer','Order','Amount','Paid','Outstanding','Due','Status','Saved'],(PM_BILL||[]).map(function(x,i){return[i+1,x.inv||x.invoice||'-',x.customer||'-',x.order||'-',pmMoney(x.amount||0),pmMoney(x.paid||0),pmMoney(x.outstanding||0),x.due||'-',x.status||'-',ssPdfSavedAt(x)];}),y);
   y=ssPlantPdfSection(d,'07. Vehicle Maintenance Register',['Sr. No.','Vehicle Type','Vehicle No.','Primary Engine KM','2nd Engine KM','Service Type','Service Date','Service Allotted To','Next Service Date','Remarks','Saved'],(PM_MAINT||[]).map(function(raw,i){var x=pmMaintNormalizeRow(raw,i);return[x.serial||i+1,x.vehicleType||'-',x.vehicleNo||'-',x.primaryKm||'-',x.secondKm||'-',x.serviceType||'-',pmMaintDisplayDate(x.serviceDate),x.serviceAllottedTo||'-',pmMaintDisplayDate(x.nextServiceDate),x.remarks||'-',ssPdfSavedAt(raw)];}),y);
-  y=ssPlantPdfSection(d,'08. Integrated Plant ERP Records',['#','Module','Reference','Name / Party','Status','Amount','Details','Saved'],(typeof MASTER_RECORDS!=='undefined' && Array.isArray(MASTER_RECORDS)?MASTER_RECORDS:[]).filter(function(x){return ['production','inventory','machinery','labour'].indexOf(x.module)>=0;}).map(function(x,i){return[i+1,x.module||'-',x.ref||'-',x.name||'-',x.status||'-',pmMoney(x.amount||0),ssModuleFieldSummary(x),ssPdfSavedAt(x)];}),y);
+  y=ssPlantPdfSection(d,'08. Integrated Plant ERP Records',['#','Module','Reference','Name / Party','Status','Amount','Details','Saved'],(Array.isArray(MASTER_RECORDS)?MASTER_RECORDS:[]).filter(function(x){return ['production','inventory','machinery','labour'].indexOf(x.module)>=0;}).map(function(x,i){return[i+1,x.module||'-',x.ref||'-',x.name||'-',x.status||'-',pmMoney(x.amount||0),ssModuleFieldSummary(x),ssPdfSavedAt(x)];}),y);
   d.save('Master_Plant_Complete_Report_'+ssTodayKey()+'.pdf');
   toast('Master Plant PDF downloaded — each plant module is separated','success');
 }
@@ -3603,7 +3622,7 @@ function ssSaveMasterModule(){
     meta:{fields:{},createdBy:CU?CU.uname:"master",createdAt:new Date().toISOString()}
   });
   inputs.forEach(function(x){MASTER_RECORDS[MASTER_RECORDS.length-1].meta.fields[x.id]=x.value||"";});
-  masterSave();closeModal();masterRenderAll();phase1Render();
+  masterRecordsSave();closeModal();if(typeof masterRenderAll==="function")masterRenderAll();if(typeof phase1Render==="function")phase1Render();
   toast(c.name+" record saved successfully","success");
 }
 function ssBindMasterModuleClicks(){
