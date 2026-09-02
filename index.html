@@ -6,6 +6,8 @@
 <title>Shree Shyam RMC ERP | Enterprise Management System</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--p:#c8102e;--a:#f59e0b;--d:#b91c1c;--s:#057a55;--pu:#7c3aed;--tl:#0891b2;--bg:#f5f5f5;--card:#fff;--b:#e2e8f0;--t:#1a1a1a;--m:#64748b;--r:10px;--sh:0 2px 16px rgba(0,0,0,.10)}
@@ -1751,7 +1753,7 @@ body{--gold:#c91435}
     <div class="pm-section-note">&#128295; Maintenance register for batching plant, mixer trucks, pumps, breakdowns, service and preventive maintenance.</div>
     <div class="pm-toolbar"><button class="btn bs" onclick="pmOpenMaint()">&#10133; Log Maintenance</button></div>
     <div class="pm-mini"><div class="pm-mini-head"><h3>Equipment &amp; Maintenance</h3><span class="pm-kpi" id="pmMaintKpi"></span></div>
-      <div class="pm-table-wrap"><table class="pm-table"><thead><tr><th>Date</th><th>Equipment</th><th>Issue / Service</th><th>Type</th><th>Priority</th><th>Status</th><th>Next Service</th><th>Assigned To</th><th>Actions</th></tr></thead><tbody id="pmMaintBody"></tbody></table></div>
+      <div class="pm-table-wrap"><table class="pm-table"><thead><tr><th>Date</th><th>Serial</th><th>Vehicle / KM</th><th>Registration</th><th>Insurance Done / Due</th><th>PUC Due</th><th>Permit Due</th><th>Service Done / Due</th><th>Engine Service Done / Due</th><th>Remarks</th><th>Actions</th></tr></thead><tbody id="pmMaintBody"></tbody></table></div>
     </div>
   </section>
 
@@ -2825,10 +2827,10 @@ function saveWL(){
   var existIdx=(eid!=null)?WL.findIndex(function(w){return w.id===eid;}):-1;
   if(existIdx>=0){
     if(CU.accountKind!=='admin' && WL[existIdx].nm!==CU.name){toast("You cannot update another employee's work","error");return;}
-    WL[existIdx]={id:WL[existIdx].id,nm:nm,dt:dt,tk:tk,sts:sts,pr:pr,nt:nt};
+    WL[existIdx]={id:WL[existIdx].id,nm:nm,dt:dt,tk:tk,sts:sts,pr:pr,nt:nt,cloudKey:WL[existIdx].cloudKey||ssWorkRecordKey(WL[existIdx])};
     toast("Daily work updated","success");
   }else{
-    WL.push({id:nWid++,nm:nm,dt:dt,tk:tk,sts:sts,pr:pr,nt:nt});
+    var newWorkId=Date.now(); WL.push({id:newWorkId,nm:nm,dt:dt,tk:tk,sts:sts,pr:pr,nt:nt,cloudKey:nm+"::"+newWorkId+"::"+dt});
     toast("Daily work added","success");
   }
   ssSaveCore();
@@ -2839,7 +2841,7 @@ function delWL(id){
   var row=WL.filter(function(x){return x.id===id;})[0];if(!row)return;
   if(CU.accountKind!=='admin' && row.nm!==CU.name){toast("You cannot delete another employee's work","error");return;}
   if(!confirm("Delete this work entry?"))return;
-  WL=WL.filter(function(x){return x.id!==id;});ssSaveCore();rWL();rStats();
+  var cloudDeleteRow=row; WL=WL.filter(function(x){return x.id!==id;});ssSaveCore();ssCloudDeleteWork(cloudDeleteRow);rWL();rStats();
 }
 function rWL(){
   var tb=document.getElementById("wlb");if(!tb)return;
@@ -3204,28 +3206,164 @@ function pmSaveBill(){
   pmSave();closeModal();pmRenderAll();toast("Billing record saved","success");
 }
 function pmRenderMaint(){
-  var open=PM_MAINT.filter(x=>x.status!=="Completed").length;
-  document.getElementById("pmMaintKpi").textContent=open+" open";
-  document.getElementById("pmMaintBody").innerHTML=PM_MAINT.length?PM_MAINT.map(function(x){return"<tr><td>"+pmEsc(x.date)+"</td><td><strong>"+pmEsc(x.equipment)+"</strong></td><td>"+pmEsc(x.issue)+"</td><td>"+pmEsc(x.type)+"</td><td><span class='pm-pill "+pmPriorityClass(x.priority)+"'>"+pmEsc(x.priority)+"</span></td><td><span class='pm-pill "+(x.status==="Completed"?"pm-ok":"pm-warn")+"'>"+pmEsc(x.status)+"</span></td><td>"+pmEsc(x.next)+"</td><td>"+pmEsc(x.by)+"</td><td><button class='ib' onclick='pmOpenMaint("+x.id+")'>&#9999;</button><button class='ib' onclick='pmDelete(\"x\","+x.id+")'>&#128465;</button></td></tr>";}).join(""):"<tr><td colspan='9' class='pm-empty'>No maintenance records.</td></tr>";
+  var open=PM_MAINT.filter(function(x){return x.status!=="Completed";}).length;
+  var k=document.getElementById("pmMaintKpi");if(k)k.textContent=open+" open";
+  var tb=document.getElementById("pmMaintBody");if(!tb)return;
+  tb.innerHTML=PM_MAINT.length?PM_MAINT.map(function(x,i){
+    var veh=x.vehicle||x.equipment||"-";
+    var reg=x.registration||"-";
+    var ins=(x.insuranceDone||"")+(x.insuranceDue?" / "+x.insuranceDue:"");
+    var svc=(x.serviceDone||"")+(x.serviceDue?" / "+x.serviceDue:"");
+    var pes=(x.engineServiceDone||"")+(x.engineServiceDue?" / "+x.engineServiceDue:"");
+    return "<tr>"+
+      "<td>"+pmEsc(x.date||"-")+"</td>"+
+      "<td>"+pmEsc(x.serial||i+1)+"</td>"+
+      "<td><strong>"+pmEsc(veh)+"</strong><br><small>KM: "+pmEsc(x.km||"-")+"</small></td>"+
+      "<td>"+pmEsc(reg)+"</td>"+
+      "<td>"+pmEsc(ins||"-")+"</td>"+
+      "<td>"+pmEsc(x.pucDue||"-")+"</td>"+
+      "<td>"+pmEsc(x.permitDue||"-")+"</td>"+
+      "<td>"+pmEsc(svc||"-")+"</td>"+
+      "<td>"+pmEsc(pes||"-")+"</td>"+
+      "<td>"+pmEsc(x.remarks||x.issue||"-")+"</td>"+
+      "<td><button class='ib' onclick='pmOpenMaint("+x.id+")' title='Edit'>&#9999;</button><button class='ib' onclick='pmDelete(\"x\","+x.id+")' title='Delete'>&#128465;</button></td>"+
+      "</tr>";
+  }).join(""):"<tr><td colspan='10' class='pm-empty'>No maintenance records. Use <b>Log Maintenance</b> or <b>Upload & Auto-Read</b> to add the register.</td></tr>";
 }
+
+function pmMaintUploadHTML(){
+  return "<div class='fi full' style='margin-top:4px'><label>&#128247; Upload Maintenance Performa (Photo / PDF)</label>"+
+    "<input id='xmfile' type='file' accept='image/*,.pdf' onchange='pmOCRFile(this)' style='padding:10px;background:#fff'>"+
+    "<div style='display:flex;gap:8px;flex-wrap:wrap;margin-top:8px'><button type='button' class='btn ba bsm' onclick='pmImportOCRRows()'>Create Rows From OCR</button><button type='button' class='btn bo bsm' onclick=\"document.getElementById('xmfile').click()\">Choose Another File</button></div><small id='xmstatus' style='display:block;margin-top:7px;color:#64748b'>Upload the handwritten/printed maintenance sheet. The system will read visible text and fill matching fields; please review before saving.</small></div>"+
+    "<div class='fi full'><label>OCR / Read Text</label><textarea id='xocr' placeholder='Extracted text will appear here...'></textarea></div>";
+}
+function pmDateGuess(v){
+  v=String(v||"").trim();
+  var m=v.match(/\b(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})\b/);
+  if(!m)return "";
+  var y=m[3].length===2?"20"+m[3]:m[3];
+  return y+"-"+String(m[2]).padStart(2,"0")+"-"+String(m[1]).padStart(2,"0");
+}
+function pmOCRNormalize(t){
+  return String(t||"").replace(/\r/g,"").replace(/[|]/g," ").replace(/\s+\n/g,"\n").trim();
+}
+function pmApplyOCRText(text){
+  text=pmOCRNormalize(text);var lines=text.split(/\n+/).map(function(x){return x.trim();}).filter(Boolean);
+  var area=document.getElementById("xocr");if(area)area.value=text;
+  // Conservative auto-fill: only high-confidence labels/values. Uncertain handwritten values remain editable.
+  var joined=lines.join(" ");
+  var veh=(joined.match(/\b(HR\s*[-]?\s*\d{1,2}\s*[A-Z]{0,3}\s*\d{3,5})\b/i)||[])[1]||"";
+  if(!veh){veh=(joined.match(/\bHR\s*[-]?\s*[A-Z0-9]{4,10}\b/i)||[])[0]||"";}
+  if(veh&&document.getElementById("xe"))document.getElementById("xe").value=veh.replace(/\s+/g," ").trim();
+  var dates=joined.match(/\b\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}\b/g)||[];
+  if(dates.length){
+    var d=pmDateGuess(dates[0]);
+    if(d&&document.getElementById("xd"))document.getElementById("xd").value=d;
+  }
+  // Recognise common header labels so the operator knows OCR ran successfully.
+  var status=document.getElementById("xmstatus");
+  if(status)status.innerHTML="<b>Auto-read complete.</b> Visible text has been extracted. High-confidence vehicle/date values were filled where possible. Review the fields and OCR text before saving.";
+}
+async function pmOCRFile(input){
+  var file=input&&input.files&&input.files[0];if(!file)return;
+  var status=document.getElementById("xmstatus");
+  if(status)status.textContent="Reading document… please wait. Handwritten sheets may need manual review.";
+  try{
+    var result;
+    if(file.type==="application/pdf"||/\.pdf$/i.test(file.name)){
+      // PDF text extraction when browser PDF.js is available; otherwise OCR the first rendered/available image is not attempted silently.
+      if(window.pdfjsLib){
+        var buf=await file.arrayBuffer();var pdf=await pdfjsLib.getDocument({data:buf}).promise;var all="";
+        for(var pno=1;pno<=pdf.numPages;pno++){
+          var page=await pdf.getPage(pno);var tc=await page.getTextContent();
+          all+=tc.items.map(function(it){return it.str;}).join(" ")+"\n";
+        }
+        pmApplyOCRText(all);
+      }else{
+        if(status)status.innerHTML="PDF selected. This browser build has OCR for images; for a PDF, save/export the page as JPG/PNG and upload it for automatic reading.";
+        return;
+      }
+    }else{
+      result=await Tesseract.recognize(file,"eng",{logger:function(m){
+        if(status&&m&&m.status&&typeof m.progress==="number")status.textContent="Reading: "+m.status+" "+Math.round(m.progress*100)+"%";
+      }});
+      pmApplyOCRText(result.data.text||"");
+    }
+    var img=new Image();img.onload=function(){
+      try{
+        var max=1200,w=img.width,h=img.height,scale=Math.min(1,max/Math.max(w,h));
+        var c=document.createElement("canvas");c.width=Math.max(1,Math.round(w*scale));c.height=Math.max(1,Math.round(h*scale));
+        c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+        window.pmPendingAttachment=c.toDataURL("image/jpeg",.62);
+        window.pmPendingAttachmentName=file.name;
+      }catch(e){}
+    };img.src=URL.createObjectURL(file);
+  }catch(e){
+    if(status)status.textContent="Auto-read failed. You can still enter the maintenance data manually.";
+    toast("Document reading failed — please review and enter the fields manually","error");
+  }
+}
+function pmImportOCRRows(){
+  var text=((document.getElementById("xocr")||{}).value||"").trim();
+  if(!text){toast("Upload and read a document first","error");return;}
+  var lines=text.split(/\n+/).map(function(v){return v.trim();}).filter(Boolean),added=0,seen={};
+  lines.forEach(function(line){
+    var sm=line.match(/^(\d{1,2})\s*[.)-]?\s+/);if(!sm)return;
+    var serial=Number(sm[1]);if(serial<1||serial>999)return;
+    var vm=line.match(/\bHR\s*[-]?\s*[A-Z0-9]{2,3}\s*[A-Z0-9]{2,5}\b/i);
+    if(!vm)vm=line.match(/\bHR\s*[-]?\s*[A-Z0-9]{5,10}\b/i);
+    if(!vm)return;
+    var veh=vm[0].replace(/\s+/g," ").trim(),key=serial+"|"+veh.toUpperCase();if(seen[key])return;seen[key]=1;
+    if(PM_MAINT.some(function(x){return Number(x.serial)===serial&&String(x.vehicle||x.equipment||"").toUpperCase()===veh.toUpperCase();}))return;
+    PM_MAINT.push({id:pmIds.x++,date:new Date().toISOString().slice(0,10),serial:serial,vehicle:veh,equipment:veh,km:"",registration:"",insuranceDone:"",insuranceDue:"",pucDue:"",permitDue:"",serviceDone:"",serviceDue:"",engineServiceDone:"",engineServiceDue:"",status:"Open",by:"Parveen Dahiya",remarks:"Imported from OCR. Review handwritten source.",issue:"Imported from OCR",type:"Service",priority:"Medium",ocrText:line,attachment:window.pmPendingAttachment||"",attachmentName:window.pmPendingAttachmentName||""});
+    added++;
+  });
+  if(!added){toast("No high-confidence vehicle rows found. Please review OCR text and enter rows manually.","error");return;}
+  pmSave();closeModal();pmRenderAll();toast(added+" maintenance row(s) imported from OCR","success");
+}
+
 function pmOpenMaint(id){
   var x=id?PM_MAINT.find(function(a){return a.id===id;}):{};
-  pmModal(id?"Edit Maintenance":"Log Maintenance",pmForm([
-    pmField("Date *","xd",x.date||new Date().toISOString().slice(0,10),"date"),
-    pmField("Equipment *","xe",x.equipment||"Batching Plant"),
-    pmField("Issue / Service *","xi",x.issue||"","text",true),
-    "<div class='fi'><label>Type</label><select id='xt'>"+["Preventive","Breakdown","Service","Inspection"].map(function(s){return"<option "+(x.type===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
-    "<div class='fi'><label>Priority</label><select id='xp'>"+["Low","Medium","High"].map(function(s){return"<option "+(x.priority===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
-    "<div class='fi'><label>Status</label><select id='xst'>"+["Open","In Progress","Completed"].map(function(s){return"<option "+(x.status===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
-    pmField("Next Service","xn",x.next||"","date"),
-    pmField("Assigned To","xby",x.by||"")
+  window.pmPendingAttachment=x.attachment||"";window.pmPendingAttachmentName=x.attachmentName||"";
+  pmModal(id?"Edit Maintenance Register Row":"Maintenance Register — Add Vehicle / Equipment",pmForm([
+    "<div class='fi'><label>Serial No.</label><input id='xser' type='number' min='1' value='"+pmEsc(x.serial||"")+"' placeholder='01'></div>",
+    pmField("Vehicle No. / KM *","xe",x.vehicle||x.equipment||"","text"),
+    pmField("KM Reading","xkm",x.km||""),
+    pmField("Registration No.","xreg",x.registration||""),
+    pmField("Insurance Date","xinsd",x.insuranceDone||"","date"),
+    pmField("Insurance Next Due","xinsn",x.insuranceDue||"","date"),
+    pmField("PUC Next Due","xpuc",x.pucDue||"","date"),
+    pmField("Permit Next Due","xper",x.permitDue||"","date"),
+    pmField("Service Done","xsd",x.serviceDone||"","date"),
+    pmField("Service Due","xsn",x.serviceDue||"","date"),
+    pmField("Primary Engine Service Done","xped",x.engineServiceDone||"","date"),
+    pmField("Primary Engine Service Due","xpen",x.engineServiceDue||"","date"),
+    "<div class='fi'><label>Status</label><select id='xst'>"+["Open","In Progress","Completed"].map(function(s){return"<option "+((x.status||"Open")===s?"selected":"")+">"+s+"</option>";}).join("")+"</select></div>",
+    pmField("Assigned To","xby",x.by||"Parveen Dahiya"),
+    pmField("Remarks","xrm",x.remarks||x.issue||"","text",true),
+    pmMaintUploadHTML()
   ]),"Save Maintenance","pmSaveMaint");window.pmEditId=id||0;
 }
 function pmSaveMaint(){
-  var d={date:document.getElementById("xd").value,equipment:document.getElementById("xe").value.trim(),issue:document.getElementById("xi").value.trim(),type:document.getElementById("xt").value,priority:document.getElementById("xp").value,status:document.getElementById("xst").value,next:document.getElementById("xn").value,by:document.getElementById("xby").value.trim()};
-  if(!d.date||!d.equipment||!d.issue){toast("Date, equipment and issue/service are required","error");return;}
-  if(window.pmEditId){var i=PM_MAINT.findIndex(x=>x.id===window.pmEditId);PM_MAINT[i]=Object.assign({},PM_MAINT[i],d);}else{d.id=pmIds.x++;PM_MAINT.push(d);}
-  pmSave();closeModal();pmRenderAll();toast("Maintenance record saved","success");
+  var d={
+    date:document.getElementById("xd").value,
+    serial:Number(document.getElementById("xser").value)||null,
+    vehicle:document.getElementById("xe").value.trim(),equipment:document.getElementById("xe").value.trim(),
+    km:document.getElementById("xkm").value.trim(),registration:document.getElementById("xreg").value.trim(),
+    insuranceDone:document.getElementById("xinsd").value,insuranceDue:document.getElementById("xinsn").value,
+    pucDue:document.getElementById("xpuc").value,permitDue:document.getElementById("xper").value,
+    serviceDone:document.getElementById("xsd").value,serviceDue:document.getElementById("xsn").value,
+    engineServiceDone:document.getElementById("xped").value,engineServiceDue:document.getElementById("xpen").value,
+    status:document.getElementById("xst").value,by:document.getElementById("xby").value.trim(),
+    remarks:document.getElementById("xrm").value.trim(),
+    issue:document.getElementById("xrm").value.trim(),type:"Service",priority:"Medium",
+    ocrText:(document.getElementById("xocr")||{}).value||"",
+    attachment:window.pmPendingAttachment||"",attachmentName:window.pmPendingAttachmentName||""
+  };
+  if(!d.vehicle){toast("Vehicle No. / Equipment is required","error");return;}
+  if(window.pmEditId){var i=PM_MAINT.findIndex(function(a){return a.id===window.pmEditId;});if(i<0){toast("Maintenance record not found","error");return;}PM_MAINT[i]=Object.assign({},PM_MAINT[i],d);}
+  else{d.id=pmIds.x++;PM_MAINT.push(d);}
+  pmSave();closeModal();pmRenderAll();toast("Maintenance register saved successfully","success");
 }
 function pmDelete(type,id){
   if(!CU||CU.accountKind!=="plant")return;
@@ -3248,9 +3386,9 @@ async function renderAdminReportCentre(){
 function pdfDoc(title,landscape){if(!window.jspdf||!window.jspdf.jsPDF)throw new Error('PDF library not loaded');var d=new window.jspdf.jsPDF({orientation:landscape?'landscape':'portrait',unit:'mm',format:'a4'});d.setFillColor(145,16,39);d.rect(0,0,landscape?297:210,20,'F');d.setTextColor(255,255,255);d.setFontSize(12);d.setFont('helvetica','bold');d.text(title,14,13);d.setFontSize(7.5);d.setFont('helvetica','normal');d.text('Shree Shyam Construction | '+new Date().toLocaleString('en-IN'),14,18);d.setTextColor(0,0,0);return d;}
 function saveReportPDF(title,file,head,body,landscape){try{if(!reportCan())throw new Error('Admin/Master access required');var d=pdfDoc(title,landscape);if(typeof d.autoTable==='function'){d.autoTable({head:[head],body:body,startY:24,styles:{fontSize:7.2,cellPadding:2,overflow:'linebreak'},headStyles:{fillColor:[145,16,39],textColor:255,fontStyle:'bold'},margin:{left:10,right:10,top:24,bottom:12}});}else{var y=28;body.forEach(function(r){d.text(r.join(' | ').slice(0,180),10,y);y+=5;if(y>190){d.addPage();y=15;}});}d.save(file);toast('PDF downloaded: '+file,'success');}catch(e){toast('PDF error: '+e.message,'error');}}
 function exportAdminUsersPDF(){var rows=Object.keys(USERS).sort().map(function(k,i){var a=USERS[k]||{},kind=accountKind(a),profile=kind==='office'?OS.filter(function(x){return x.nm===a.name;})[0]:SL.filter(function(x){return x.nm===a.name;})[0];return[i+1,a.name||'-',kind,k,a.pass||'-',(profile&&profile.ph)||'-',(profile&&profile.em)||'-'];});saveReportPDF('All Login Accounts & Credentials','Admin_Login_Accounts.pdf',['#','Name','Role','Login ID','Password','Phone','Email'],rows,false);}
-async function exportAdminOfficeWorkPDF(){if(!reportCan())return;toast("Refreshing staff work from cloud...","success");await ssCloudRefreshWork();var rows=WL.slice().sort(function(a,b){return String(b.dt||"").localeCompare(String(a.dt||""));}).map(function(w,i){return[i+1,w.nm||"-",fd(w.dt),w.tk||"-",w.sts||"Pending",w.pr||"Medium",w.nt||"-"];});if(!rows.length){toast("No Office Staff work entries found in cloud or this device","error");return;}saveReportPDF("Complete Office Work Report","Admin_Office_Work_Report.pdf",["#","Staff","Date","Task / Work","Status","Priority","Notes"],rows,true);}
+async function exportAdminOfficeWorkPDF(){if(!reportCan())return;toast("Loading all staff work from cloud...","success");var ok=await ssCloudRefreshWork();if(!ok){toast("Cloud work could not be loaded. Please check internet and try again.","error");return;}var rows=WL.slice().sort(function(a,b){return String(b.dt||"").localeCompare(String(a.dt||""));}).map(function(w,i){return[i+1,w.nm||"-",fd(w.dt),w.tk||"-",w.sts||"Pending",w.pr||"Medium",w.nt||"-"];});if(!rows.length){toast("No Office Staff work entries found.","error");return;}saveReportPDF("Complete Office Work Report","Admin_Office_Work_Report.pdf",["#","Staff","Date","Task / Work","Status","Priority","Notes"],rows,true);}
 function exportAdminVisitsPDF(){var rows=R.slice().sort(function(a,b){return b.vd.localeCompare(a.vd);}).map(function(r,i){return[i+1,r.sp,fd(r.vd),r.cu||'-',r.cc||'-',r.co||'-',r.si||'-',r.sa||'-',r.ar||'-',r.gr||'-',r.rm||'-'];});saveReportPDF('Complete Sales Visit Report','Admin_Sales_Visits_Report.pdf',['#','Salesperson','Date','Customer','Contact','Contractor','Site','Address','Area','Grade','Remarks'],rows,true);}
-function exportAdminPlantPDF(){var body=[];PM_ORDERS.forEach(function(x){body.push(['Order',x.order||'-',x.customer||'-',x.site||'-',x.grade||'-',x.qty||0,x.status||'-']);});PM_FLEET.forEach(function(x){body.push(['Fleet',x.vehicle||'-',x.driver||'-','Capacity '+(x.capacity||'-'),'Trips '+(x.trips||0),x.status||'-',x.last||'-']);});PM_MAT.forEach(function(x){var b=pmMaterialBalance(x);body.push(['Material',x.name||'-','Opening '+b.opening,'Received '+b.received,'Consumed '+b.consumed,'Balance '+b.balance,'Reorder '+(x.reorder||0)]);});PM_MAINT.forEach(function(x){body.push(['Maintenance',x.equipment||'-',x.issue||'-',x.type||'-',x.priority||'-',x.status||'-',x.remarks||'-']);});saveReportPDF('RMC Plant Operations Report','Admin_Plant_Operations_Report.pdf',['Type','Item','Detail 1','Detail 2','Detail 3','Status / Balance','Remarks'],body,true);}
+function exportAdminPlantPDF(){var body=[];PM_ORDERS.forEach(function(x){body.push(['Order',x.order||'-',x.customer||'-',x.site||'-',x.grade||'-',x.qty||0,x.status||'-']);});PM_FLEET.forEach(function(x){body.push(['Fleet',x.vehicle||'-',x.driver||'-','Capacity '+(x.capacity||'-'),'Trips '+(x.trips||0),x.status||'-',x.last||'-']);});PM_MAT.forEach(function(x){var b=pmMaterialBalance(x);body.push(['Material',x.name||'-','Opening '+b.opening,'Received '+b.received,'Consumed '+b.consumed,'Balance '+b.balance,'Reorder '+(x.reorder||0)]);});PM_MAINT.forEach(function(x){body.push(['Maintenance',x.vehicle||x.equipment||'-',x.registration||'-',((x.insuranceDone||'-')+' / '+(x.insuranceDue||'-')),x.pucDue||'-',x.permitDue||'-',((x.serviceDone||'-')+' / '+(x.serviceDue||'-')),((x.engineServiceDone||'-')+' / '+(x.engineServiceDue||'-')),x.remarks||x.issue||'-']);});saveReportPDF('RMC Plant Operations Report','Admin_Plant_Operations_Report.pdf',['Type','Vehicle / Equipment','Registration','Insurance Done / Due','PUC Due','Permit Due','Service Done / Due','Engine Service Done / Due','Remarks'],body,true);}
 function exportMasterERPPDF(){var rows=MASTER_RECORDS.map(function(x,i){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module};return[i+1,m.name,x.ref,x.name,x.status,pmMoney(x.amount||0),x.notes||'-'];});saveReportPDF('Shree Shyam Integrated Master ERP Report','Master_ERP_Report.pdf',['#','Module','Reference','Name / Party','Status','Amount','Notes'],rows,true);}
 function openMasterReports(){if(!masterCan())return;var el=document.getElementById('masterReportsInline');if(!el)return;el.innerHTML='<div class="master-panel" style="margin:0 0 16px"><div class="mph"><div><h3>&#128196; Master Reports Centre</h3><small style="color:#64748b">Download separate management reports without changing existing records.</small></div><button class="btn bo bsm" onclick="document.getElementById(\'masterReportsInline\').innerHTML=\'\'">Close</button></div><div class="master-report-grid" style="padding:14px"><div class="master-report-card"><strong>&#128273; Users</strong><span>All credentials and account roles.</span><button class="btn ba bsm" onclick="exportAdminUsersPDF()">Users PDF</button></div><div class="master-report-card"><strong>&#128221; Office Work</strong><span>All office work entries.</span><button class="btn ba bsm" onclick="exportAdminOfficeWorkPDF()">Work PDF</button></div><div class="master-report-card"><strong>&#128203; Visits</strong><span>All sales visits.</span><button class="btn ba bsm" onclick="exportAdminVisitsPDF()">Visits PDF</button></div><div class="master-report-card"><strong>&#127981; Plant</strong><span>Orders, fleet, stock and maintenance.</span><button class="btn ba bsm" onclick="exportAdminPlantPDF()">Plant PDF</button></div><div class="master-report-card"><strong>&#9733; ERP</strong><span>Master records and approvals.</span><button class="btn ba bsm" onclick="exportMasterERPPDF()">ERP PDF</button></div></div></div>';
   el.scrollIntoView({behavior:'smooth',block:'start'});
@@ -3452,18 +3590,35 @@ function ssCoreStorageHealthy(){
    ========================================================= */
 var SS_SUPABASE_URL="https://xihbqwhsqlpgrysttwth.supabase.co";
 var SS_SUPABASE_KEY="sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
-var SS_CLOUD_STATE_ID=1;
+var SS_WORK_TABLE="office_work_entries";
 var ssCloudSaveTimer=null;
 var ssCloudBusy=false;
 
-function ssCloudHeaders(){return {"apikey":SS_SUPABASE_KEY,"Authorization":"Bearer "+SS_SUPABASE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"};}
-function ssWorkSignature(w){return [w&&w.nm||"",w&&w.dt||"",w&&w.tk||"",w&&w.sts||"",w&&w.pr||"",w&&w.nt||""].join("|");}
+function ssCloudHeaders(extra){
+  return Object.assign({
+    "apikey":SS_SUPABASE_KEY,
+    "Authorization":"Bearer "+SS_SUPABASE_KEY,
+    "Content-Type":"application/json"
+  },extra||{});
+}
+function ssWorkRecordKey(w){
+  if(w&&w.cloudKey)return String(w.cloudKey);
+  return String((w&&w.nm)||"")+"::"+String((w&&w.id)||"")+"::"+String((w&&w.dt)||"");
+}
+function ssWorkSignature(w){
+  return [w&&w.nm||"",w&&w.dt||"",w&&w.tk||"",w&&w.sts||"",w&&w.pr||"",w&&w.nt||""].join("|");
+}
 function ssMergeWork(localRows,cloudRows){
-  var out=[],seen={};
+  var out=[],seenSig={};
   [].concat(cloudRows||[],localRows||[]).forEach(function(w){
     if(!w)return;
     var sig=ssWorkSignature(w);
-    if(!seen[sig]){seen[sig]=true;out.push(w);}
+    if(!seenSig[sig]){
+      seenSig[sig]=true;
+      var copy=Object.assign({},w);
+      copy.cloudKey=copy.cloudKey||ssWorkRecordKey(copy);
+      out.push(copy);
+    }
   });
   out.sort(function(a,b){return String(b.dt||"").localeCompare(String(a.dt||""));});
   var max=out.reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0);
@@ -3472,13 +3627,17 @@ function ssMergeWork(localRows,cloudRows){
 }
 async function ssCloudReadWork(){
   try{
-    var r=await fetch(SS_SUPABASE_URL+"/rest/v1/app_state?id=eq."+SS_CLOUD_STATE_ID+"&select=state,version",{headers:ssCloudHeaders(),cache:"no-store"});
-    if(!r.ok)throw new Error("Cloud read "+r.status);
+    var r=await fetch(SS_SUPABASE_URL+"/rest/v1/"+SS_WORK_TABLE+"?select=record_key,id,nm,dt,tk,sts,pr,nt,updated_at&order=dt.desc,updated_at.desc&limit=5000",
+      {headers:ssCloudHeaders(),cache:"no-store"});
+    if(!r.ok)throw new Error("Cloud work read "+r.status);
     var rows=await r.json();
-    if(!rows.length||!rows[0].state)return [];
-    var st=rows[0].state;
-    return Array.isArray(st.office_work)?st.office_work:[];
-  }catch(e){console.warn("Shree Shyam cloud work read failed",e);return null;}
+    return (rows||[]).map(function(x){
+      return {id:Number(x.id)||0,nm:x.nm||"",dt:x.dt||"",tk:x.tk||"",sts:x.sts||"Pending",pr:x.pr||"Medium",nt:x.nt||"",cloudKey:x.record_key};
+    });
+  }catch(e){
+    console.warn("Shree Shyam cloud work read failed",e);
+    return null;
+  }
 }
 async function ssCloudSaveWorkNow(){
   if(ssCloudBusy)return;
@@ -3486,24 +3645,49 @@ async function ssCloudSaveWorkNow(){
   try{
     var cloud=await ssCloudReadWork();
     if(cloud===null)return;
-    var merged=ssMergeWork(WL,cloud);
-    WL=merged;
+    WL=ssMergeWork(WL,cloud);
+    var payloads=WL.map(function(w){
+      return {
+        record_key:ssWorkRecordKey(w),
+        id:Number(w.id)||0,
+        nm:String(w.nm||""),
+        dt:String(w.dt||new Date().toISOString().slice(0,10)),
+        tk:String(w.tk||""),
+        sts:String(w.sts||"Pending"),
+        pr:String(w.pr||"Medium"),
+        nt:String(w.nt||""),
+        updated_at:new Date().toISOString()
+      };
+    }).filter(function(x){return x.nm&&x.tk;});
+    if(payloads.length){
+      var r=await fetch(SS_SUPABASE_URL+"/rest/v1/"+SS_WORK_TABLE,
+        {method:"POST",headers:ssCloudHeaders({"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(payloads)});
+      if(!r.ok)throw new Error("Cloud work save "+r.status+" "+await r.text());
+    }
     try{localStorage.setItem("RMC_OFFICE_WORK",JSON.stringify(WL));}catch(e){}
-    var payload={id:SS_CLOUD_STATE_ID,state:{office_work:WL},version:Date.now(),updated_at:new Date().toISOString()};
-    var r=await fetch(SS_SUPABASE_URL+"/rest/v1/app_state",{method:"POST",headers:Object.assign({},ssCloudHeaders(),{"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(payload)});
-    if(!r.ok)throw new Error("Cloud save "+r.status);
   }catch(e){console.warn("Shree Shyam cloud work save failed",e);}
   finally{ssCloudBusy=false;}
 }
 function ssCloudSaveWork(){
   clearTimeout(ssCloudSaveTimer);
-  ssCloudSaveTimer=setTimeout(function(){ssCloudSaveWorkNow();},250);
+  ssCloudSaveTimer=setTimeout(function(){ssCloudSaveWorkNow();},350);
 }
 async function ssCloudRefreshWork(){
   var cloud=await ssCloudReadWork();
   if(cloud===null)return false;
-  if(cloud.length||WL.length){WL=ssMergeWork(WL,cloud);try{localStorage.setItem("RMC_OFFICE_WORK",JSON.stringify(WL));}catch(e){}}
+  WL=ssMergeWork(WL,cloud);
+  try{localStorage.setItem("RMC_OFFICE_WORK",JSON.stringify(WL));}catch(e){}
   return true;
+}
+async function ssCloudDeleteWork(w){
+  if(!w)return true;
+  try{
+    var key=encodeURIComponent(ssWorkRecordKey(w));
+    var r=await fetch(SS_SUPABASE_URL+"/rest/v1/"+SS_WORK_TABLE+"?record_key=eq."+key,
+      {method:"DELETE",headers:ssCloudHeaders({"Prefer":"return=minimal"})});
+    if(!r.ok)throw new Error("Cloud work delete "+r.status);
+    return true;
+  }catch(e){console.warn("Shree Shyam cloud work delete failed",e);return false;}
 }
 
 function ssSaveCore(){
@@ -3543,6 +3727,8 @@ function ssLoadCore(){
     var maxA=AT.reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0);
     nRid=maxR+1;nQid=maxQ+1;nWid=maxW+1;nAid=maxA+1;
   }catch(e){}
+  /* Cross-device office work: cloud is the shared source; localStorage is only a cache. */
+  setTimeout(function(){ssCloudRefreshWork().then(function(){try{localStorage.setItem("RMC_OFFICE_WORK",JSON.stringify(WL));}catch(e){} if(typeof rWL==="function")rWL(); if(typeof rStats==="function")rStats();}).catch(function(e){console.warn("Initial cloud work refresh failed",e);});},50);
 }
 
 function ssApplyFreshState(){
