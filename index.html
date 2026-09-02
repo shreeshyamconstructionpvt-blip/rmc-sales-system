@@ -3464,7 +3464,16 @@ async function renderAdminReportCentre(){
 function pdfDoc(title,landscape){if(!window.jspdf||!window.jspdf.jsPDF)throw new Error('PDF library not loaded');var d=new window.jspdf.jsPDF({orientation:landscape?'landscape':'portrait',unit:'mm',format:'a4'});d.setFillColor(145,16,39);d.rect(0,0,landscape?297:210,20,'F');d.setTextColor(255,255,255);d.setFontSize(12);d.setFont('helvetica','bold');d.text(title,14,13);d.setFontSize(7.5);d.setFont('helvetica','normal');d.text('Shree Shyam Construction | '+new Date().toLocaleString('en-IN'),14,18);d.setTextColor(0,0,0);return d;}
 function saveReportPDF(title,file,head,body,landscape){try{if(!reportCan())throw new Error('Admin/Master access required');var d=pdfDoc(title,landscape);if(typeof d.autoTable==='function'){d.autoTable({head:[head],body:body,startY:24,styles:{fontSize:7.2,cellPadding:2,overflow:'linebreak'},headStyles:{fillColor:[145,16,39],textColor:255,fontStyle:'bold'},margin:{left:10,right:10,top:24,bottom:12}});}else{var y=28;body.forEach(function(r){d.text(r.join(' | ').slice(0,180),10,y);y+=5;if(y>190){d.addPage();y=15;}});}d.save(file);toast('PDF downloaded: '+file,'success');}catch(e){toast('PDF error: '+e.message,'error');}}
 function exportAdminUsersPDF(){var rows=Object.keys(USERS).sort().map(function(k,i){var a=USERS[k]||{},kind=accountKind(a),profile=kind==='office'?OS.filter(function(x){return x.nm===a.name;})[0]:SL.filter(function(x){return x.nm===a.name;})[0];return[i+1,a.name||'-',kind,k,a.pass||'-',(profile&&profile.ph)||'-',(profile&&profile.em)||'-'];});saveReportPDF('All Login Accounts & Credentials','Admin_Login_Accounts.pdf',['#','Name','Role','Login ID','Password','Phone','Email'],rows,false);}
-async function exportAdminOfficeWorkPDF(){if(!reportCan())return;toast("Loading all staff work from cloud...","success");var ok=await ssCloudRefreshWork();if(!ok){toast("Cloud work could not be loaded. Please check internet and try again.","error");return;}var rows=WL.slice().sort(function(a,b){return String(b.dt||"").localeCompare(String(a.dt||""));}).map(function(w,i){return[i+1,w.nm||"-",fd(w.dt),w.tk||"-",w.sts||"Pending",w.pr||"Medium",w.nt||"-"];});if(!rows.length){toast("No Office Staff work entries found.","error");return;}saveReportPDF("Complete Office Work Report","Admin_Office_Work_Report.pdf",["#","Staff","Date","Task / Work","Status","Priority","Notes"],rows,true);}
+function exportAdminOfficeWorkPDF(){
+  if(!reportCan()){toast("Admin/Master access required","error");return;}
+  try{
+    var rows=(Array.isArray(WL)?WL:[]).slice().sort(function(a,b){return String(b.dt||"").localeCompare(String(a.dt||""));}).map(function(w,i){
+      return [i+1,w.nm||"-",fd(w.dt),w.tk||"-",w.sts||"Pending",w.pr||"Medium",w.nt||"-"];
+    });
+    if(!rows.length){toast("No Office Staff work entries found.","error");return;}
+    saveReportPDF("Complete Office Work Report","Admin_Office_Work_Report.pdf",["#","Staff","Date","Task / Work","Status","Priority","Notes"],rows,true);
+  }catch(e){toast("Work PDF error: "+(e.message||e),"error");}
+}
 function exportAdminVisitsPDF(){var rows=R.slice().sort(function(a,b){return b.vd.localeCompare(a.vd);}).map(function(r,i){return[i+1,r.sp,fd(r.vd),r.cu||'-',r.cc||'-',r.co||'-',r.si||'-',r.sa||'-',r.ar||'-',r.gr||'-',r.rm||'-'];});saveReportPDF('Complete Sales Visit Report','Admin_Sales_Visits_Report.pdf',['#','Salesperson','Date','Customer','Contact','Contractor','Site','Address','Area','Grade','Remarks'],rows,true);}
 function ssPdfSavedAt(x){
   var v=x&& (x.updatedAt||x.createdAt||x.savedAt||x.timestamp);
@@ -3501,7 +3510,25 @@ function exportAdminPlantPDF(){
   d.save('Master_Plant_Complete_Report_'+ssTodayKey()+'.pdf');
   toast('Master Plant PDF downloaded — each plant module is separated','success');
 }
-function exportMasterPlantCompletePDF(){exportAdminPlantPDF();}
+function ssModuleFieldSummary(x){
+  try{
+    if(!x)return "-";
+    var skip={id:1,module:1,ref:1,name:1,status:1,amount:1,createdAt:1,updatedAt:1,savedAt:1,timestamp:1};
+    var out=[];
+    Object.keys(x).forEach(function(k){
+      if(skip[k])return;
+      var v=x[k];
+      if(v===null||v===undefined||v==="")return;
+      if(typeof v==="object")return;
+      out.push(k+": "+String(v));
+    });
+    return out.length?out.slice(0,8).join(" | "):"-";
+  }catch(e){return "-";}
+}
+function exportMasterPlantCompletePDF(){
+  if(!reportCan()){toast("Admin/Master access required","error");return;}
+  try{exportAdminPlantPDF();}catch(e){toast("Master Plant PDF error: "+(e.message||e),"error");}
+}
 function saveRolePDF(title,file,head,body,landscape){try{if(!window.jspdf||!window.jspdf.jsPDF)throw new Error("PDF library not loaded");var d=new window.jspdf.jsPDF({orientation:landscape?'landscape':'portrait',unit:'mm',format:'a4'});d.setFillColor(145,16,39);d.rect(0,0,landscape?297:210,20,'F');d.setTextColor(255,255,255);d.setFontSize(12);d.setFont('helvetica','bold');d.text(title,14,13);d.setFontSize(7.5);d.setFont('helvetica','normal');d.text('Shree Shyam Construction | '+new Date().toLocaleString('en-IN'),14,18);d.setTextColor(0,0,0);d.autoTable({head:[head],body:body.length?body:[["No records"].concat(head.slice(1).map(function(){return "-";}))],startY:24,styles:{fontSize:7.2,cellPadding:2,overflow:'linebreak'},headStyles:{fillColor:[145,16,39],textColor:255,fontStyle:'bold'},margin:{left:10,right:10,top:24,bottom:12}});d.save(file);toast('PDF downloaded: '+file,'success');}catch(e){toast('PDF error: '+e.message,'error');}}
 function exportParveenFullWorkPDF(){
   if(!CU||CU.accountKind!=='plant'){toast('Plant Manager access required','error');return;}
