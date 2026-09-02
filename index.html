@@ -1514,7 +1514,7 @@ body{--gold:#c91435}
 
     
 <div class="ss-master-pdf-wrap" style="margin:12px 0 15px;display:flex;justify-content:flex-end">
-  <button class="btn ba" onclick="downloadMasterDailyPDF()">📄 Master Daily PDF</button>
+  <button class="btn ba" onclick="downloadMasterDailyPDF()">📄 Master PDF — All Entries</button>
 </div>
 <div id="masterReportsInline"></div>
 
@@ -1525,7 +1525,7 @@ body{--gold:#c91435}
 <button class="btn" style="background:#dcfce7;color:#166534;border:1px solid #86efac" onclick="alert('Data Safety Lock: automatic and manual data reset is disabled.')">🛡️ Data Safety ON</button>
 
   <button onclick="phase3Refresh()">↻ Refresh MIS</button>
-  <button onclick="downloadMasterDailyPDF()">📄 Master Daily PDF</button>
+  <button onclick="downloadMasterDailyPDF()">📄 Master PDF — All Entries</button>
   <button onclick="phase2Sync()">🔗 Sync Workflows</button>
   <button onclick="phase3ExportExecutivePDF()">📈 Executive MIS</button>
 </div>
@@ -2944,7 +2944,17 @@ function pmLoad(){
   pmSave();
 }
 function pmSave(){
-  [["RMC_PM_ORDERS",PM_ORDERS],["RMC_PM_FLEET",PM_FLEET],["RMC_PM_STAFF",PM_STAFF],["RMC_PM_QC",PM_QC],["RMC_PM_MAT",PM_MAT],["RMC_PM_BILL",PM_BILL],["RMC_PM_MAINT",PM_MAINT]].forEach(function(a){try{localStorage.setItem(a[0],JSON.stringify(a[1]));}catch(e){}});
+  /* Every Plant Manager save is timestamped. Existing business values are preserved. */
+  var savedAt=new Date().toISOString();
+  [["RMC_PM_ORDERS",PM_ORDERS],["RMC_PM_FLEET",PM_FLEET],["RMC_PM_STAFF",PM_STAFF],["RMC_PM_QC",PM_QC],["RMC_PM_MAT",PM_MAT],["RMC_PM_BILL",PM_BILL],["RMC_PM_MAINT",PM_MAINT]].forEach(function(a){
+    try{
+      (Array.isArray(a[1])?a[1]:[]).forEach(function(x){
+        if(x && !x.createdAt) x.createdAt=x.date||x.serviceDate||x.schedule||savedAt;
+        if(x) x.lastSavedAt=savedAt;
+      });
+      localStorage.setItem(a[0],JSON.stringify(a[1]));
+    }catch(e){}
+  });
 }
 function pmInit(){pmLoad();pmRenderAll();}
 function pmMoney(n){return "Rs."+Number(n||0).toLocaleString("en-IN");}
@@ -4100,34 +4110,40 @@ function ssRowsToday(arr,dateFields){
 }
 function downloadMasterDailyPDF(){
   if(typeof reportCan==="function" && !reportCan())return;
-  var d=ssTodayKey(),m=phase3Metrics();
-  var all=[
-    ["System Date",d],
-    ["Users / Accounts",m.users],
-    ["Sales Visits",m.visits],
-    ["Quotations",m.quotes],
-    ["Accepted Quotations",m.accepted],
-    ["Quotation Value",pmMoney(m.quoteValue)],
-    ["Accepted Value",pmMoney(m.acceptedValue)],
-    ["Plant Orders",PM_ORDERS.length],
-    ["Dispatched / Moved Orders",m.dispatched],
-    ["Raw Materials",PM_MAT.length],
-    ["Current Stock",m.stock.toLocaleString("en-IN")],
-    ["Low Stock Items",m.low],
-    ["Fleet",PM_FLEET.length],
-    ["Fleet Trips",m.totalTrips],
-    ["QC Records",m.qc],
-    ["QC Failures",m.qcFail],
-    ["Billing Records",PM_BILL.length],
-    ["Billed",pmMoney(m.billed)],
-    ["Paid",pmMoney(m.paid)],
-    ["Outstanding",pmMoney(m.outstanding)],
-    ["Open Maintenance",m.openMaint],
-    ["Office Work Entries",m.work],
-    ["Sales Staff",m.sales],
-    ["Office Staff",m.office]
-  ];
-  saveReportPDF("Shree Shyam RMC — Master Daily ERP Report","Master_Daily_ERP_Report_"+d+".pdf",["Today's Master Snapshot","Value"],all,false);
+  try{
+    var d=ssTodayKey(), now=new Date().toLocaleString("en-IN"),m=phase3Metrics();
+    var doc=pdfDoc("Shree Shyam RMC — Master ERP Report",true);
+    var y=28;
+    function section(title,head,rows){
+      if(y>185){doc.addPage();y=18;}
+      doc.setFontSize(11);doc.setFont("helvetica","bold");doc.text(title,10,y);y+=4;
+      rows=rows||[];
+      if(typeof doc.autoTable==='function'){
+        doc.autoTable({head:[head],body:rows,startY:y+2,styles:{fontSize:6.5,cellPadding:1.7,overflow:'linebreak'},headStyles:{fillColor:[145,16,39],textColor:255,fontStyle:'bold'},margin:{left:10,right:10,top:12,bottom:10},theme:'grid'});
+        y=(doc.lastAutoTable&&doc.lastAutoTable.finalY?doc.lastAutoTable.finalY:y+12)+8;
+      }else{rows.forEach(function(r){if(y>190){doc.addPage();y=15;}doc.setFontSize(6.5);doc.text(r.join(' | ').slice(0,230),10,y);y+=4;});y+=5;}
+    }
+    doc.setFontSize(16);doc.setFont("helvetica","bold");doc.text("Shree Shyam Construction — Master ERP",10,12);
+    doc.setFontSize(8);doc.setFont("helvetica","normal");doc.text("Complete Plant Manager + Company Management Report | Generated: "+now,10,18);
+    section("1. Executive Snapshot",["Metric","Value"],[
+      ["Report Date",d],["Report Generated",now],["Users / Accounts",m.users],["Sales Visits",m.visits],["Quotations",m.quotes],["Quotation Value",pmMoney(m.quoteValue)],
+      ["Plant Orders",PM_ORDERS.length],["Raw Materials",PM_MAT.length],["Current Stock",m.stock.toLocaleString("en-IN")],["Low Stock Items",m.low],
+      ["Fleet",PM_FLEET.length],["Fleet Trips",m.totalTrips],["QC Records",m.qc],["Billing Records",PM_BILL.length],["Outstanding",pmMoney(m.outstanding)],
+      ["Maintenance Records",PM_MAINT.length],["Office Work Entries",m.work],["Sales Staff",m.sales],["Office Staff",m.office]
+    ]);
+    section("2. Plant Orders — Parveen Plant Manager",["#","Order","Customer","Site","Grade","Qty","Status","Last Saved"],PM_ORDERS.map(function(x,i){return[i+1,x.order||'-',x.customer||'-',x.site||'-',x.grade||'-',x.qty||0,x.status||'-',x.lastSavedAt||'-'];}));
+    section("3. Fleet & Dispatch — Parveen Plant Manager",["#","Vehicle","Driver","Capacity","Trips","Status","Last","Last Saved"],PM_FLEET.map(function(x,i){return[i+1,x.vehicle||'-',x.driver||'-',x.capacity||x.cap||'-',x.trips||0,x.status||'-',x.last||'-',x.lastSavedAt||'-'];}));
+    section("4. Plant Staff",["#","Name","Role","Department","Phone","Shift","Status","Last Saved"],PM_STAFF.map(function(x,i){return[i+1,x.name||'-',x.role||'-',x.dept||'-',x.phone||'-',x.shift||'-',x.status||'-',x.lastSavedAt||'-'];}));
+    section("5. Quality Control",["#","Date","Batch / Ref","Grade","Slump","Cube / Test","Result","Remarks","Last Saved"],PM_QC.map(function(x,i){return[i+1,x.date||'-',x.batch||x.ref||'-',x.grade||'-',x.slump||'-',x.cube||x.test||'-',x.result||x.status||'-',x.remarks||'-',x.lastSavedAt||'-'];}));
+    section("6. Raw Material Stock",["#","Material","Unit","Opening","Received","Consumed","Current","Reorder","Last Saved"],PM_MAT.map(function(x,i){var b=pmMaterialBalance(x);return[i+1,x.name||'-',x.unit||'-',b.opening,b.received,b.consumed,b.balance,b.reorder,x.lastSavedAt||'-'];}));
+    section("7. Billing & Receivables",["#","Invoice / Ref","Customer","Amount","Paid","Outstanding","Status","Last Saved"],PM_BILL.map(function(x,i){return[i+1,x.invoice||x.ref||'-',x.customer||'-',pmMoney(x.amount||0),pmMoney(x.paid||0),pmMoney(x.outstanding||0),x.status||'-',x.lastSavedAt||'-'];}));
+    section("8. Maintenance Register — Parveen",["#","Sr.","Vehicle Type","Vehicle No.","Primary KM","2nd KM","Service Type / Date","Allotted To","Next Service","Remarks","Last Saved"],PM_MAINT.map(function(raw,i){var x=pmMaintNormalizeRow(raw,i);return[i+1,x.serial||'-',x.vehicleType||'-',x.vehicleNo||'-',x.primaryKm||'-',x.secondKm||'-',(x.serviceType||'-')+' / '+pmMaintDisplayDate(x.serviceDate),x.serviceAllottedTo||'-',pmMaintDisplayDate(x.nextServiceDate),x.remarks||'-',x.lastSavedAt||raw.lastSavedAt||'-'];}));
+    section("9. Office Work / Staff Activity",["#","Staff","Date","Task","Status","Priority","Notes","Last Saved"],WL.slice().sort(function(a,b){return String(b.dt||'').localeCompare(String(a.dt||''));}).map(function(w,i){return[i+1,w.nm||'-',fd(w.dt),w.tk||'-',w.sts||'Pending',w.pr||'Medium',w.nt||'-',w.lastSavedAt||'-'];}));
+    section("10. Sales Visits",["#","Salesperson","Date","Customer","Site","Area","Grade","Remarks"],R.slice().sort(function(a,b){return String(b.vd||'').localeCompare(String(a.vd||''));}).map(function(r,i){return[i+1,r.sp||'-',fd(r.vd),r.cu||'-',r.si||'-',r.ar||'-',r.gr||'-',r.rm||'-'];}));
+    doc.setFontSize(7);doc.setFont("helvetica","normal");doc.text("Data protection: existing records are included as currently stored. Report generated at the exact date/time shown above.",10,202);
+    doc.save("Shree_Shyam_RMC_Master_ERP_All_Entries_"+d+".pdf");
+    toast("Master PDF downloaded — all available entries included","success");
+  }catch(e){toast("Master PDF error: "+e.message,"error");}
 }
 
 
