@@ -3238,8 +3238,9 @@ function pmDelete(type,id){
 
 // ===== ADMIN REPORT CENTRE / SEPARATE PDF EXPORTS =====
 function reportCan(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'));}
-function renderAdminReportCentre(){
+async function renderAdminReportCentre(){
   if(!reportCan())return;
+  await ssCloudRefreshWork();
   var ub=document.getElementById('adminUsersReportBody'),wb=document.getElementById('adminWorkReportBody');
   if(ub){var keys=Object.keys(USERS).sort();ub.innerHTML=keys.map(function(k,i){var a=USERS[k]||{},kind=accountKind(a),profile=kind==='office'?OS.filter(function(x){return x.nm===a.name;})[0]:SL.filter(function(x){return x.nm===a.name;})[0];return '<tr><td>'+(i+1)+'</td><td><strong>'+pmEsc(a.name||'-')+'</strong></td><td>'+pmEsc(kind)+'</td><td><code>'+pmEsc(k)+'</code></td><td><code>'+pmEsc(a.pass||'-')+'</code></td><td>'+pmEsc(profile&&profile.ph||a.phone||'-')+'</td><td><button class="ib" onclick="openUserProfile('+JSON.stringify(k)+')">&#128065;</button></td></tr>';}).join('');}
   if(wb){var rows=WL.slice().sort(function(a,b){return b.dt.localeCompare(a.dt);});wb.innerHTML=rows.length?rows.map(function(w,i){return '<tr><td>'+(i+1)+'</td><td><strong>'+pmEsc(w.nm)+'</strong></td><td>'+fd(w.dt)+'</td><td>'+pmEsc(w.tk)+'</td><td>'+pmEsc(w.sts)+'</td><td>'+pmEsc(w.pr)+'</td><td>'+pmEsc(w.nt||'-')+'</td></tr>';}).join(''):'<tr><td colspan="7" class="nd">No work records yet.</td></tr>';}
@@ -3247,7 +3248,7 @@ function renderAdminReportCentre(){
 function pdfDoc(title,landscape){if(!window.jspdf||!window.jspdf.jsPDF)throw new Error('PDF library not loaded');var d=new window.jspdf.jsPDF({orientation:landscape?'landscape':'portrait',unit:'mm',format:'a4'});d.setFillColor(145,16,39);d.rect(0,0,landscape?297:210,20,'F');d.setTextColor(255,255,255);d.setFontSize(12);d.setFont('helvetica','bold');d.text(title,14,13);d.setFontSize(7.5);d.setFont('helvetica','normal');d.text('Shree Shyam Construction | '+new Date().toLocaleString('en-IN'),14,18);d.setTextColor(0,0,0);return d;}
 function saveReportPDF(title,file,head,body,landscape){try{if(!reportCan())throw new Error('Admin/Master access required');var d=pdfDoc(title,landscape);if(typeof d.autoTable==='function'){d.autoTable({head:[head],body:body,startY:24,styles:{fontSize:7.2,cellPadding:2,overflow:'linebreak'},headStyles:{fillColor:[145,16,39],textColor:255,fontStyle:'bold'},margin:{left:10,right:10,top:24,bottom:12}});}else{var y=28;body.forEach(function(r){d.text(r.join(' | ').slice(0,180),10,y);y+=5;if(y>190){d.addPage();y=15;}});}d.save(file);toast('PDF downloaded: '+file,'success');}catch(e){toast('PDF error: '+e.message,'error');}}
 function exportAdminUsersPDF(){var rows=Object.keys(USERS).sort().map(function(k,i){var a=USERS[k]||{},kind=accountKind(a),profile=kind==='office'?OS.filter(function(x){return x.nm===a.name;})[0]:SL.filter(function(x){return x.nm===a.name;})[0];return[i+1,a.name||'-',kind,k,a.pass||'-',(profile&&profile.ph)||'-',(profile&&profile.em)||'-'];});saveReportPDF('All Login Accounts & Credentials','Admin_Login_Accounts.pdf',['#','Name','Role','Login ID','Password','Phone','Email'],rows,false);}
-function exportAdminOfficeWorkPDF(){var rows=WL.slice().sort(function(a,b){return b.dt.localeCompare(a.dt);}).map(function(w,i){return[i+1,w.nm,fd(w.dt),w.tk,w.sts,w.pr,w.nt||'-'];});saveReportPDF('Complete Office Work Report','Admin_Office_Work_Report.pdf',['#','Staff','Date','Task / Work','Status','Priority','Notes'],rows,true);}
+async function exportAdminOfficeWorkPDF(){if(!reportCan())return;toast("Refreshing staff work from cloud...","success");await ssCloudRefreshWork();var rows=WL.slice().sort(function(a,b){return String(b.dt||"").localeCompare(String(a.dt||""));}).map(function(w,i){return[i+1,w.nm||"-",fd(w.dt),w.tk||"-",w.sts||"Pending",w.pr||"Medium",w.nt||"-"];});if(!rows.length){toast("No Office Staff work entries found in cloud or this device","error");return;}saveReportPDF("Complete Office Work Report","Admin_Office_Work_Report.pdf",["#","Staff","Date","Task / Work","Status","Priority","Notes"],rows,true);}
 function exportAdminVisitsPDF(){var rows=R.slice().sort(function(a,b){return b.vd.localeCompare(a.vd);}).map(function(r,i){return[i+1,r.sp,fd(r.vd),r.cu||'-',r.cc||'-',r.co||'-',r.si||'-',r.sa||'-',r.ar||'-',r.gr||'-',r.rm||'-'];});saveReportPDF('Complete Sales Visit Report','Admin_Sales_Visits_Report.pdf',['#','Salesperson','Date','Customer','Contact','Contractor','Site','Address','Area','Grade','Remarks'],rows,true);}
 function exportAdminPlantPDF(){var body=[];PM_ORDERS.forEach(function(x){body.push(['Order',x.order||'-',x.customer||'-',x.site||'-',x.grade||'-',x.qty||0,x.status||'-']);});PM_FLEET.forEach(function(x){body.push(['Fleet',x.vehicle||'-',x.driver||'-','Capacity '+(x.capacity||'-'),'Trips '+(x.trips||0),x.status||'-',x.last||'-']);});PM_MAT.forEach(function(x){var b=pmMaterialBalance(x);body.push(['Material',x.name||'-','Opening '+b.opening,'Received '+b.received,'Consumed '+b.consumed,'Balance '+b.balance,'Reorder '+(x.reorder||0)]);});PM_MAINT.forEach(function(x){body.push(['Maintenance',x.equipment||'-',x.issue||'-',x.type||'-',x.priority||'-',x.status||'-',x.remarks||'-']);});saveReportPDF('RMC Plant Operations Report','Admin_Plant_Operations_Report.pdf',['Type','Item','Detail 1','Detail 2','Detail 3','Status / Balance','Remarks'],body,true);}
 function exportMasterERPPDF(){var rows=MASTER_RECORDS.map(function(x,i){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module};return[i+1,m.name,x.ref,x.name,x.status,pmMoney(x.amount||0),x.notes||'-'];});saveReportPDF('Shree Shyam Integrated Master ERP Report','Master_ERP_Report.pdf',['#','Module','Reference','Name / Party','Status','Amount','Notes'],rows,true);}
@@ -3444,11 +3445,73 @@ function ssCoreStorageHealthy(){
            localStorage.getItem("RMC_ATTENDANCE")!==null;
   }catch(e){return false;}
 }
+/* =========================================================
+   SHARED CLOUD OFFICE-WORK SYNC
+   Uses the existing Supabase app_state table so Office Staff
+   entries created on mobile/another device are visible to Admin.
+   ========================================================= */
+var SS_SUPABASE_URL="https://xihbqwhsqlpgrysttwth.supabase.co";
+var SS_SUPABASE_KEY="sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
+var SS_CLOUD_STATE_ID=1;
+var ssCloudSaveTimer=null;
+var ssCloudBusy=false;
+
+function ssCloudHeaders(){return {"apikey":SS_SUPABASE_KEY,"Authorization":"Bearer "+SS_SUPABASE_KEY,"Content-Type":"application/json","Prefer":"return=minimal"};}
+function ssWorkSignature(w){return [w&&w.nm||"",w&&w.dt||"",w&&w.tk||"",w&&w.sts||"",w&&w.pr||"",w&&w.nt||""].join("|");}
+function ssMergeWork(localRows,cloudRows){
+  var out=[],seen={};
+  [].concat(cloudRows||[],localRows||[]).forEach(function(w){
+    if(!w)return;
+    var sig=ssWorkSignature(w);
+    if(!seen[sig]){seen[sig]=true;out.push(w);}
+  });
+  out.sort(function(a,b){return String(b.dt||"").localeCompare(String(a.dt||""));});
+  var max=out.reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0);
+  nWid=Math.max(Number(nWid)||1,max+1);
+  return out;
+}
+async function ssCloudReadWork(){
+  try{
+    var r=await fetch(SS_SUPABASE_URL+"/rest/v1/app_state?id=eq."+SS_CLOUD_STATE_ID+"&select=state,version",{headers:ssCloudHeaders(),cache:"no-store"});
+    if(!r.ok)throw new Error("Cloud read "+r.status);
+    var rows=await r.json();
+    if(!rows.length||!rows[0].state)return [];
+    var st=rows[0].state;
+    return Array.isArray(st.office_work)?st.office_work:[];
+  }catch(e){console.warn("Shree Shyam cloud work read failed",e);return null;}
+}
+async function ssCloudSaveWorkNow(){
+  if(ssCloudBusy)return;
+  ssCloudBusy=true;
+  try{
+    var cloud=await ssCloudReadWork();
+    if(cloud===null)return;
+    var merged=ssMergeWork(WL,cloud);
+    WL=merged;
+    try{localStorage.setItem("RMC_OFFICE_WORK",JSON.stringify(WL));}catch(e){}
+    var payload={id:SS_CLOUD_STATE_ID,state:{office_work:WL},version:Date.now(),updated_at:new Date().toISOString()};
+    var r=await fetch(SS_SUPABASE_URL+"/rest/v1/app_state",{method:"POST",headers:Object.assign({},ssCloudHeaders(),{"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(payload)});
+    if(!r.ok)throw new Error("Cloud save "+r.status);
+  }catch(e){console.warn("Shree Shyam cloud work save failed",e);}
+  finally{ssCloudBusy=false;}
+}
+function ssCloudSaveWork(){
+  clearTimeout(ssCloudSaveTimer);
+  ssCloudSaveTimer=setTimeout(function(){ssCloudSaveWorkNow();},250);
+}
+async function ssCloudRefreshWork(){
+  var cloud=await ssCloudReadWork();
+  if(cloud===null)return false;
+  if(cloud.length||WL.length){WL=ssMergeWork(WL,cloud);try{localStorage.setItem("RMC_OFFICE_WORK",JSON.stringify(WL));}catch(e){}}
+  return true;
+}
+
 function ssSaveCore(){
   try{localStorage.setItem("RMC_VISITS",JSON.stringify(R));}catch(e){}
   try{localStorage.setItem("RMC_QUOTATIONS",JSON.stringify(QT));}catch(e){}
   try{localStorage.setItem("RMC_OFFICE_WORK",JSON.stringify(WL));}catch(e){}
   try{localStorage.setItem("RMC_ATTENDANCE",JSON.stringify(AT));}catch(e){}
+  ssCloudSaveWork();
 }
 
 /* Load only data that belongs to the transactional modules.
