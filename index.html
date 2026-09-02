@@ -6,7 +6,6 @@
 <title>Shree Shyam RMC ERP | Enterprise Management System</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--p:#c8102e;--a:#f59e0b;--d:#b91c1c;--s:#057a55;--pu:#7c3aed;--tl:#0891b2;--bg:#f5f5f5;--card:#fff;--b:#e2e8f0;--t:#1a1a1a;--m:#64748b;--r:10px;--sh:0 2px 16px rgba(0,0,0,.10)}
@@ -1874,116 +1873,17 @@ body{--gold:#c91435}
 </main>
 </div>
 <script>
-// ===== SUPABASE CLOUD LOGIN BRIDGE (V12) =====
-// IMPORTANT: this public GitHub Pages app uses only the publishable key.
-// It NEVER contains a Supabase secret/service-role key.
-// Login uses the main client; account creation uses a separate, memory-only
-// client so creating a staff account cannot replace the Admin/Master session.
-var SS_SUPABASE_URL = "https://xihbqwhsqlpgrysttwth.supabase.co";
-var SS_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
-var SS_SB = null, SS_SB_READY = false, SS_SIGNUP = null;
-try{
-  if(window.supabase && window.supabase.createClient){
-    SS_SB = window.supabase.createClient(SS_SUPABASE_URL, SS_SUPABASE_PUBLISHABLE_KEY, {
-      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:"shree_shyam_rmc_auth_v8"}
-    });
-    SS_SIGNUP = window.supabase.createClient(SS_SUPABASE_URL, SS_SUPABASE_PUBLISHABLE_KEY, {
-      auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:"shree_shyam_rmc_signup_v8"}
-    });
-    SS_SB_READY = true;
-  }
-}catch(e){ console.error("SHREE SHYAM SUPABASE INIT ERROR",e); }
-function ssCloudEmail(loginId,account){
-  var real=String((account&&account.email)||"").trim().toLowerCase();
-  if(real && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(real)) return real;
-  return String(loginId||"").trim().toLowerCase()+"@xihbqwhsqlpgrysttwth.supabase.co";
-}
-function ssAuthErrorMessage(e){
-  var m=String((e&&e.message)||e||"Unknown Supabase error"),low=m.toLowerCase();
-  if(/failed to fetch|network|fetch/.test(low))return "Unable to connect to Supabase. Check internet/project status or browser extensions.";
-  if(/rate limit|too many requests|429/.test(low))return "Supabase Auth rate limit is active. Do not keep retrying; wait for the limit to reset.";
-  if(/signup.*disabled|signups.*not.*allowed|disable.*signup/.test(low))return "NEW USER CREATION IS DISABLED in Supabase. Open Authentication → Providers → Email and turn ON 'Allow new users to sign up'.";
-  if(/confirm|email.*not.*confirmed/.test(low))return "The account exists but Email Confirmation is required. For this internal staff-login system, turn OFF 'Confirm email' in Authentication → Providers → Email.";
-  if(/invalid.*login|invalid.*credentials|user.*not.*found/.test(low))return "Cloud account not found or password is incorrect.";
-  return m;
-}
-async function ssCloudLogin(loginId,password){
-  if(!SS_SB||!SS_SB_READY)return {ok:false,error:"Supabase client could not be initialized."};
-  var local=USERS[String(loginId||"").trim().toLowerCase()]||{};
-  var email=ssCloudEmail(loginId,local);
-  try{
-    // Resolve the Login ID on the server and repair an unconfirmed Auth user
-    // before attempting the actual password sign-in. This makes the same
-    // Login ID work on a fresh PC/mobile without relying on localStorage.
-    try{
-      var repair=await SS_SB.functions.invoke("repair-login",{body:{loginId:String(loginId||"").trim().toLowerCase(),password:String(password||"")}});
-      if(!repair.error&&repair.data&&repair.data.ok&&repair.data.email){
-        email=String(repair.data.email).trim().toLowerCase();
-      }
-    }catch(re){ /* normal sign-in below will return the authoritative error */ }
-    var r=await SS_SB.auth.signInWithPassword({email:email,password:password});
-    if(!r.error){
-      var u=r.data&&r.data.user,md=(u&&u.user_metadata)||{};
-      return {ok:true,account:{pass:password,role:md.role||local.role||"staff",type:md.type||local.type||md.role||"staff",name:md.name||local.name||loginId,phone:md.phone||local.phone||"",email:md.email||local.email||email}};
-    }
-    return {ok:false,error:ssAuthErrorMessage(r.error)};
-  }catch(e){return {ok:false,error:ssAuthErrorMessage(e)};}
-}
-var SS_PROVISION_BUSY=false;
-var SS_CLOUD_RATE_BLOCK_UNTIL=0;
-function ssCloudRateBlocked(){ return Date.now() < SS_CLOUD_RATE_BLOCK_UNTIL; }
-function ssCloudRateBlockMessage(){
-  var mins=Math.max(1,Math.ceil((SS_CLOUD_RATE_BLOCK_UNTIL-Date.now())/60000));
-  return "Supabase Auth is rate-limited right now. New local ID can still be created, and cloud setup can be retried in about "+mins+" minute(s).";
-}
-async function ssProvisionOneUser(loginId,password,account){
-  if(!SS_SB||!SS_SB_READY)return {ok:false,error:"Supabase client could not be initialized. Reload the page and try again."};
-  if(SS_PROVISION_BUSY)return {ok:false,error:"Cloud user creation is already running. Please wait."};
-  if(String(password||"").length<6)return {ok:false,error:"Password must be at least 6 characters."};
-  SS_PROVISION_BUSY=true;
-  try{
-    var sessionResult=await SS_SB.auth.getSession();
-    var session=sessionResult&&sessionResult.data&&sessionResult.data.session;
-    if(session&&session.access_token){
-      var payload={loginId:String(loginId||"").trim().toLowerCase(),password:String(password||""),name:account&&account.name||loginId,role:account&&account.role||"staff",type:account&&account.type||account.role||"staff",phone:account&&account.phone||"",email:account&&account.email||""};
-      var fn=await SS_SB.functions.invoke("provision-user",{body:payload});
-      if(!fn.error&&fn.data){
-        if(fn.data.ok)return {ok:true,existing:!!fn.data.existing,created:!!fn.data.created,email:fn.data.email||ssCloudEmail(loginId,account)};
-        return {ok:false,error:fn.data.error||"Cloud provisioning failed."};
-      }
-      if(fn.error){
-        var fm=String((fn.error&&fn.error.message)||fn.error||"");
-        if(!/404|not found|failed to fetch|network/i.test(fm))return {ok:false,error:fm||"Cloud provisioning failed."};
-      }
-    }
-    var email=ssCloudEmail(loginId,account);
-    var r=await SS_SIGNUP.auth.signUp({email:email,password:password,options:{data:{login_id:loginId,name:account.name||loginId,role:account.role||"staff",type:account.type||account.role||"staff",phone:account.phone||"",email:email}}});
-    if(r.error){
-      var m=String(r.error.message||r.error);
-      if(/already registered|already exists|user already/i.test(m))return {ok:true,existing:true,email:email};
-      if(/rate limit|too many requests|429/i.test(m)){SS_CLOUD_RATE_BLOCK_UNTIL=Date.now()+10*60*1000;return {ok:false,rateLimited:true,error:ssAuthErrorMessage(r.error)};}
-      return {ok:false,error:ssAuthErrorMessage(r.error)};
-    }
-    var confirmed=!!(r.data&&r.data.session);try{await SS_SIGNUP.auth.signOut({scope:"local"});}catch(e){}
-    return {ok:true,created:true,confirmed:confirmed,email:email,user:(r.data&&r.data.user)||null};
-  }catch(e){return {ok:false,error:ssAuthErrorMessage(e)};}
-  finally{SS_PROVISION_BUSY=false;}
-}
-async function syncAllUsersToCloud(){
-  if(!canEdit()){toast("Admin / Master only","error");return;}
-  toast("Cloud bulk sync is disabled. Create users one at a time. A Supabase Auth rate limit never blocks the local ERP account or a valid local login.","success");
-}
 // ===== USER ACCOUNTS =====
 var USERS = {
   admin:     {pass:"admin@123", role:"admin", name:"Administrator"},
   master:    {pass:"Master@2026", role:"master", name:"Master Control"},
   parvinder: {pass:"staff@123", role:"staff", name:"Parvinder Kumar"},
-  parveen:   {pass:"plant 123", role:"office", type:"office", name:"Parveen Dahiya"},
   pawan:     {pass:"staff@123", role:"staff", name:"Pawan Kumar"},
-  rupesh:    {pass:"plant@123", role:"office", type:"office", name:"Rupesh"},
+  rupesh:    {pass:"plant@123", role:"office", type:"office", name:"Rupesh Sharma"},
   punit:     {pass:"plant@123", role:"office", type:"office", name:"Punit"},
-  rajsing:   {pass:"plant@123", role:"office", type:"office", name:"Raj Sing"},
-  yoginder:  {pass:"plant@123", role:"office", type:"office", name:"Yoginder"}
+  raj:       {pass:"plant@123", role:"office", type:"office", name:"Raj Sing"},
+  yoginder:  {pass:"plant@123", role:"office", type:"office", name:"Yoginder"},
+  parveen:   {pass:"plant 123", role:"plant", type:"plant", name:"Parveen Dahiya"}
 };
 var CU = null; // current user
 var selectedLoginRole = 'admin';
@@ -2045,13 +1945,13 @@ function openUserManagerModal(){
   if(!canEdit()){toast("Admin / Master only","error");return;}
   document.getElementById("mt").textContent="Create New User — Sales Person / Office Staff";
   document.getElementById("mb2").innerHTML=userHTML()+"<div id='userListBox' style='margin-top:16px'></div>";
-  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Close</button><button class='btn bw' onclick='syncAllUsersToCloud()'>&#9729; Cloud Setup</button><button class='btn bs' onclick='saveUser()'>&#128190; Create User</button>";
+  document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Close</button><button class='btn bs' onclick='saveUser()'>&#128190; Create User</button>";
   renderUserList();
   userTypeChanged();
   openModal();
 }
 
-async function saveUser(){
+function saveUser(){
   if(!canEdit())return;
   var u=(document.getElementById("uun").value||"").trim().toLowerCase();
   var pw=(document.getElementById("upw").value||"").trim();
@@ -2066,16 +1966,18 @@ async function saveUser(){
   var st=(document.getElementById("ust")||{}).value||"Active";
 
   if(!/^[a-z0-9._-]{3,30}$/.test(u)){toast("Login ID must be 3-30 characters: letters, numbers, dot, _ or -","error");return;}
-  if(pw.length<6){toast("Password must be at least 6 characters","error");return;}
+  if(pw.length<4){toast("Password must be at least 4 characters","error");return;}
   if(!nm){toast("Full name required","error");return;}
   if(userExists(u)){toast("Login ID already exists","error");return;}
 
-  // IMPORTANT: save the ERP account locally FIRST. A Supabase Auth 429 must
-  // never prevent Master/Admin from creating the employee profile.
   if(type==='admin'){
     USERS[u]={pass:pw,role:"admin",name:nm,type:"admin",phone:ph,email:em};
     saveUsers();
-  }else if(type==='sales'){
+    toast("Admin user created: "+u,"success");
+    renderUserList();rStats();return;
+  }
+
+  if(type==='sales'){
     var salesProfile=link ? SL.filter(function(x){return x.nm===link;})[0] : null;
     if(salesProfile){
       salesProfile.ph=ph||salesProfile.ph;salesProfile.em=em||salesProfile.em;
@@ -2088,7 +1990,6 @@ async function saveUser(){
     }
     USERS[u]={pass:pw,role:"staff",type:"sales",name:nm,phone:ph,email:em};
     try{localStorage.setItem("RMC_SL",JSON.stringify(SL));}catch(e){}
-    saveUsers();
   }else if(type==='office'){
     var officeProfile=OS.filter(function(x){return x.nm===nm;})[0];
     if(officeProfile){
@@ -2102,33 +2003,10 @@ async function saveUser(){
     }
     USERS[u]={pass:pw,role:"office",type:"office",name:nm,phone:ph,email:em};
     try{localStorage.setItem("RMC_OS",JSON.stringify(OS));}catch(e){}
-    saveUsers();
   }
-
-  renderUserList();rStats();rStg();rOS();popDD();
-
-  // Cloud provisioning is attempted only after the local ERP account exists.
-  // If Supabase is rate-limited, the account remains usable on this browser
-  // and is marked as pending cloud provisioning instead of being discarded.
-  if(ssCloudRateBlocked()){
-    toast("ID created successfully in this browser. Cloud setup is temporarily rate-limited; "+ssCloudRateBlockMessage(),"success");
-    return;
-  }
-  var cloudAccount={name:nm,role:type==='admin'?"admin":(type==='office'?"office":"staff"),type:type,phone:ph,email:em};
-  var cloud=await ssProvisionOneUser(u,pw,cloudAccount);
-  if(!cloud.ok){
-    if(cloud.rateLimited){
-      toast("ID created successfully, but Cloud Login is temporarily rate-limited. Your data is NOT lost. Do not retry Cloud Setup for 10 minutes.","success");
-    }else{
-      toast("ID created successfully, but Cloud Login is pending: "+cloud.error,"success");
-    }
-    return;
-  }
-  if(cloud.existing){
-    toast("ID created successfully. Cloud account already exists for "+u+".","success");
-  }else{
-    toast("ID + Cloud Login created successfully: "+u,"success");
-  }
+  saveUsers();
+  toast((type==='office'?"Office Staff":"Sales Person")+" created successfully: "+u,"success");
+  renderUserList();rStg();rOS();popDD();rStats();
 }
 function waShareAll(){
   var msg="*RMC Sales Visit Summary*\nDate: "+new Date().toLocaleDateString("en-IN")+"\nTotal: "+FR.length+" records\n\n";
@@ -2218,7 +2096,7 @@ function editLoginUser(u){
 function saveLoginUser(oldU){
   if(!canEdit())return;
   var u=document.getElementById("euun").value.trim().toLowerCase(),pw=document.getElementById("eupw").value.trim(),nm=document.getElementById("eunm").value.trim();
-  if(!/^[a-z0-9._-]{3,30}$/.test(u)||pw.length<6||!nm){toast("Enter a valid Login ID, password (minimum 6 characters) and name","error");return;}
+  if(!/^[a-z0-9._-]{3,30}$/.test(u)||pw.length<4||!nm){toast("Enter a valid Login ID, password and name","error");return;}
   if(u!==oldU&&userExists(u)){toast("Login ID already exists","error");return;}
   var a=USERS[oldU];delete USERS[oldU];USERS[u]={pass:pw,role:a.role,type:a.type,name:nm};saveUsers();closeModal();renderUserList();toast("Login account updated","success");
 }
@@ -2261,83 +2139,65 @@ function accountKind(account){
   if(account.role==="plant" || account.type==="plant")return "plant";
   return "staff";
 }
-async function doLogin(){
+function doLogin(){
   var u=(document.getElementById('lUser').value||'').trim().toLowerCase();
   var p=document.getElementById('lPass').value||'';
   var err=document.getElementById('lErr');
   if(!u||!p){if(err){err.style.display='block';err.textContent='Please enter username and password';}return;}
-
-  /*
-   * V12 LOGIN RULE:
-   * 1) If the account exists in the ERP on this browser, validate it locally FIRST.
-   *    This prevents a Supabase 429/rate-limit from blocking a valid employee login.
-   * 2) Only when there is no local account do we contact Supabase.
-   * 3) If cloud login succeeds, cache the account locally for faster future logins.
-   * This fixes the previous cloud-first failure where a valid newly-created ID was
-   * rejected simply because Supabase Auth was temporarily rate-limited.
-   */
   var account=USERS[u];
-  var localFallback=false;
-  var cloud=null;
-
   if(account && account.pass===p){
-    localFallback=true;
-  }else{
-    cloud=await ssCloudLogin(u,p);
-    if(cloud.ok){
-      account=Object.assign({},USERS[u]||{},cloud.account,{pass:p});
-      USERS[u]=account;
-      saveUsers();
-    }else{
-      if(err){
-        err.style.display='block';
-        err.textContent=cloud.error || 'Incorrect username/password.';
-      }
-      var pass=document.getElementById('lPass');if(pass)pass.value='';
+    var kind=accountKind(account);
+
+    if(selectedLoginRole==="admin" && kind!=="admin" && kind!=="master"){
+      showLoginAccessModal("Staff Account Detected",
+        kind==="office"
+          ? "You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials."
+          : kind==="plant"
+          ? "You are a Plant Manager user. Kindly use the correct staff/plant login section."
+          : "You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials.");
       return;
     }
-  }
+    if(selectedLoginRole==="staff" && (kind==="admin"||kind==="master")){
+      showLoginAccessModal(kind==="master"?"Master Account Detected":"Admin Account Detected",
+        kind==="master"
+          ? "You are a Master user. Kindly select the Admin Login section and sign in with your Master credentials."
+          : "You are an Admin user. Kindly select the Admin Login section and sign in with your Admin credentials.");
+      return;
+    }
 
-  var kind=accountKind(account);
-  if(selectedLoginRole==='admin' && kind!=='admin' && kind!=='master'){
-    showLoginAccessModal('Staff Account Detected',
-      kind==='office'
-        ? 'You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials.'
-        : kind==='plant'
-        ? 'You are a Plant Manager user. Kindly use the correct Staff Login section and sign in with your Plant Manager credentials.'
-        : 'You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials.');
-    if(SS_SB)try{await SS_SB.auth.signOut();}catch(e){}
-    return;
-  }
-  if(selectedLoginRole==='staff' && (kind==='admin'||kind==='master')){
-    showLoginAccessModal(kind==='master'?'Master Account Detected':'Admin Account Detected',
-      kind==='master'
-        ? 'You are a Master user. Kindly select the Admin Login section and sign in with your Master credentials.'
-        : 'You are an Admin user. Kindly select the Admin Login section and sign in with your Admin credentials.');
-    if(SS_SB)try{await SS_SB.auth.signOut();}catch(e){}
-    return;
-  }
+    CU=Object.assign({},account);
+    CU.uname=u;CU.accountKind=kind;
+    if(err)err.style.display='none';
 
-  CU=Object.assign({},account);CU.uname=u;CU.accountKind=kind;
-  if(err)err.style.display='none';
-  try{localStorage.setItem('RMC_LAST_CLOUD_LOGIN',JSON.stringify({u:u,at:new Date().toISOString(),mode:localFallback?'local':'cloud'}));}catch(e){}
+    var lp=document.getElementById('loginPage'),app=document.getElementById('app');
+    if(lp)lp.style.display='none';
+    if(app){
+      app.style.display='block';
+      app.classList.remove('admin-mode','staff-mode','office-mode','plant-mode','master-mode');
+      app.classList.add(kind==='master'?'master-mode':kind==='admin'?'admin-mode':kind==='office'?'office-mode':kind==='plant'?'plant-mode':'staff-mode');
+    }
 
-  var lp=document.getElementById('loginPage'),app=document.getElementById('app');
-  if(lp)lp.style.display='none';
-  if(app){
-    app.style.display='block';
-    app.classList.remove('admin-mode','staff-mode','office-mode','plant-mode','master-mode');
-    app.classList.add(kind==='master'?'master-mode':kind==='admin'?'admin-mode':kind==='office'?'office-mode':kind==='plant'?'plant-mode':'staff-mode');
-  }
-  var ub=document.getElementById('userBadge');
-  if(ub)ub.innerHTML='&#128100; '+CU.name+' <span class="'+(kind==='master'?'badge bpu':kind==='admin'?'badge bb':kind==='office'?'staff-badge office-badge':kind==='plant'?'plant-badge':'staff-badge')+'">'+(kind==='master'?'MASTER':kind==='admin'?'ADMIN':kind==='office'?'OFFICE':kind==='plant'?'PLANT':'SALES')+'</span>';
-  var dw=document.getElementById('dwUser');if(dw)dw.textContent=CU.name;
-  var hs=document.getElementById('hSub');
-  if(hs)hs.textContent=kind==='master'?'Master Control — Full Enterprise Access':kind==='admin'?'Admin Mode — Full Access':kind==='office'?'Office Staff Mode — My Work Only':kind==='plant'?'Plant Manager Mode — Plant Operations & Dispatch':'Sales Staff Mode — My Visits Only';
-  applyRoleAccess();applyPlantAccess();initApp();
-  if(typeof ssLoginSmile==='function')ssLoginSmile(CU.name);else toast('Welcome, '+CU.name+'!','success');
-  if(localFallback && ssCloudRateBlocked()){
-    setTimeout(function(){toast('Welcome, '+CU.name+'! Cloud Auth is temporarily rate-limited, but your ERP login is working normally.','info');},250);
+    var ub=document.getElementById('userBadge');
+    if(ub)ub.innerHTML='&#128100; '+CU.name+
+      ' <span class="'+(kind==='master'?'badge bpu':kind==='admin'?'badge bb':kind==='office'?'staff-badge office-badge':kind==='plant'?'plant-badge':'staff-badge')+'">'+
+      (kind==='master'?'MASTER':kind==='admin'?'ADMIN':kind==='office'?'OFFICE':kind==='plant'?'PLANT':'SALES')+'</span>';
+
+    var dw=document.getElementById('dwUser');if(dw)dw.textContent=CU.name;
+    var hs=document.getElementById('hSub');
+    if(hs)hs.textContent=kind==='master'?'Master Control — Full Enterprise Access':
+      kind==='admin'?'Admin Mode — Full Access':
+      kind==='office'?'Office Staff Mode — My Work Only':
+      kind==='plant'?'Plant Manager Mode — Plant Operations & Dispatch':
+      'Sales Staff Mode — My Visits Only';
+
+    applyRoleAccess();
+    applyPlantAccess();
+    initApp();
+    if(typeof ssLoginSmile==="function")ssLoginSmile(CU.name);
+    else toast('Welcome, '+CU.name+'!','success');
+  }else{
+    if(err){err.style.display='block';err.textContent='Incorrect username or password';}
+    var pass=document.getElementById('lPass');if(pass)pass.value='';
   }
 }
 function applyRoleAccess(){
@@ -2383,8 +2243,6 @@ function doLogout(){
   if(lp)lp.style.display='flex';
   var u=document.getElementById('lUser'),p=document.getElementById('lPass'),e=document.getElementById('lErr');
   if(u)u.value='';if(p)p.value='';if(e)e.style.display='none';
-
-  if(SS_SB)try{SS_SB.auth.signOut();}catch(e){}
 }
 function canEdit(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'));}
 function canAddVisit(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'||CU.accountKind==='staff'));}
@@ -2418,9 +2276,13 @@ try{
 var OS=[
   {id:1,nm:"Rajesh Sharma",rl:"Office Manager",dp:"Admin",ph:"9998000001",st:"Active",cl:"#7c3aed"},
   {id:2,nm:"Sunita Devi",  rl:"Accountant",   dp:"Finance",ph:"9998000002",st:"Active",cl:"#e02424"},
-  {id:3,nm:"Amit Verma",   rl:"Data Entry",   dp:"Admin",  ph:"9998000003",st:"Active",cl:"#f59e0b"}
+  {id:3,nm:"Amit Verma",   rl:"Data Entry",   dp:"Admin",  ph:"9998000003",st:"Active",cl:"#f59e0b"},
+  {id:4,nm:"Rupesh Sharma",rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#0891b2",loginId:"rupesh"},
+  {id:5,nm:"Punit",        rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#16a34a",loginId:"punit"},
+  {id:6,nm:"Raj Sing",     rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#ea580c",loginId:"raj"},
+  {id:7,nm:"Yoginder",     rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#7c3aed",loginId:"yoginder"}
 ];
-var nOid=4;
+var nOid=8;
 var WL=[
   {id:1,nm:"Rajesh Sharma",dt:"2026-08-22",tk:"Monthly MIS Report",sts:"Completed",pr:"High",nt:"Sent to MD"},
   {id:2,nm:"Sunita Devi",  dt:"2026-08-23",tk:"Invoice Processing",sts:"In Progress",pr:"Medium",nt:"30 invoices"},
@@ -2900,7 +2762,12 @@ try{
   if(savedOS){
     var parsedOS=JSON.parse(savedOS);
     if(Array.isArray(parsedOS)&&parsedOS.length){
-      OS=parsedOS;
+      /* Merge saved profiles over the built-in profiles instead of replacing them.
+         This keeps mobile/fresh-device built-in staff selectable. */
+      parsedOS.forEach(function(saved){
+        var ix=OS.findIndex(function(base){return (saved.loginId&&base.loginId===saved.loginId)||base.nm===saved.nm;});
+        if(ix>=0) OS[ix]=Object.assign({},OS[ix],saved); else OS.push(saved);
+      });
       nOid=Math.max.apply(null,OS.map(function(s){return Number(s.id)||0;}))+1;
     }
   }
@@ -2908,8 +2775,19 @@ try{
 // ===== WORK LOG =====
 function officeWorkForm(w){
   w=w||{};
-  var source=CU.accountKind==='office'?OS.filter(function(s){return s.nm===CU.name;}):OS;
-  var osOpts=source.map(function(s){return"<option "+(w.nm===s.nm?"selected":"")+">"+s.nm+"</option>";}).join("");
+  /* Always resolve the logged-in employee, even on a fresh mobile/device where
+     RMC_OS has never been stored. This prevents an empty Staff dropdown. */
+  var source;
+  if(CU.accountKind==='office'){
+    source=OS.filter(function(s){return s.nm===CU.name||s.loginId===CU.uname;});
+    if(!source.length){
+      source=[{id:0,nm:CU.name,rl:"Office Staff",dp:"Office",ph:CU.phone||"",st:"Active",cl:"#b91c2f",loginId:CU.uname}];
+    }
+  }else{
+    source=OS;
+  }
+  var selectedName=w.nm||CU.name||"";
+  var osOpts=source.map(function(s){return"<option value=\""+s.nm.replace(/\"/g,'&quot;')+"\" "+(selectedName===s.nm?"selected":"")+">"+s.nm+"</option>";}).join("");
   return "<div class='fg'>"+
     "<div class='fi'><label>Staff *</label><select id='wnm' "+(CU.accountKind==='office'?"disabled":"")+">"+osOpts+"</select></div>"+
     "<div class='fi'><label>Date *</label><input id='wdt' type='date' value='"+(w.dt||new Date().toISOString().slice(0,10))+"'></div>"+
@@ -2940,7 +2818,8 @@ function openEditWLModal(id){
 function saveWL(){
   if(!canOfficeWork())return;
   var tk=document.getElementById("wtk").value.trim();if(!tk){toast("Task description required","error");return;}
-  var nm=document.getElementById("wnm").value;
+  var nm=CU.accountKind==='office' ? CU.name : (document.getElementById("wnm").value||"");
+  if(!nm){toast("Staff name is required","error");return;}
   if(CU.accountKind==='office' && nm!==CU.name){toast("You can only save your own work entry","error");return;}
   var dt=document.getElementById("wdt").value,sts=document.getElementById("wst").value,pr=document.getElementById("wpr").value,nt=document.getElementById("wnt").value.trim();
   var existIdx=(eid!=null)?WL.findIndex(function(w){return w.id===eid;}):-1;
