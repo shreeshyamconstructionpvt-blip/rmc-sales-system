@@ -2978,18 +2978,57 @@ function pmLoad(){
       {id:pmIds.f++,vehicle:"RMC-02",driver:"Driver 02",cap:7,trips:0,status:"Available",last:"—"}
     ];
   }
-  if(!PM_MAT.length && !ssFreshMode()){
-    PM_MAT=[
-      {id:pmIds.m++,name:"Cement",unit:"MT",opening:0,received:0,consumed:0,reorder:10},
-      {id:pmIds.m++,name:"20mm Aggregate",unit:"MT",opening:0,received:0,consumed:0,reorder:30},
-      {id:pmIds.m++,name:"10mm Aggregate",unit:"MT",opening:0,received:0,consumed:0,reorder:20},
-      {id:pmIds.m++,name:"Sand",unit:"MT",opening:0,received:0,consumed:0,reorder:30},
-      {id:pmIds.m++,name:"Admixture",unit:"L",opening:0,received:0,consumed:0,reorder:500}
-    ];
-  }
+  pmRestoreParveenMaterials();
   pmNormalizeMaterials();
   pmSave();
 }
+/* ===== PARVEEN MATERIAL RECOVERY / SAFE BASELINE =====
+   Source: Parveen Dahiya Complete Plant Work Report supplied with this update.
+   Rule: never overwrite an existing non-placeholder material record. Missing
+   baseline materials are added only; the current browser data remains intact. */
+var PARVEEN_MATERIAL_BASELINE=[
+  {name:"CEMENT",unit:"MT",opening:40,received:0,consumed:0,reorder:200},
+  {name:"F/ASH",unit:"MT",opening:20,received:0,consumed:0,reorder:80},
+  {name:"D/ wash dust",unit:"MT",opening:160,received:0,consumed:0,reorder:300},
+  {name:"Blue Dust",unit:"MT",opening:5,received:82,consumed:0,reorder:200},
+  {name:"White/Dust",unit:"MT",opening:180,received:0,consumed:0,reorder:300},
+  {name:"20 MM Blue",unit:"MT",opening:25,received:0,consumed:0,reorder:300},
+  {name:"20 MM Red",unit:"MT",opening:240,received:0,consumed:0,reorder:300},
+  {name:"10MM Blue",unit:"MT",opening:10,received:0,consumed:0,reorder:200},
+  {name:"10MM Red",unit:"MT",opening:120,received:0,consumed:0,reorder:300},
+  {name:"Admixture",unit:"letter",opening:1050,received:0,consumed:0,reorder:10000},
+  {name:"diesel",unit:"letter",opening:2,received:1704.06,consumed:0,reorder:2500}
+];
+function pmMaterialNameKey(v){return String(v==null?"":v).trim().toLowerCase().replace(/[^a-z0-9]+/g,"");}
+function pmRestoreParveenMaterials(){
+  if(!Array.isArray(PM_MAT))PM_MAT=[];
+  var marker="RMC_PARVEEN_MATERIAL_BASELINE_V1";
+  var alreadyApplied=false;
+  try{alreadyApplied=localStorage.getItem(marker)==="1";}catch(e){}
+  if(alreadyApplied)return;
+  var legacyNames={"cement":1,"20mmaggregate":1,"10mmaggregate":1,"sand":1,"admixture":1};
+  var legacyPlaceholder=PM_MAT.length>0 && PM_MAT.length<=5 && PM_MAT.every(function(x){
+    var b=pmMaterialBalance(x);
+    return legacyNames[pmMaterialNameKey(x&&x.name)] && b.opening===0 && b.received===0 && b.consumed===0;
+  });
+  if(legacyPlaceholder){
+    var backup=JSON.stringify(PM_MAT);
+    try{localStorage.setItem("RMC_SAFETY_BACKUP_RMC_PM_MAT_LEGACY",backup);localStorage.setItem("RMC_SAFETY_BACKUP_RMC_PM_MAT_LEGACY_AT",new Date().toISOString());}catch(e){}
+    PM_MAT=[];
+  }
+  var existing={};
+  PM_MAT.forEach(function(x){existing[pmMaterialNameKey(x&&x.name)]=true;});
+  PARVEEN_MATERIAL_BASELINE.forEach(function(b){
+    var key=pmMaterialNameKey(b.name);
+    if(!existing[key]){
+      var now=new Date().toISOString();
+      PM_MAT.push({id:pmIds.m++,name:b.name,unit:b.unit,opening:b.opening,received:b.received,consumed:b.consumed,reorder:b.reorder,createdAt:now,updatedAt:now,savedAt:now,source:"Parveen Dahiya Plant Work Report"});
+      existing[key]=true;
+    }
+  });
+  try{localStorage.setItem(marker,"1");}catch(e){}
+}
+
 function pmSave(){
   var savedAt=new Date().toISOString();
   [["RMC_PM_ORDERS",PM_ORDERS],["RMC_PM_FLEET",PM_FLEET],["RMC_PM_STAFF",PM_STAFF],["RMC_PM_QC",PM_QC],["RMC_PM_MAT",PM_MAT],["RMC_PM_BILL",PM_BILL],["RMC_PM_MAINT",PM_MAINT]].forEach(function(a){try{localStorage.setItem(a[0],JSON.stringify(a[1]));}catch(e){}});
@@ -3510,6 +3549,7 @@ function ssPlantPdfSection(d,title,head,rows,y){
 }
 function exportAdminPlantPDF(){
   if(!reportCan()){toast('Admin/Master access required','error');return;}
+  try{if(typeof ssLoadCore==='function')ssLoadCore();if(typeof pmLoad==='function')pmLoad();if(typeof masterLoad==='function')masterLoad();}catch(e){}
   var d=pdfDoc('RMC Plant Operations — Complete Master Report',true);
   var generated=new Date().toLocaleString('en-IN');
   var saved=typeof pmLastSavedAt==='function'?pmLastSavedAt():null;
@@ -3787,8 +3827,37 @@ function exportMyRolePDF(){
   window.ssModuleRows=function(id){var rows=[];(MASTER_RECORDS||[]).filter(function(x){return x&&x.module===id;}).slice().reverse().forEach(function(x,i){rows.push([i+1,x.ref||'-',x.name||'-',x.status||'Pending',pmMoney(x.amount||0),ssModuleFieldSummary(x)]);});function push(ref,name,status,amount,details){rows.push([rows.length+1,ref,name,status,pmMoney(amount||0),details]);}if(id==='inventory')(PM_MAT||[]).forEach(function(x){var b=pmMaterialBalance(x);push('STOCK-'+(x.id||rows.length+1),x.name||'-','Live Stock',0,'Unit: '+(x.unit||'MT')+' | Opening: '+b.opening+' | Received: '+b.received+' | Consumed: '+b.consumed+' | Current: '+b.balance+' | Reorder: '+b.reorder);});if(id==='production')(PM_ORDERS||[]).forEach(function(x){push(x.order||('ORDER-'+(x.id||rows.length+1)),x.customer||'-',x.status||'Pending',0,'Site: '+(x.site||'-')+' | Grade: '+(x.grade||'-')+' | Qty: '+(x.qty||0)+' m³ | Schedule: '+(x.schedule||'-'));});if(id==='machinery'){(PM_FLEET||[]).forEach(function(x){push(x.vehicle||('FLEET-'+(x.id||rows.length+1)),x.driver||'-',x.status||'Available',0,'Capacity: '+(x.cap||x.capacity||'-')+' | Trips: '+(x.trips||0)+' | Last: '+(x.last||'-'));});(PM_MAINT||[]).forEach(function(x){push('MAINT-'+(x.id||rows.length+1),x.equipment||'-',x.status||'Open',0,'Issue: '+(x.issue||'-')+' | Priority: '+(x.priority||'-')+' | Next: '+(x.next||'-'));});}if(id==='labour')(PM_STAFF||[]).forEach(function(x){push('STAFF-'+(x.id||rows.length+1),x.name||'-',x.status||'Active',0,'Role: '+(x.role||'-')+' | Department: '+(x.dept||'-')+' | Shift: '+(x.shift||'-')+' | Phone: '+(x.phone||'-'));});if(id==='finance')(PM_BILL||[]).forEach(function(x){push(x.inv||('BILL-'+(x.id||rows.length+1)),x.customer||'-',x.status||'Pending',Number(x.amount||0),'Paid: '+(x.paid||0)+' | Outstanding: '+(x.outstanding||0)+' | Due: '+(x.due||'-'));});return rows;};
   window.exportMasterERPPDF=function(){
     if(!reportCan())return;
-    var rows=(MASTER_RECORDS||[]).map(function(x,i){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module};return[i+1,m.name,x.ref||'-',x.name||'-',x.status||'-',pmMoney(x.amount||0),x.notes||'-'];});
-    saveReportPDF('Shree Shyam Integrated Master ERP Report','Master_ERP_Report.pdf',['#','Module','Reference','Name / Party','Status','Amount','Notes'],rows,true);
+    try{if(typeof ssLoadCore==='function')ssLoadCore();if(typeof pmLoad==='function')pmLoad();if(typeof masterLoad==='function')masterLoad();}catch(e){}
+    try{
+      var d=pdfDoc('Shree Shyam — Complete Master ERP Report',true);
+      d.setFontSize(8);d.setFont('helvetica','normal');d.setTextColor(60,60,60);
+      d.text('Generated: '+new Date().toLocaleString('en-IN'),12,25);
+      d.text('Live Master Snapshot — all current browser-saved departments',120,25);
+      var y=33;
+      function masterSection(title,head,rows){
+        if(y>178){d.addPage();y=15;}
+        d.setFontSize(10);d.setFont('helvetica','bold');d.setTextColor(145,16,39);d.text(title,12,y);y+=5;
+        var body=rows&&rows.length?rows:[['-'].concat(head.slice(1).map(function(){return 'No records';}))];
+        d.autoTable({head:[head],body:body,startY:y,styles:{fontSize:6.2,cellPadding:1.6,overflow:'linebreak',valign:'middle'},headStyles:{fillColor:[145,16,39],textColor:255,fontStyle:'bold',fontSize:6.5},alternateRowStyles:{fillColor:[248,248,248]},margin:{left:10,right:10,top:12,bottom:12},didDrawPage:function(){d.setFontSize(6.5);d.setTextColor(100,100,100);d.text('Shree Shyam Construction | Master Control | Page '+d.internal.getNumberOfPages(),10,205);}});
+        y=(d.lastAutoTable&&d.lastAutoTable.finalY?d.lastAutoTable.finalY:y+12)+9;
+      }
+      masterSection('01. Sales Staff Directory',['#','Employee','Role','Department','Phone','Email','Status','Login ID'],(SL||[]).map(function(x,i){var login='';Object.keys(USERS||{}).some(function(k){if(USERS[k]&&USERS[k].name===x.nm&&['staff','master','admin'].indexOf(USERS[k].role)>=0){login=k;return true;}return false;});return[i+1,x.nm||'-',x.rl||'-',x.dp||'-',x.ph||'-',x.em||'-',x.st||'-',login||'-'];}));
+      masterSection('02. Office Staff Directory',['#','Employee','Role','Department','Phone','Status','Login ID'],(OS||[]).map(function(x,i){var login=x.loginId||'';if(!login)Object.keys(USERS||{}).some(function(k){if(USERS[k]&&USERS[k].name===x.nm&&accountKind(USERS[k])==='office'){login=k;return true;}return false;});return[i+1,x.nm||'-',x.rl||'-',x.dp||'-',x.ph||'-',x.st||'-',login||'-'];}));
+      masterSection('03. Sales Staff Visits — All Entries',['#','Salesperson','Date','Customer','Contact','Contractor','Site','Address','Area','Grade','Remarks'],(R||[]).slice().sort(function(a,b){return String(b.vd||'').localeCompare(String(a.vd||''));}).map(function(x,i){return[i+1,x.sp||'-',fd(x.vd),x.cu||'-',x.cc||'-',x.co||'-',x.si||'-',x.sa||'-',x.ar||'-',x.gr||'-',x.rm||'-'];}));
+      masterSection('04. Office Staff Work — All Entries',['#','Staff','Date','Task / Work','Status','Priority','Notes'],(WL||[]).slice().sort(function(a,b){return String(b.dt||'').localeCompare(String(a.dt||''));}).map(function(x,i){return[i+1,x.nm||'-',fd(x.dt),x.tk||'-',x.sts||'-',x.pr||'-',x.nt||'-'];}));
+      masterSection('05. Quotations — All Entries',['#','Customer','Date','Grade','Qty','Rate','Total','Status','Notes'],(QT||[]).map(function(x,i){return[i+1,x.cu||'-',fd(x.dt),x.gr||'-',x.qty||0,rupee(x.rate||0),rupee(x.total||0),x.sts||'-',x.nt||'-'];}));
+      masterSection('06. Attendance — All Entries',['#','Employee','Department','Date','Status','Notes'],(AT||[]).map(function(x,i){return[i+1,x.nm||'-',x.dp||'-',fd(x.dt),x.sts||'-',x.nt||'-'];}));
+      masterSection('07. Plant Orders & Dispatch',['#','Order','Customer','Site','Grade','Qty m³','Schedule','Vehicle','Status','Saved'],(PM_ORDERS||[]).map(function(x,i){return[i+1,x.order||'-',x.customer||'-',x.site||'-',x.grade||'-',x.qty||0,x.schedule||'-',x.vehicle||'-',x.status||'-',ssPdfSavedAt(x)];}));
+      masterSection('08. Plant Raw Materials — Parveen Dahiya',['#','Material','Unit','Opening','Received','Consumed','Current','Reorder','Status','Saved'],(PM_MAT||[]).map(function(x,i){var z=pmMaterialBalance(x);return[i+1,x.name||'-',x.unit||'-',z.opening,z.received,z.consumed,z.balance,z.reorder,(Number(z.balance)<=Number(z.reorder)?'REORDER':'OK'),ssPdfSavedAt(x)];}));
+      masterSection('09. Plant Fleet & Vehicles',['#','Vehicle','Driver','Capacity','Trips','Status','Last Trip / Issue','Saved'],(PM_FLEET||[]).map(function(x,i){return[i+1,x.vehicle||'-',x.driver||'-',x.cap||x.capacity||'-',x.trips||0,x.status||'-',x.last||'-',ssPdfSavedAt(x)];}));
+      masterSection('10. Plant Quality Control',['#','Date','Batch / Order','Grade','Slump','Cube 7d','Cube 28d','Status','Tested By','Saved'],(PM_QC||[]).map(function(x,i){return[i+1,x.date||'-',x.order||x.batch||'-',x.grade||'-',x.slump||'-',x.cube7||x.cube7d||'-',x.cube28||x.cube28d||'-',x.status||'-',x.by||'-',ssPdfSavedAt(x)];}));
+      masterSection('11. Plant Billing & Payments',['#','Invoice','Customer','Order','Amount','Paid','Outstanding','Due','Status','Saved'],(PM_BILL||[]).map(function(x,i){return[i+1,x.inv||x.invoice||'-',x.customer||'-',x.order||'-',pmMoney(x.amount||0),pmMoney(x.paid||0),pmMoney(x.outstanding||0),x.due||'-',x.status||'-',ssPdfSavedAt(x)];}));
+      masterSection('12. Vehicle Maintenance Register',['Sr. No.','Vehicle Type','Vehicle No.','Primary Engine KM','2nd Engine KM','Service Type','Service Date','Service Allotted To','Next Service Date','Remarks','Saved'],(PM_MAINT||[]).map(function(raw,i){var x=pmMaintNormalizeRow(raw,i);return[x.serial||i+1,x.vehicleType||'-',x.vehicleNo||'-',x.primaryKm||'-',x.secondKm||'-',x.serviceType||'-',pmMaintDisplayDate(x.serviceDate),x.serviceAllottedTo||'-',pmMaintDisplayDate(x.nextServiceDate),x.remarks||'-',ssPdfSavedAt(raw)];}));
+      masterSection('13. Plant Staff & Operators',['#','Name','Role','Department','Phone','Shift','Status','Saved'],(PM_STAFF||[]).map(function(x,i){return[i+1,x.name||'-',x.role||'-',x.dept||'-',x.phone||'-',x.shift||'-',x.status||'-',ssPdfSavedAt(x)];}));
+      masterSection('14. Master ERP Records',['#','Module','Reference','Name / Party','Status','Amount','Details','Saved'],(MASTER_RECORDS||[]).map(function(x,i){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module||'-'};return[i+1,m.name,x.ref||'-',x.name||'-',x.status||'-',pmMoney(x.amount||0),ssModuleFieldSummary(x),ssPdfSavedAt(x)];}));
+      d.save('Master_Complete_ERP_Report_'+ssTodayKey()+'.pdf');
+      toast('Complete Master ERP PDF downloaded — live sales, office, plant and ERP data included','success');
+    }catch(e){toast('Master ERP PDF error: '+(e.message||e),'error');}
   };
   window.downloadMasterDailyPDF=function(){
     if(!reportCan())return;
@@ -3803,6 +3872,7 @@ function exportMyRolePDF(){
   };
   window.openMasterReports=function(){
     if(!masterCan())return;
+    try{if(typeof ssLoadCore==='function')ssLoadCore();if(typeof pmLoad==='function')pmLoad();if(typeof masterLoad==='function')masterLoad();}catch(e){}
     var el=document.getElementById('masterReportsInline');if(!el){toast('Reports Centre area is unavailable','error');return;}
     el.innerHTML='<div class="master-panel" style="margin:0 0 16px"><div class="mph"><div><h3>📄 Master Reports Centre</h3><small style="color:#64748b">Download management reports without changing existing records.</small></div><button class="btn bo bsm" onclick="document.getElementById(\'masterReportsInline\').innerHTML=\'\'">Close</button></div><div class="master-report-grid" style="padding:14px"><div class="master-report-card"><strong>🔑 Users</strong><span>All credentials and account roles.</span><button class="btn ba bsm" onclick="exportAdminUsersPDF()">Users PDF</button></div><div class="master-report-card"><strong>📝 Office Work</strong><span>All office work entries.</span><button class="btn ba bsm" onclick="exportAdminOfficeWorkPDF()">Work PDF</button></div><div class="master-report-card"><strong>📋 Visits</strong><span>All sales visits.</span><button class="btn ba bsm" onclick="exportAdminVisitsPDF()">Visits PDF</button></div><div class="master-report-card"><strong>🏭 Plant</strong><span>Orders, fleet, stock, QC and maintenance.</span><button class="btn ba bsm" onclick="exportAdminPlantPDF()">Plant PDF</button></div><div class="master-report-card"><strong>⭐ ERP</strong><span>Master records and approvals.</span><button class="btn ba bsm" onclick="exportMasterERPPDF()">ERP PDF</button></div></div></div>';
     el.scrollIntoView({behavior:'smooth',block:'start'});
@@ -3992,6 +4062,26 @@ masterRenderModules=function(){
 </script>
 <script>
 (function(){try{window.__RMC_DATA_SAFETY__={enabled:true,automaticReset:false,manualReset:false,version:"2026-09-01-data-safe"};}catch(e){}})();
+// ===== LIVE ADMIN REFRESH ACROSS OPEN TABS =====
+window.addEventListener('storage',function(e){
+  if(!e||!e.key)return;
+  var liveKeys=['RMC_USERS','RMC_SL','RMC_OS','RMC_VISITS','RMC_QUOTATIONS','RMC_OFFICE_WORK','RMC_ATTENDANCE','RMC_PM_ORDERS','RMC_PM_FLEET','RMC_PM_STAFF','RMC_PM_QC','RMC_PM_MAT','RMC_PM_BILL','RMC_PM_MAINT','RMC_MASTER_RECORDS','RMC_ERP_WORKFLOWS'];
+  if(liveKeys.indexOf(e.key)<0)return;
+  try{
+    if(typeof ssLoadCore==='function')ssLoadCore();
+    if(typeof loadUsers==='function')loadUsers();
+    if(typeof pmLoad==='function')pmLoad();
+    if(typeof masterLoad==='function')masterLoad();
+    if(CU&&['admin','master'].indexOf(CU.accountKind)>=0){
+      if(typeof rStats==='function')rStats();
+      if(typeof rWL==='function')rWL();
+      if(typeof rStg==='function')rStg();
+      if(typeof rOS==='function')rOS();
+      if(typeof masterRenderAll==='function')masterRenderAll();
+      if(typeof renderAdminReportCentre==='function')renderAdminReportCentre();
+    }
+  }catch(err){console.warn('Live data refresh failed',err);}
+});
 </script>
 </body>
 </html>
