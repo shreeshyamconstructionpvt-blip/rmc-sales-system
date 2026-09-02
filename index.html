@@ -3576,6 +3576,272 @@ function exportMyRolePDF(){
 }
 
 
+/* ===== V22 REPAIRED CORE INSERTED BEFORE MASTER PATCH ===== */
+// ===== V22 DATA-SAFE RUNTIME REPAIR =====
+// Non-destructive repair: no reset, no removeItem, no clearing of existing data.
+(function(){
+  function safeArray(raw){
+    try{var v=JSON.parse(raw);return Array.isArray(v)?v:null;}catch(e){return null;}
+  }
+  function safeObj(raw){
+    try{var v=JSON.parse(raw);return v&&typeof v==='object'&&!Array.isArray(v)?v:null;}catch(e){return null;}
+  }
+  function backupKey(key){
+    try{
+      var raw=localStorage.getItem(key);
+      if(raw===null)return;
+      localStorage.setItem('RMC_SAFETY_BACKUP_'+key,raw);
+      localStorage.setItem('RMC_SAFETY_BACKUP_AT',new Date().toISOString());
+    }catch(e){}
+  }
+  window.ssDataSafetyBackup=function(){
+    ['RMC_USERS','RMC_SL','RMC_OS','RMC_VISITS','RMC_QUOTATIONS','RMC_OFFICE_WORK','RMC_ATTENDANCE','RMC_ATTENDANCE_STATE','RMC_PM_ORDERS','RMC_PM_FLEET','RMC_PM_STAFF','RMC_PM_QC','RMC_PM_MAT','RMC_PM_BILL','RMC_PM_MAINT','RMC_MASTER_RECORDS','RMC_ERP_WORKFLOWS'].forEach(backupKey);
+  };
+
+  // The current V21 file references this helper from pmLoad().
+  // It is deliberately locked OFF so this repair can never perform a reset.
+  window.ssFreshMode=function(){return false;};
+
+  // Core persistence was referenced by Visit/Quotation/Office/Attendance handlers
+  // but the function was missing from the current file.
+  window.ssSaveCore=function(){
+    ssDataSafetyBackup();
+    var pairs=[['RMC_VISITS',R],['RMC_QUOTATIONS',QT],['RMC_OFFICE_WORK',WL],['RMC_ATTENDANCE',AT]];
+    var ok=0;
+    pairs.forEach(function(a){try{localStorage.setItem(a[0],JSON.stringify(a[1]));ok++;}catch(e){}});
+    try{localStorage.setItem('RMC_CORE_LAST_SAVED_AT',new Date().toISOString());}catch(e){}
+    return ok===pairs.length;
+  };
+  window.ssLoadCore=function(){
+    var v=safeArray(localStorage.getItem('RMC_VISITS')); if(v)R=v;
+    var q=safeArray(localStorage.getItem('RMC_QUOTATIONS')); if(q)QT=q;
+    var w=safeArray(localStorage.getItem('RMC_OFFICE_WORK')); if(w)WL=w;
+    var a=safeArray(localStorage.getItem('RMC_ATTENDANCE')); if(a)AT=a;
+    FQ=[].concat(QT||[]);
+    nRid=(R||[]).reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0)+1;
+    nQid=(QT||[]).reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0)+1;
+    nWid=(WL||[]).reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0)+1;
+    nAid=(AT||[]).reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0)+1;
+  };
+
+  // Load persisted transactional data BEFORE any new save operation.
+  try{ssLoadCore();}catch(e){}
+  try{
+    var ats=safeObj(localStorage.getItem('RMC_ATTENDANCE_STATE')); if(ats)attState=ats;
+  }catch(e){}
+
+  // Wrap the existing plant save so every save first keeps a recovery copy.
+  if(typeof window.pmSave==='function' && !window.pmSave.__v22safe){
+    var originalPmSave=window.pmSave;
+    var safePmSave=function(){ssDataSafetyBackup();return originalPmSave.apply(this,arguments);};
+    safePmSave.__v22safe=true;window.pmSave=safePmSave;
+  }
+  if(typeof window.saveUsers==='function' && !window.saveUsers.__v22safe){
+    var originalSaveUsers=window.saveUsers;
+    var safeSaveUsers=function(){ssDataSafetyBackup();return originalSaveUsers.apply(this,arguments);};
+    safeSaveUsers.__v22safe=true;window.saveUsers=safeSaveUsers;
+  }
+  if(typeof window.masterRecordsSave==='function' && !window.masterRecordsSave.__v22safe){
+    var originalMasterSave=window.masterRecordsSave;
+    var safeMasterSave=function(){ssDataSafetyBackup();return originalMasterSave.apply(this,arguments);};
+    safeMasterSave.__v22safe=true;window.masterRecordsSave=safeMasterSave;
+  }
+
+  // ===== MASTER CONTROL =====
+  window.P1_ROLE_MATRIX=[
+    ['Master','All modules, users, plants, approvals, reports','Full'],
+    ['Admin','Company-wide operations, users, reports, approvals','Full'],
+    ['Plant Manager','Plant, production, dispatch, stock, QC, fleet, maintenance','Plant'],
+    ['Sales','Leads, visits, quotations, customer follow-up','Own'],
+    ['Office Staff','Office tasks, attendance, own work reports','Own'],
+    ['QC','Quality records, tests, NCR and lab reports','Quality'],
+    ['Dispatcher','Orders, dispatch, vehicles and trip status','Dispatch'],
+    ['Store','Stock, GRN, issues, transfers and consumption','Inventory'],
+    ['Purchase','Indent, RFQ, vendor, PO and GRN workflow','Purchase'],
+    ['Accounts','Invoices, receipts, ledger, outstanding and payments','Finance'],
+    ['HR','Employee, attendance, leave and payroll records','HR']
+  ];
+  window.P1_ACTIVITY=[];
+  window.phase1Load=function(){try{var x=safeArray(localStorage.getItem('RMC_PHASE1_ACTIVITY'));if(x)P1_ACTIVITY=x;}catch(e){}};
+  window.phase1Log=function(action,detail,kind){
+    P1_ACTIVITY.unshift({id:Date.now()+Math.random(),at:new Date().toISOString(),by:CU?CU.name:'System',action:action,detail:detail||'',kind:kind||'info'});
+    P1_ACTIVITY=P1_ACTIVITY.slice(0,100);try{localStorage.setItem('RMC_PHASE1_ACTIVITY',JSON.stringify(P1_ACTIVITY));}catch(e){}
+  };
+  window.phase1FmtAgo=function(iso){var t=new Date(iso).getTime(),m=Math.max(0,Math.floor((Date.now()-t)/60000));if(m<1)return'just now';if(m<60)return m+'m ago';var h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';};
+  window.phase1Render=function(){
+    if(!masterCan())return;
+    var users=Object.keys(USERS||{}).length,visits=(R||[]).length,quotes=(QT||[]).length,office=(OS||[]).length,orders=(PM_ORDERS||[]).length,mats=(PM_MAT||[]).length;
+    var pending=(MASTER_RECORDS||[]).filter(function(x){return x.status==='Pending'||x.status==='For Approval';}).length;
+    var low=(PM_MAT||[]).filter(function(x){var b=pmMaterialBalance(x);return b.balance<=b.reorder;}).length;
+    var open=(PM_MAINT||[]).filter(function(x){return x.status!=='Completed';}).length;
+    var k=[['👥','Users',users,'All login accounts'],['📍','Visits',visits,'Sales activity'],['💰','Quotations',quotes,'Commercial pipeline'],['🏭','Plant Orders',orders,'RMC operations'],['📦','Materials',mats,'Stock master'],['⚠️','Low Stock',low,'Reorder attention'],['📝','Approvals',pending,'Pending decisions'],['🔧','Open Maintenance',open,'Service attention']];
+    var ke=document.getElementById('phase1Kpis');if(ke)ke.innerHTML=k.map(function(x){return'<div class="p1-card"><div class="p1-label">'+x[0]+' '+x[1]+'</div><div class="p1-value">'+x[2]+'</div><div class="p1-note">'+x[3]+'</div></div>';}).join('');
+    var alerts=[];if(low)alerts.push(['red','📦 '+low+' material item(s) below reorder level','Open Plant → Materials']);if(pending)alerts.push(['amber','📝 '+pending+' Master approval(s) pending','Review Approval Desk']);if(open)alerts.push(['amber','🔧 '+open+' maintenance item(s) still open','Review Maintenance']);if(!alerts.length)alerts.push(['green','✓ No critical alerts detected','System health looks good']);
+    var ae=document.getElementById('phase1Alerts'),ac=document.getElementById('phase1AlertCount');if(ae)ae.innerHTML=alerts.map(function(a){return'<div class="p1-row"><div><strong>'+a[1]+'</strong><small>'+a[2]+'</small></div><span class="p1-badge '+a[0]+'">'+(a[0]==='red'?'ACTION':'WATCH')+'</span></div>';}).join('');if(ac)ac.textContent=(alerts[0][0]==='green'?0:alerts.length)+' active';
+    var pe=document.getElementById('phase1Perms');if(pe)pe.innerHTML=P1_ROLE_MATRIX.map(function(x){return'<div class="p1-perm"><b>'+x[0]+' · '+x[2]+'</b><span>'+x[1]+'</span></div>';}).join('');
+    var act=(P1_ACTIVITY||[]).slice(0,12),ae2=document.getElementById('phase1Activity'),ac2=document.getElementById('phase1ActivityCount');if(ae2)ae2.innerHTML=act.length?act.map(function(x){return'<div class="p1-row"><div><strong>'+pmEsc(x.action)+'</strong><small>'+pmEsc(x.by)+' · '+pmEsc(x.detail||'')+'</small></div><span class="p1-badge">'+phase1FmtAgo(x.at)+'</span></div>';}).join(''):'<div class="p1-row"><div><strong>No activity yet</strong><small>Actions taken in the ERP will appear here.</small></div></div>';if(ac2)ac2.textContent=act.length+' events';
+  };
+  window.phase1Refresh=function(){masterRenderAll();toast('Phase 1 command centre refreshed','success');};
+  window.phase1ExportSnapshot=function(){
+    if(!masterCan())return;
+    var snapshot={generatedAt:new Date().toISOString(),generatedBy:CU?CU.name:'',users:USERS,visits:R,quotations:QT,officeStaff:OS,officeWork:WL,plantOrders:PM_ORDERS,materials:PM_MAT,fleet:PM_FLEET,qc:PM_QC,billing:PM_BILL,maintenance:PM_MAINT,masterRecords:MASTER_RECORDS,connectedWorkflows:ERP_WORKFLOWS};
+    var blob=new Blob([JSON.stringify(snapshot,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Shree_Shyam_RMC_Full_Snapshot_'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);phase1Log('Exported ERP snapshot','Full current data snapshot downloaded','export');toast('Full ERP snapshot downloaded','success');
+  };
+  phase1Load();
+
+  window.MASTER_MODULES=[
+    {id:'finance',icon:'💰',name:'Finance & Accounts',desc:'Invoices, receipts, outstanding, cash flow and plant-linked commercial control.'},
+    {id:'hr',icon:'👥',name:'HR & Payroll',desc:'Employee profiles, attendance, payroll readiness, leave and workforce records.'},
+    {id:'purchase',icon:'🛒',name:'Purchase Management',desc:'Purchase requests, vendors, quotations, POs, approvals and GRN workflow.'},
+    {id:'inventory',icon:'📦',name:'Store & Inventory',desc:'Raw material, stock movement, reorder, transfers and consumption visibility.'},
+    {id:'production',icon:'🏭',name:'Plant & Production',desc:'Batching, production plans, plant status, dispatch and production output.'},
+    {id:'machinery',icon:'🔧',name:'Machinery & Vehicles',desc:'Fleet, machine logs, service schedules, permits and maintenance control.'},
+    {id:'labour',icon:'👷',name:'Labour Management',desc:'Labour deployment, attendance, productivity and wage-ready records.'},
+    {id:'contractor',icon:'🤝',name:'Contractor Management',desc:'Contractors, work orders, progress, certification and payment tracking.'},
+    {id:'planning',icon:'📋',name:'Planning & Estimation',desc:'Budgets, resource plans, estimates, targets and variance alerts.'},
+    {id:'projects',icon:'🏗️',name:'Project Management',desc:'Sites, milestones, tasks, progress, resources and project health.'},
+    {id:'mis',icon:'📊',name:'Management Information System',desc:'Consolidated KPIs across sales, plant, stock, people, machinery and finance.'},
+    {id:'approvals',icon:'✅',name:'Approvals & Compliance',desc:'Central approval desk for purchase, quotations, invoices, inspections and requests.'}
+  ];
+  window.MASTER_RECORDS=Array.isArray(window.MASTER_RECORDS)?window.MASTER_RECORDS:[];
+  window.masterLoad=function(){try{var x=safeArray(localStorage.getItem('RMC_MASTER_RECORDS'));if(x)MASTER_RECORDS=x;}catch(e){}};
+  window.masterRecordsSave=function(){ssDataSafetyBackup();try{localStorage.setItem('RMC_MASTER_RECORDS',JSON.stringify(MASTER_RECORDS));}catch(e){toast('Could not save Master records','error');}};
+  window.masterSave=window.masterRecordsSave;
+  window.masterCan=function(){return !!(CU&&(CU.accountKind==='master'||CU.accountKind==='admin'));};
+  window.masterEnsure=function(){masterLoad();};
+  window.masterRenderKpis=function(){
+    var sales=(R||[]).length,quotes=(QT||[]).length,office=(OS||[]).length,orders=(PM_ORDERS||[]).length,stock=(PM_MAT||[]).reduce(function(s,x){return s+Math.max(0,pmMaterialBalance(x).balance);},0),out=(PM_BILL||[]).reduce(function(s,x){return s+(Number(x.outstanding)||0);},0);
+    var k=[['📋','Sales Visits',sales,'Existing sales data'],['💰','Quotations',quotes,'Commercial pipeline'],['🏢','Office Staff',office,'People & office'],['🏭','Plant Orders',orders,'RMC dispatch'],['📦','Stock Units',stock.toLocaleString('en-IN',{maximumFractionDigits:2}),'Current plant stock'],['₹','Outstanding',pmMoney(out),'Plant receivables']];
+    var el=document.getElementById('masterKpis');if(el)el.innerHTML=k.map(function(x){return'<div class="master-kpi"><div class="mk-label">'+x[0]+' '+x[1]+'</div><div class="mk-num">'+x[2]+'</div><div class="mk-hint">'+x[3]+'</div></div>';}).join('');
+  };
+  window.masterRenderModules=function(){
+    var el=document.getElementById('masterModules');if(!el)return;
+    el.innerHTML=MASTER_MODULES.map(function(m){var count=(MASTER_RECORDS||[]).filter(function(x){return x.module===m.id;}).length;return'<div class="master-module '+m.id+'" onclick="masterOpenModule(\''+m.id+'\')" tabindex="0"><div class="mi">'+m.icon+'</div><h3>'+pmEsc(m.name)+'</h3><p>'+pmEsc(m.desc)+'</p><div class="mm-foot"><span>Open workspace →</span><span class="mm-badge">'+count+' records</span><button type="button" class="mm-new" onclick="event.stopPropagation();masterOpenModule(\''+m.id+'\')">＋ New Entry</button></div></div>';}).join('');
+  };
+  window.masterPopulateFilter=function(){var s=document.getElementById('masterModuleFilter');if(!s)return;var old=s.value;s.innerHTML='<option value="">All Modules</option>'+MASTER_MODULES.map(function(m){return'<option value="'+m.id+'">'+pmEsc(m.name)+'</option>';}).join('');if(MASTER_MODULES.some(function(m){return m.id===old;}))s.value=old;};
+  window.masterRenderRecords=function(){masterPopulateFilter();var filter=(document.getElementById('masterModuleFilter')||{}).value||'',body=document.getElementById('masterRecordsBody');if(!body)return;var rows=(MASTER_RECORDS||[]).filter(function(x){return!filter||x.module===filter;}).slice().reverse();body.innerHTML=rows.length?rows.map(function(x){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module};var st=x.status||'Pending',cls=['Approved','Completed','Active'].indexOf(st)>=0?'ok':['Rejected','Cancelled'].indexOf(st)>=0?'bad':'';return'<tr><td><strong>'+pmEsc(m.name)+'</strong></td><td>'+pmEsc(x.ref)+'</td><td>'+pmEsc(x.name)+'</td><td><span class="master-status '+cls+'">'+pmEsc(st)+'</span></td><td>'+pmMoney(x.amount||0)+'</td><td>'+pmEsc(x.notes||'—')+'</td><td><button class="ib" onclick="masterOpenRecord('+x.id+')">✎</button><button class="ib" onclick="masterDeleteRecord('+x.id+')">🗑</button></td></tr>';}).join(''):'<tr><td colspan="7" class="master-empty">No integrated records yet.</td></tr>';};
+  window.masterRenderApprovals=function(){var pending=(MASTER_RECORDS||[]).filter(function(x){return x.status==='Pending'||x.status==='For Approval';}),k=document.getElementById('masterApprovalKpi'),el=document.getElementById('masterApprovals');if(k)k.textContent=pending.length+' pending';if(!el)return;el.innerHTML=pending.length?pending.map(function(x){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module};return'<div class="master-approval"><div><strong>'+pmEsc(x.ref)+' · '+pmEsc(x.name)+'</strong><small>'+pmEsc(m.name)+' · '+pmEsc(x.notes||'Approval required')+'</small></div><div class="master-actions"><button class="btn bs bsm" onclick="masterSetStatus('+x.id+',\'Approved\')">Approve</button><button class="btn bo bsm" onclick="masterSetStatus('+x.id+',\'Rejected\')">Reject</button></div></div>';}).join(''):'<div class="master-empty">No pending approvals.</div>';};
+  window.masterRenderAll=function(){if(!masterCan())return;masterRenderKpis();masterRenderModules();masterRenderRecords();masterRenderApprovals();phase1Render();if(typeof phase2Render==='function')phase2Render();if(typeof phase3Render==='function')phase3Render();};
+  window.masterInit=function(){if(!masterCan())return;masterEnsure();if(typeof phase2Load==='function')phase2Load();masterRenderAll();};
+  window.masterOpenRecord=function(id,moduleContext){
+    if(!masterCan()){toast('Master/Admin access required','error');return;}
+    var x=id?MASTER_RECORDS.find(function(a){return Number(a.id)===Number(id);}):{},selected=moduleContext||x.module||((document.getElementById('masterModuleFilter')||{}).value)||'finance';
+    var opts=MASTER_MODULES.map(function(m){return'<option value="'+m.id+'" '+(selected===m.id?'selected':'')+'>'+pmEsc(m.name)+'</option>';}).join('');
+    pmModal(id?'Edit ERP Record':'Add Integrated ERP Record',pmForm([
+      '<div class="fi"><label>Module *</label><select id="mrm">'+opts+'</select></div>',
+      pmField('Reference *','mrr',x.ref||'ERP-'+String((MASTER_RECORDS||[]).length+1).padStart(4,'0')),
+      pmField('Name / Party *','mrn',x.name||''),
+      '<div class="fi"><label>Status</label><select id="mrs">'+['Draft','Pending','For Approval','Approved','Active','Completed','Rejected','Cancelled'].map(function(v){return'<option '+(x.status===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>',
+      pmField('Amount','mra',x.amount||0,'number'),pmField('Notes','mrnotes',x.notes||'','text',true)
+    ]),'Save ERP Record','masterSaveRecord');window.masterEditId=id||0;
+  };
+  window.masterSaveRecord=function(){if(!masterCan())return;var d={module:document.getElementById('mrm').value,ref:document.getElementById('mrr').value.trim(),name:document.getElementById('mrn').value.trim(),status:document.getElementById('mrs').value,amount:Number(document.getElementById('mra').value)||0,notes:document.getElementById('mrnotes').value.trim()};if(!d.ref||!d.name){toast('Reference and name are required','error');return;}if(window.masterEditId){var i=MASTER_RECORDS.findIndex(function(x){return Number(x.id)===Number(window.masterEditId);});if(i>=0)MASTER_RECORDS[i]=Object.assign({},MASTER_RECORDS[i],d);}else{d.id=(MASTER_RECORDS||[]).reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1;MASTER_RECORDS.push(d);}masterRecordsSave();window.masterEditId=0;closeModal();masterRenderAll();toast('ERP record saved','success');};
+  window.masterSetStatus=function(id,status){if(!masterCan())return;var i=MASTER_RECORDS.findIndex(function(x){return Number(x.id)===Number(id);});if(i<0)return;MASTER_RECORDS[i].status=status;masterRecordsSave();phase1Log('Approval '+status.toLowerCase(),MASTER_RECORDS[i].ref+' · '+MASTER_RECORDS[i].name,'approval');masterRenderAll();toast('Request '+status.toLowerCase(),'success');};
+  window.masterDeleteRecord=function(id){if(!masterCan())return;if(!confirm('Delete this ERP record?'))return;var removed=MASTER_RECORDS.find(function(x){return Number(x.id)===Number(id);});MASTER_RECORDS=MASTER_RECORDS.filter(function(x){return Number(x.id)!==Number(id);});masterRecordsSave();phase1Log('Deleted ERP record',removed?removed.ref:'Record '+id,'erp');masterRenderAll();};
+
+  // ===== PHASE 2 =====
+  window.ERP_WORKFLOWS=[];
+  window.phase2Load=function(){try{var x=safeArray(localStorage.getItem('RMC_ERP_WORKFLOWS'));if(x)ERP_WORKFLOWS=x;}catch(e){ERP_WORKFLOWS=[];}};
+  window.phase2Save=function(){ssDataSafetyBackup();try{localStorage.setItem('RMC_ERP_WORKFLOWS',JSON.stringify(ERP_WORKFLOWS));}catch(e){toast('Could not save Phase 2 workflows','error');}};
+  window.phase2Log=function(action,detail){phase1Log(action,detail,'workflow');};
+  window.phase2Stages=function(w){if(w==='Commercial')return['Visit','Quotation','Accepted','Order','Invoice','Payment'];if(w==='Procure-to-Stock')return['Indent','RFQ','PO','GRN','QC','Stock','Consumed'];if(w==='Produce-to-Dispatch')return['Order','Plan','Batching','QC','Loading','Dispatched','Delivered'];return['Vehicle','Trip','Service Due','Breakdown','Repair','Available'];};
+  window.phase2StatusClass=function(s){s=String(s||'').toLowerCase();return /attention|reorder|overdue/.test(s)?'bad':/open|pending|draft|follow-up/.test(s)?'warn':/healthy|completed|delivered|paid|accepted/.test(s)?'ok':'info';};
+  window.phase2Sync=function(){
+    if(!masterCan())return;var created=0,next=(ERP_WORKFLOWS||[]).reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1;
+    function add(w){var exists=ERP_WORKFLOWS.some(function(x){return x.sourceType===w.sourceType&&String(x.sourceId)===String(w.sourceId);});if(!exists){w.id=next++;ERP_WORKFLOWS.push(w);created++;}}
+    (R||[]).forEach(function(v){add({workflow:'Commercial',sourceType:'Visit',sourceId:v.id,ref:'VIS-'+String(v.id).padStart(4,'0'),party:v.cu&&v.cu!=='NA'?v.cu:v.co||'Customer',stage:'Visit',qty:pmNum(v.ar),amount:0,owner:v.sp,status:'Open',updatedAt:new Date().toISOString()});});
+    (QT||[]).forEach(function(q){add({workflow:'Commercial',sourceType:'Quotation',sourceId:q.id,ref:'QT-'+String(q.id).padStart(4,'0'),party:q.cu||'-',stage:q.sts==='Accepted'?'Accepted':'Quotation',qty:pmNum(q.qty),amount:pmNum(q.total),owner:'Sales',status:q.sts||'Draft',updatedAt:new Date().toISOString()});});
+    (PM_ORDERS||[]).forEach(function(o){add({workflow:'Produce-to-Dispatch',sourceType:'Plant Order',sourceId:o.id,ref:o.order||('ORD-'+o.id),party:o.customer||'-',stage:o.status||'Pending',qty:pmNum(o.qty),amount:0,owner:'Plant',status:o.status||'Pending',updatedAt:new Date().toISOString()});});
+    (PM_MAT||[]).forEach(function(m){var b=pmMaterialBalance(m);add({workflow:'Procure-to-Stock',sourceType:'Material',sourceId:m.id,ref:'MAT-'+String(m.id).padStart(4,'0'),party:m.name||'-',stage:b.balance<=b.reorder?'Reorder':'Stock',qty:b.balance,amount:0,owner:'Store',status:b.balance<=b.reorder?'Attention':'Healthy',updatedAt:new Date().toISOString()});});
+    (PM_FLEET||[]).forEach(function(f){add({workflow:'Fleet-to-Maintenance',sourceType:'Fleet',sourceId:f.id,ref:f.vehicle||('VEH-'+f.id),party:f.driver||'-',stage:f.status||'Available',qty:pmNum(f.trips),amount:0,owner:'Fleet',status:f.status||'Available',updatedAt:new Date().toISOString()});});
+    phase2Save();phase2Log('Phase 2 data sync','Created '+created+' connected workflow records from existing RMC data.');phase2Render();phase3Render();toast(created+' workflow records synchronized','success');
+  };
+  window.phase2Render=function(){
+    if(!masterCan())return;var filter=(document.getElementById('phase2Filter')||{}).value||'',rows=ERP_WORKFLOWS.filter(function(x){return!filter||x.workflow===filter;});
+    var k=document.getElementById('phase2Kpis');if(k)k.innerHTML=[['🔗','Connected Records',ERP_WORKFLOWS.length,'Cross-module workflow layer'],['📍','Commercial Leads',ERP_WORKFLOWS.filter(function(x){return x.workflow==='Commercial';}).length,'Visits + quotations'],['🏭','Plant Flow',ERP_WORKFLOWS.filter(function(x){return x.workflow==='Produce-to-Dispatch';}).length,'Order to delivery'],['📦','Stock Flow',ERP_WORKFLOWS.filter(function(x){return x.workflow==='Procure-to-Stock';}).length,'Procure to consumption']].map(function(x){return'<div class="erp-stat"><div class="e-label">'+x[0]+' '+x[1]+'</div><div class="e-value">'+x[2]+'</div><div class="e-note">'+x[3]+'</div></div>';}).join('');
+    var pipe=document.getElementById('phase2Pipeline');if(pipe){var stages=filter?phase2Stages(filter):['Visit','Quotation','Order','QC','Dispatched','Delivered','Payment'];pipe.innerHTML=stages.map(function(s){return'<div class="erp-stage"><div class="num">'+rows.filter(function(x){return x.stage===s;}).length+'</div><div class="name">'+s+'</div><div class="hint">workflow stage</div></div>';}).join('');}
+    var body=document.getElementById('phase2WorkflowBody');if(body)body.innerHTML=rows.slice().reverse().slice(0,100).map(function(x){return'<tr><td><span class="erp-chip info">'+pmEsc(x.workflow)+'</span></td><td><strong>'+pmEsc(x.ref)+'</strong></td><td>'+pmEsc(x.party)+'</td><td><span class="erp-chip '+phase2StatusClass(x.status)+'">'+pmEsc(x.stage)+'</span></td><td>'+(x.amount?pmMoney(x.amount):pmEsc(String(x.qty||0)))+'</td><td>'+pmEsc(x.owner||'-')+'</td><td><button class="ib" onclick="phase2Advance('+x.id+')">→</button><button class="ib" onclick="phase2Delete('+x.id+')">🗑</button></td></tr>';}).join('')||'<tr><td colspan="7" class="master-empty">No connected workflows yet. Click Sync Existing Data.</td></tr>';
+    var ex=ERP_WORKFLOWS.filter(function(x){return ['Attention','Rejected','Overdue','Reorder'].indexOf(x.status)>=0;}),ec=document.getElementById('phase2ExceptionCount'),ee=document.getElementById('phase2Exceptions');if(ec)ec.textContent=ex.length;if(ee)ee.innerHTML=ex.length?ex.slice(0,10).map(function(x){return'<div class="erp-alert amber"><div><b>'+pmEsc(x.ref+' · '+x.party)+'</b><small>'+pmEsc(x.workflow)+' needs attention</small></div><span class="tag">ACTION</span></div>';}).join(''):'<div class="erp-alert green"><div><b>No workflow exceptions</b><small>Connected workflow layer is healthy.</small></div><span class="tag">OK</span></div>';
+    var pb=document.getElementById('phase2ProcBody');if(pb)pb.innerHTML=ERP_WORKFLOWS.filter(function(x){return x.workflow==='Procure-to-Stock';}).slice().reverse().slice(0,12).map(function(x){return'<tr><td>'+pmEsc(x.ref)+'</td><td>'+pmEsc(x.party)+'</td><td>—</td><td>'+pmEsc(x.qty)+'</td><td>'+pmEsc(x.stage)+'</td><td><span class="erp-chip '+phase2StatusClass(x.status)+'">'+pmEsc(x.status)+'</span></td></tr>';}).join('')||'<tr><td colspan="6" class="master-empty">No procure-to-stock workflow records.</td></tr>';
+    var pr=document.getElementById('phase2ProdBody');if(pr)pr.innerHTML=ERP_WORKFLOWS.filter(function(x){return x.workflow==='Produce-to-Dispatch';}).slice().reverse().slice(0,12).map(function(x){return'<tr><td>'+pmEsc(x.ref)+'</td><td>'+pmEsc(x.party)+'</td><td>—</td><td>'+pmEsc(x.qty)+'</td><td>'+pmEsc(x.stage)+'</td><td><span class="erp-chip '+phase2StatusClass(x.status)+'">'+pmEsc(x.status)+'</span></td></tr>';}).join('')||'<tr><td colspan="6" class="master-empty">No production-to-dispatch workflow records.</td></tr>';
+  };
+  window.phase2Advance=function(id){if(!masterCan())return;var x=ERP_WORKFLOWS.find(function(a){return Number(a.id)===Number(id);});if(!x)return;var s=phase2Stages(x.workflow),i=s.indexOf(x.stage);if(i<0)i=0;if(i<s.length-1){x.stage=s[i+1];x.status=['Delivered','Payment','Available'].indexOf(x.stage)>=0?'Completed':'In Progress';}else{x.status='Completed';}x.updatedAt=new Date().toISOString();phase2Log('Advanced workflow',x.ref+' → '+x.stage);phase2Save();phase2Render();phase3Render();toast(x.ref+' moved to '+x.stage,'success');};
+  window.phase2Delete=function(id){if(!masterCan())return;if(!confirm('Delete this connected workflow record?'))return;ERP_WORKFLOWS=ERP_WORKFLOWS.filter(function(a){return Number(a.id)!==Number(id);});phase2Save();phase2Log('Deleted workflow','Record '+id);phase2Render();phase3Render();};
+  window.phase2NewWorkflow=function(wf){if(!masterCan())return;wf=wf||'Commercial';pmModal('New Connected Workflow',pmForm(['<div class="fi"><label>Workflow Type *</label><select id="ewf">'+['Commercial','Procure-to-Stock','Produce-to-Dispatch','Fleet-to-Maintenance'].map(function(x){return'<option '+(x===wf?'selected':'')+'>'+x+'</option>';}).join('')+'</select></div>',pmField('Reference *','ewr','WF-'+String(ERP_WORKFLOWS.length+1).padStart(4,'0')),pmField('Party / Item *','ewparty',''),pmField('Quantity','ewqty',0,'number'),pmField('Amount','ewamt',0,'number'),pmField('Owner','ewowner',CU?CU.name:'Master'),pmField('Remarks','ewnotes','','text',true)]),'Save Workflow','phase2SaveWorkflow');};
+  window.phase2SaveWorkflow=function(){if(!masterCan())return;var wf=document.getElementById('ewf').value,x={workflow:wf,ref:document.getElementById('ewr').value.trim(),party:document.getElementById('ewparty').value.trim(),qty:pmNum(document.getElementById('ewqty').value),amount:pmNum(document.getElementById('ewamt').value),owner:document.getElementById('ewowner').value.trim(),notes:document.getElementById('ewnotes').value.trim(),stage:phase2Stages(wf)[0],status:'Open',updatedAt:new Date().toISOString()};if(!x.ref||!x.party){toast('Reference and Party / Item are required','error');return;}x.id=ERP_WORKFLOWS.reduce(function(a,b){return Math.max(a,Number(b.id)||0);},0)+1;ERP_WORKFLOWS.push(x);phase2Save();phase2Log('Created workflow',x.ref+' · '+x.workflow);closeModal();phase2Render();toast('Workflow created','success');};
+  window.switchERPPhase=function(p,btn){if(!masterCan()){toast('Master/Admin access required','error');return;}document.querySelectorAll('.erp-phase-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');var p2=document.getElementById('erpPhase2Panel'),p3=document.getElementById('erpPhase3Panel');if(p2)p2.classList.toggle('active',p==='p2');if(p3)p3.classList.toggle('active',p==='p3');if(p==='p2')phase2Render();else phase3Render();};
+  phase2Load();
+
+  // ===== PHASE 3 / MIS =====
+  window.phase3Metrics=function(){var visits=R||[],quotes=QT||[],orders=PM_ORDERS||[],mats=PM_MAT||[],fleet=PM_FLEET||[],qc=PM_QC||[],bill=PM_BILL||[],maint=PM_MAINT||[];var accepted=quotes.filter(function(q){return q.sts==='Accepted';});var quoteValue=quotes.reduce(function(s,q){return s+pmNum(q.total);},0),acceptedValue=accepted.reduce(function(s,q){return s+pmNum(q.total);},0),billed=bill.reduce(function(s,x){return s+pmNum(x.amount);},0),paid=bill.reduce(function(s,x){return s+pmNum(x.paid);},0),outstanding=bill.reduce(function(s,x){return s+Math.max(0,pmNum(x.outstanding));},0),stock=mats.reduce(function(s,x){return s+Math.max(0,pmMaterialBalance(x).balance);},0),low=mats.filter(function(x){var b=pmMaterialBalance(x);return b.balance<=b.reorder;}).length,pendingOrders=orders.filter(function(x){return ['Delivered','Completed'].indexOf(x.status)<0;}).length,dispatched=orders.filter(function(x){return ['Dispatched','In Transit','Delivered'].indexOf(x.status)>=0;}).length,qcFail=qc.filter(function(x){return x.status==='Fail';}).length,openMaint=maint.filter(function(x){return x.status!=='Completed';}).length,totalTrips=fleet.reduce(function(s,x){return s+pmNum(x.trips);},0);return{visits:visits.length,quotes:quotes.length,accepted:accepted.length,quoteValue:quoteValue,acceptedValue:acceptedValue,billed:billed,paid:paid,outstanding:outstanding,stock:stock,low:low,pendingOrders:pendingOrders,dispatched:dispatched,qc:qc.length,qcFail:qcFail,openMaint:openMaint,totalTrips:totalTrips,users:Object.keys(USERS||{}).length,office:(OS||[]).length,sales:(SL||[]).length,work:(WL||[]).length};};
+  window.phase3Render=function(){if(!masterCan())return;var m=phase3Metrics(),k=document.getElementById('phase3Kpis');if(k)k.innerHTML=[['💰','Quotation Value',pmMoney(m.quoteValue),'All quotations'],['🤝','Accepted Value',pmMoney(m.acceptedValue),'Accepted commercial value'],['🧾','Billed',pmMoney(m.billed),'Plant billing'],['💳','Outstanding',pmMoney(m.outstanding),'Receivables exposure'],['📦','Current Stock',m.stock.toLocaleString('en-IN'),'Combined material quantity'],['⚠️','Low Stock',m.low,'Reorder exposure'],['🏭','Pending Orders',m.pendingOrders,'Plant delivery pipeline'],['🧪','QC Failures',m.qcFail,'Quality attention']].map(function(x){return'<div class="erp-stat"><div class="e-label">'+x[0]+' '+x[1]+'</div><div class="e-value">'+x[2]+'</div><div class="e-note">'+x[3]+'</div></div>';}).join('');var perf=document.getElementById('phase3Performance');if(perf){var conv=m.quotes?Math.round(m.accepted/m.quotes*100):0,collection=m.billed?Math.round(m.paid/m.billed*100):0,delivery=m.pendingOrders+m.dispatched?Math.round(m.dispatched/(m.pendingOrders+m.dispatched)*100):0;perf.innerHTML=[['Quotation Conversion',conv+'%','Accepted quotations / total quotations'],['Collection Ratio',collection+'%','Paid / billed amount'],['Dispatch Coverage',delivery+'%','Dispatched or delivered vs open + moved orders']].map(function(x){return'<div class="erp-stat"><div class="e-label">'+x[0]+'</div><div class="e-value">'+x[1]+'</div><div class="e-note">'+x[2]+'</div></div>';}).join('');}var alerts=[];if(m.low)alerts.push(['red',m.low+' material item(s) below reorder','Store / Inventory']);if(m.outstanding)alerts.push(['amber',pmMoney(m.outstanding)+' outstanding','Billing / Collections']);if(m.qcFail)alerts.push(['red',m.qcFail+' QC test(s) failed','Quality Control']);if(m.openMaint)alerts.push(['amber',m.openMaint+' maintenance item(s) open','Maintenance']);if(m.pendingOrders)alerts.push(['blue',m.pendingOrders+' plant order(s) still in pipeline','Production / Dispatch']);if(!alerts.length)alerts.push(['green','No major management exceptions','System is within current thresholds']);var ac=document.getElementById('phase3AlertCount'),ae=document.getElementById('phase3Alerts');if(ac)ac.textContent=alerts.length;if(ae)ae.innerHTML=alerts.map(function(a){return'<div class="erp-alert '+a[0]+'"><div><b>'+pmEsc(a[1])+'</b><small>'+pmEsc(a[2])+'</small></div><span class="tag">'+(a[0]==='green'?'OK':'WATCH')+'</span></div>';}).join('');};
+  window.phase3Refresh=function(){phase3Render();phase2Render();toast('Executive MIS refreshed','success');};
+  window.phase3ExportExecutivePDF=function(){if(!reportCan())return;var m=phase3Metrics();saveReportPDF('Shree Shyam Executive MIS','Executive_MIS_Report.pdf',['KPI','Value'],[['Quotation Value',pmMoney(m.quoteValue)],['Accepted Quotation Value',pmMoney(m.acceptedValue)],['Billed',pmMoney(m.billed)],['Paid',pmMoney(m.paid)],['Outstanding',pmMoney(m.outstanding)],['Current Stock',m.stock.toLocaleString('en-IN')],['Low Stock Items',m.low],['Pending Plant Orders',m.pendingOrders],['Dispatched / In-Transit / Delivered',m.dispatched],['QC Tests',m.qc],['QC Failures',m.qcFail],['Open Maintenance',m.openMaint],['Fleet Trips',m.totalTrips],['Sales Visits',m.visits],['Office Work Entries',m.work]],false);};
+  window.phase3ExportCommercialPDF=function(){saveReportPDF('Commercial & Receivables Report','Commercial_Receivables_Report.pdf',['#','Customer','Date','Grade','Qty','Rate','Total','Status'],(QT||[]).map(function(q,i){return[i+1,q.cu||'-',fd(q.dt),q.gr||'-',q.qty||0,rupee(q.rate||0),rupee(q.total||0),q.sts||'-'];}),true);};
+  window.phase3ExportPeoplePDF=function(){var rows=[];(SL||[]).forEach(function(s){rows.push(['Sales',s.nm,s.rl||'-',s.dp||'-',s.st||'-',s.ph||'-']);});(OS||[]).forEach(function(s){rows.push(['Office',s.nm,s.rl||'-',s.dp||'-',s.st||'-',s.ph||'-']);});saveReportPDF('People & Attendance Summary','People_Attendance_Summary.pdf',['Type','Name','Role','Department','Status','Phone'],rows,true);};
+  window.phase3ExportFleetPDF=function(){var rows=[];(PM_FLEET||[]).forEach(function(x,i){rows.push([i+1,x.vehicle||'-',x.driver||'-',x.cap||0,x.trips||0,x.status||'-',x.last||'-']);});(PM_MAINT||[]).forEach(function(x){rows.push(['M',x.equipment||'-',x.by||'-','','',x.status||'-',x.issue||'-']);});saveReportPDF('Fleet & Maintenance Report','Fleet_Maintenance_Report.pdf',['#','Vehicle / Equipment','Driver / Assigned','Capacity','Trips','Status','Last Trip / Issue'],rows,true);};
+  window.phase3ExportStockPDF=function(){exportMasterModulePDF('inventory','Raw_Material_Stock_Health.pdf');};
+
+  // ===== MASTER MODULE PDF DATA (existing records only) =====
+  window.ssModuleFieldSummary=function(rec){var f=rec&&rec.meta&&rec.meta.fields?rec.meta.fields:{},out=[];Object.keys(f).forEach(function(k){var v=f[k];if(String(v==null?'':v).trim()!=='')out.push(k+': '+String(v));});return out.join(' | ')||String(rec&&rec.notes||'—');};
+  window.ssModuleRows=function(id){var rows=[];(MASTER_RECORDS||[]).filter(function(x){return x&&x.module===id;}).slice().reverse().forEach(function(x,i){rows.push([i+1,x.ref||'-',x.name||'-',x.status||'Pending',pmMoney(x.amount||0),ssModuleFieldSummary(x)]);});function push(ref,name,status,amount,details){rows.push([rows.length+1,ref,name,status,pmMoney(amount||0),details]);}if(id==='inventory')(PM_MAT||[]).forEach(function(x){var b=pmMaterialBalance(x);push('STOCK-'+(x.id||rows.length+1),x.name||'-','Live Stock',0,'Unit: '+(x.unit||'MT')+' | Opening: '+b.opening+' | Received: '+b.received+' | Consumed: '+b.consumed+' | Current: '+b.balance+' | Reorder: '+b.reorder);});if(id==='production')(PM_ORDERS||[]).forEach(function(x){push(x.order||('ORDER-'+(x.id||rows.length+1)),x.customer||'-',x.status||'Pending',0,'Site: '+(x.site||'-')+' | Grade: '+(x.grade||'-')+' | Qty: '+(x.qty||0)+' m³ | Schedule: '+(x.schedule||'-'));});if(id==='machinery'){(PM_FLEET||[]).forEach(function(x){push(x.vehicle||('FLEET-'+(x.id||rows.length+1)),x.driver||'-',x.status||'Available',0,'Capacity: '+(x.cap||x.capacity||'-')+' | Trips: '+(x.trips||0)+' | Last: '+(x.last||'-'));});(PM_MAINT||[]).forEach(function(x){push('MAINT-'+(x.id||rows.length+1),x.equipment||'-',x.status||'Open',0,'Issue: '+(x.issue||'-')+' | Priority: '+(x.priority||'-')+' | Next: '+(x.next||'-'));});}if(id==='labour')(PM_STAFF||[]).forEach(function(x){push('STAFF-'+(x.id||rows.length+1),x.name||'-',x.status||'Active',0,'Role: '+(x.role||'-')+' | Department: '+(x.dept||'-')+' | Shift: '+(x.shift||'-')+' | Phone: '+(x.phone||'-'));});if(id==='finance')(PM_BILL||[]).forEach(function(x){push(x.inv||('BILL-'+(x.id||rows.length+1)),x.customer||'-',x.status||'Pending',Number(x.amount||0),'Paid: '+(x.paid||0)+' | Outstanding: '+(x.outstanding||0)+' | Due: '+(x.due||'-'));});return rows;};
+  window.exportMasterERPPDF=function(){
+    if(!reportCan())return;
+    var rows=(MASTER_RECORDS||[]).map(function(x,i){var m=MASTER_MODULES.find(function(a){return a.id===x.module;})||{name:x.module};return[i+1,m.name,x.ref||'-',x.name||'-',x.status||'-',pmMoney(x.amount||0),x.notes||'-'];});
+    saveReportPDF('Shree Shyam Integrated Master ERP Report','Master_ERP_Report.pdf',['#','Module','Reference','Name / Party','Status','Amount','Notes'],rows,true);
+  };
+  window.downloadMasterDailyPDF=function(){
+    if(!reportCan())return;
+    var m=phase3Metrics(),d=new Date().toISOString().slice(0,10),rows=[
+      ['System Date',d],['Users / Accounts',m.users],['Sales Visits',m.visits],['Quotations',m.quotes],['Accepted Quotations',m.accepted],
+      ['Quotation Value',pmMoney(m.quoteValue)],['Accepted Value',pmMoney(m.acceptedValue)],['Plant Orders',PM_ORDERS.length],['Dispatched / Moved Orders',m.dispatched],
+      ['Raw Materials',PM_MAT.length],['Current Stock',m.stock.toLocaleString('en-IN')],['Low Stock Items',m.low],['Fleet',PM_FLEET.length],['Fleet Trips',m.totalTrips],
+      ['QC Records',m.qc],['QC Failures',m.qcFail],['Billing Records',PM_BILL.length],['Billed',pmMoney(m.billed)],['Paid',pmMoney(m.paid)],['Outstanding',pmMoney(m.outstanding)],
+      ['Open Maintenance',m.openMaint],['Office Work Entries',m.work],['Sales Staff',m.sales],['Office Staff',m.office]
+    ];
+    saveReportPDF('Shree Shyam RMC — Master Daily ERP Report','Master_Daily_ERP_Report_'+d+'.pdf',["Today's Master Snapshot",'Value'],rows,false);
+  };
+  window.openMasterReports=function(){
+    if(!masterCan())return;
+    var el=document.getElementById('masterReportsInline');if(!el){toast('Reports Centre area is unavailable','error');return;}
+    el.innerHTML='<div class="master-panel" style="margin:0 0 16px"><div class="mph"><div><h3>📄 Master Reports Centre</h3><small style="color:#64748b">Download management reports without changing existing records.</small></div><button class="btn bo bsm" onclick="document.getElementById(\'masterReportsInline\').innerHTML=\'\'">Close</button></div><div class="master-report-grid" style="padding:14px"><div class="master-report-card"><strong>🔑 Users</strong><span>All credentials and account roles.</span><button class="btn ba bsm" onclick="exportAdminUsersPDF()">Users PDF</button></div><div class="master-report-card"><strong>📝 Office Work</strong><span>All office work entries.</span><button class="btn ba bsm" onclick="exportAdminOfficeWorkPDF()">Work PDF</button></div><div class="master-report-card"><strong>📋 Visits</strong><span>All sales visits.</span><button class="btn ba bsm" onclick="exportAdminVisitsPDF()">Visits PDF</button></div><div class="master-report-card"><strong>🏭 Plant</strong><span>Orders, fleet, stock, QC and maintenance.</span><button class="btn ba bsm" onclick="exportAdminPlantPDF()">Plant PDF</button></div><div class="master-report-card"><strong>⭐ ERP</strong><span>Master records and approvals.</span><button class="btn ba bsm" onclick="exportMasterERPPDF()">ERP PDF</button></div></div></div>';
+    el.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+
+  window.exportMasterModulePDF=function(id,fileName){if(!reportCan())return;var m=MASTER_MODULES.find(function(x){return x.id===id;})||{name:id};var rows=ssModuleRows(id);if(!rows.length)rows=[[1,'—','No existing entries','—',pmMoney(0),'No records found in this module.']];saveReportPDF(m.name+' — Complete Records',fileName||m.name.replace(/[^a-z0-9]+/gi,'_')+'_Records.pdf',['#','Reference','Name / Party','Status','Amount','Entry Details'],rows,true);};
+
+  // Master tab was referenced by the UI but was missing in V21.
+  window.swMasterTab=function(btn,id){if(!CU||CU.accountKind!=='master'){toast('Master Control access required','error');return;}swTab(btn,id);masterRenderAll();};
+
+  // Missing staff delete handler.
+  window.delStaff=function(id){if(!canEdit())return;if(!confirm('Delete this staff profile?'))return;SL=SL.filter(function(x){return Number(x.id)!==Number(id);});try{localStorage.setItem('RMC_SL',JSON.stringify(SL));}catch(e){}rStg();popDD();rStats();toast('Staff deleted','error');};
+
+  // The visible "My Plant PDF" button is also present in Master mode.
+  // Master/Admin should be allowed to generate the same complete plant report.
+  window.exportParveenFullWorkPDF=function(){
+    if(!CU||['plant','master','admin'].indexOf(CU.accountKind)<0){toast('Plant/Admin/Master access required','error');return;}
+    try{
+      var d=pdfDoc('Parveen Dahiya — Complete Plant Work Report',true);d.setFontSize(8);d.setFont('helvetica','normal');d.setTextColor(60,60,60);d.text('Generated: '+new Date().toLocaleString('en-IN'),12,25);d.text('Plant Manager: Parveen Dahiya',120,25);d.text('All plant modules are shown separately below.',12,30);var y=38;
+      y=ssPlantPdfSection(d,'01. Concrete Orders & Dispatch',['#','Order','Customer','Site','Grade','Qty m³','Schedule','Vehicle','Status','Saved'],(PM_ORDERS||[]).map(function(x,i){return[i+1,x.order||'-',x.customer||'-',x.site||'-',x.grade||'-',x.qty||0,x.schedule||'-',x.vehicle||'-',x.status||'-',ssPdfSavedAt(x)];}),y);
+      y=ssPlantPdfSection(d,'02. Fleet & Vehicles',['#','Vehicle','Driver','Capacity','Trips','Status','Last Trip / Issue','Saved'],(PM_FLEET||[]).map(function(x,i){return[i+1,x.vehicle||'-',x.driver||'-',x.cap||x.capacity||'-',x.trips||0,x.status||'-',x.last||'-',ssPdfSavedAt(x)];}),y);
+      y=ssPlantPdfSection(d,'03. Plant Staff & Operators',['#','Name','Role','Department','Phone','Shift','Status','Saved'],(PM_STAFF||[]).map(function(x,i){return[i+1,x.name||'-',x.role||'-',x.dept||'-',x.phone||'-',x.shift||'-',x.status||'-',ssPdfSavedAt(x)];}),y);
+      y=ssPlantPdfSection(d,'04. Quality Control',['#','Date','Batch / Order','Grade','Slump','Cube 7d','Cube 28d','Status','Tested By','Saved'],(PM_QC||[]).map(function(x,i){return[i+1,x.date||'-',x.order||x.batch||'-',x.grade||'-',x.slump||'-',x.cube7||x.cube7d||'-',x.cube28||x.cube28d||'-',x.status||'-',x.by||'-',ssPdfSavedAt(x)];}),y);
+      y=ssPlantPdfSection(d,'05. Raw Material Stock & Consumption',['#','Material','Unit','Opening','Received','Consumed','Current','Reorder','Status','Saved'],(PM_MAT||[]).map(function(x,i){var z=pmMaterialBalance(x);return[i+1,x.name||'-',x.unit||'-',z.opening,z.received,z.consumed,z.balance,z.reorder,(Number(z.balance)<=Number(z.reorder)?'REORDER':'OK'),ssPdfSavedAt(x)];}),y);
+      y=ssPlantPdfSection(d,'06. Billing & Payments',['#','Invoice','Customer','Order','Amount','Paid','Outstanding','Due','Status','Saved'],(PM_BILL||[]).map(function(x,i){return[i+1,x.inv||x.invoice||'-',x.customer||'-',x.order||'-',pmMoney(x.amount||0),pmMoney(x.paid||0),pmMoney(x.outstanding||0),x.due||'-',x.status||'-',ssPdfSavedAt(x)];}),y);
+      y=ssPlantPdfSection(d,'07. Vehicle Maintenance Register',['Sr. No.','Vehicle Type','Vehicle No.','Primary Engine KM','2nd Engine KM','Service Type','Service Date','Service Allotted To','Next Service Date','Remarks','Saved'],(PM_MAINT||[]).map(function(raw,i){var x=pmMaintNormalizeRow(raw,i);return[x.serial||i+1,x.vehicleType||'-',x.vehicleNo||'-',x.primaryKm||'-',x.secondKm||'-',x.serviceType||'-',pmMaintDisplayDate(x.serviceDate),x.serviceAllottedTo||'-',pmMaintDisplayDate(x.nextServiceDate),x.remarks||'-',ssPdfSavedAt(raw)];}),y);
+      y=ssPlantPdfSection(d,'08. Integrated Plant ERP Records',['#','Module','Reference','Name / Party','Status','Amount','Details','Saved'],(MASTER_RECORDS||[]).filter(function(x){return['production','inventory','machinery','labour'].indexOf(x.module)>=0;}).map(function(x,i){return[i+1,x.module||'-',x.ref||'-',x.name||'-',x.status||'-',pmMoney(x.amount||0),ssModuleFieldSummary(x),ssPdfSavedAt(x)];}),y);
+      d.save((CU.accountKind==='plant'?'Parveen_Plant_Work_Report_':'Master_Plant_Work_Report_')+ssTodayKey()+'.pdf');toast('Plant PDF downloaded successfully','success');
+    }catch(e){toast('Plant PDF error: '+(e.message||e),'error');}
+  };
+
+  // Repair final navigation wrapper safely. It now has real underlying functions.
+  if(typeof window.masterRenderModules==='function'){
+    var oldRenderModules=window.masterRenderModules;
+    window.masterRenderModules=function(){oldRenderModules.apply(this,arguments);if(typeof ssBindMasterModuleClicks==='function')ssBindMasterModuleClicks();};
+  }
+})();
+
+
 /* =========================================================
    MASTER MODULE OPEN FIX — DIRECT, ROBUST WORKSPACES
    ========================================================= */
