@@ -2143,7 +2143,7 @@ function accountKind(account){
 }
 function doLogin(){
   var u=(document.getElementById('lUser').value||'').trim().toLowerCase();
-  var p=document.getElementById('lPass').value||'';
+  var p=(document.getElementById('lPass').value||'').trim();
   var err=document.getElementById('lErr');
   if(!u||!p){if(err){err.style.display='block';err.textContent='Please enter username and password';}return;}
   var account=USERS[u];
