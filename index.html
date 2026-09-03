@@ -2029,8 +2029,8 @@ function visitHTML(r){r=r||{};
 return "<div class='fg'><div class='fi'><label>Salesperson *</label><select id='vsp'>"+(sps.length?sps.map(function(s){return"<option "+(r.sp===s?"selected":"")+">"+s+"</option>";}).join(""):"<option>Parvinder Kumar</option><option>Pawan Kumar</option>")+"</select></div><div class='fi'><label>Visit Date *</label><input id='vvd' type='date' value='"+(r.vd||new Date().toISOString().slice(0,10))+"'></div><div class='fi'><label>Customer/Company</label><input id='vcu' value='"+(r.cu||"")+"' placeholder='Customer name'></div><div class='fi'><label>Customer Contact</label><input id='vcc' value='"+(r.cc||"")+"' placeholder='Phone number'></div><div class='fi'><label>Contractor Name *</label><input id='vco' value='"+(r.co||"")+"' placeholder='Contractor name'></div><div class='fi'><label>Contractor No.</label><input id='vcc2' value='"+(r.cc2||"")+"' placeholder='Phone number'></div><div class='fi'><label>Site / Project *</label><input id='vsi' value='"+(r.si||"")+"' placeholder='Site or project name'></div><div class='fi full'><label>Site Address</label><input id='vsa' value='"+(r.sa||"")+"' placeholder='Full address'></div><div class='fi'><label>Area (sqft)</label><input id='var' type='number' value='"+(r.ar||"")+"' placeholder='e.g. 1000'></div><div class='fi'><label>Concrete Grade</label><select id='vgr'><option value=''>-- Select --</option>"+(grs.map(function(g){return"<option "+(r.gr===g?"selected":"")+">"+g+"</option>";})).join("")+"</select></div><div class='fi'><label>Required Date</label><input id='vrd' type='date' value='"+(r.rd||"")+"'></div><div class='fi full'><label>Remarks</label><textarea id='vrm'>"+(r.rm||"")+"</textarea></div></div>";}
 function openAddVisitModal(){if(!canAddVisit()){toast("Please login first","error");return;}eid=null;document.getElementById("mt").textContent="Add Visit";document.getElementById("mb2").innerHTML=visitHTML();document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveVisit()'>Save</button>";openModal();}
 function openEditVisitModal(id){var r=R.filter(function(x){return x.id===id;})[0];if(!r)return;if(!(CU&&(CU.accountKind==='admin'||CU.accountKind==='staff'&&r.sp===CU.name))){toast("You can only update your own visit","error");return;}eid=id;document.getElementById("mt").textContent="Edit Visit";document.getElementById("mb2").innerHTML=visitHTML(r);document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveVisit()'>Update</button>";openModal();}
-function saveVisit(){if(!canAddVisit()){toast("Please login first","error");return;}var co=document.getElementById("vco").value.trim(),vd=document.getElementById("vvd").value;if(!co||!vd){toast("Contractor & Date required","error");return;}var d={sp:(CU&&CU.accountKind==="staff"?CU.name:document.getElementById("vsp").value),vd:vd,cu:document.getElementById("vcu").value.trim(),cc:document.getElementById("vcc").value.trim(),co:co,cc2:document.getElementById("vcc2").value.trim(),si:document.getElementById("vsi").value.trim(),sa:document.getElementById("vsa").value.trim(),ar:document.getElementById("var").value,gr:document.getElementById("vgr").value,rd:document.getElementById("vrd").value,rm:document.getElementById("vrm").value.trim()};if(eid){var ix=R.map(function(x){return x.id;}).indexOf(eid);if(ix<0){toast("Visit record not found","error");return;}R[ix]=Object.assign({},R[ix],d);toast("Updated!","success");}else{d.id=nRid++;R.push(d);toast("Visit added!","success");}ssSaveCore();closeModal();popDD();applyF();rStats();}
-function delR(id){if(!canEdit()){toast("Admin only","error");return;}if(!confirm("Delete this visit?"))return;R=R.filter(function(x){return x.id!==id;});ssSaveCore();applyF();popDD();rStats();toast("Deleted","error");}
+async function saveVisit(){if(!canAddVisit()){toast("Please login first","error");return;}var co=document.getElementById("vco").value.trim(),vd=document.getElementById("vvd").value;if(!co||!vd){toast("Contractor & Date required","error");return;}var d={sp:(CU&&CU.accountKind==="staff"?CU.name:document.getElementById("vsp").value),vd:vd,cu:document.getElementById("vcu").value.trim(),cc:document.getElementById("vcc").value.trim(),co:co,cc2:document.getElementById("vcc2").value.trim(),si:document.getElementById("vsi").value.trim(),sa:document.getElementById("vsa").value.trim(),ar:document.getElementById("var").value,gr:document.getElementById("vgr").value,rd:document.getElementById("vrd").value,rm:document.getElementById("vrm").value.trim()};var savedRow=null;if(eid){var ix=R.map(function(x){return x.id;}).indexOf(eid);if(ix<0){toast("Visit record not found","error");return;}R[ix]=Object.assign({},R[ix],d);savedRow=R[ix];toast("Updated!","success");}else{d.id=nRid++;R.push(d);savedRow=d;toast("Visit added!","success");}ssSaveCore();if(typeof ssCloudSaveVisit==="function")await ssCloudSaveVisit(savedRow);closeModal();popDD();applyF();rStats();}
+async function delR(id){if(!canEdit()){toast("Admin only","error");return;}if(!confirm("Delete this visit?"))return;var old=R.filter(function(x){return x.id===id;})[0];R=R.filter(function(x){return x.id!==id;});ssSaveCore();if(old&&typeof ssCloudDeleteVisit==="function")await ssCloudDeleteVisit(old);applyF();popDD();rStats();toast("Deleted","error");}
 function renderUserList(){
   var el=document.getElementById("userListBox");if(!el)return;
   var keys=Object.keys(USERS).sort();
@@ -2141,6 +2141,23 @@ function accountKind(account){
   if(account.role==="plant" || account.type==="plant")return "plant";
   return "staff";
 }
+// ===== SALES VISITS CLOUD SYNC (SUPABASE) =====
+(function(){
+  var SS_SB_URL="https://xihbqwhsqlpgrysttwth.supabase.co";
+  var SS_SB_KEY="sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
+  var SS_VISIT_TABLE="sales_visit_entries";
+  function hdr(extra){return Object.assign({apikey:SS_SB_KEY,Authorization:"Bearer "+SS_SB_KEY,"Content-Type":"application/json"},extra||{});}
+  function visitKey(v){return "visit:"+String(v&&v.id!=null?v.id:"");}
+  function cleanVisit(v){return {record_key:visitKey(v),id:Number(v.id),sp:String(v.sp||""),vd:String(v.vd||new Date().toISOString().slice(0,10)),cu:String(v.cu||""),cc:String(v.cc||""),co:String(v.co||""),cc2:String(v.cc2||""),si:String(v.si||""),sa:String(v.sa||""),ar:String(v.ar||""),gr:String(v.gr||""),rd:v.rd?String(v.rd):null,rm:String(v.rm||""),updated_by:(window.CU&&CU.name)||"local",updated_at:new Date().toISOString()};}
+  async function upsert(v){var res=await fetch(SS_SB_URL+"/rest/v1/"+SS_VISIT_TABLE+"?on_conflict=record_key",{method:"POST",headers:hdr({Prefer:"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(cleanVisit(v))});if(!res.ok){var tx=await res.text();throw new Error("Cloud save failed ("+res.status+"): "+tx.slice(0,180));}return true;}
+  async function remove(v){var res=await fetch(SS_SB_URL+"/rest/v1/"+SS_VISIT_TABLE+"?record_key=eq."+encodeURIComponent(visitKey(v)),{method:"DELETE",headers:hdr()});if(!res.ok)throw new Error("Cloud delete failed ("+res.status+")");}
+  async function readAll(){var res=await fetch(SS_SB_URL+"/rest/v1/"+SS_VISIT_TABLE+"?select=*&order=id.asc",{headers:hdr()});if(!res.ok){var tx=await res.text();throw new Error("Cloud read failed ("+res.status+"): "+tx.slice(0,180));}return await res.json();}
+  window.ssCloudSaveVisit=async function(v){try{await upsert(v);localStorage.setItem("RMC_VISIT_CLOUD_OK_AT",new Date().toISOString());return true;}catch(e){console.error("SHREE SHYAM VISIT CLOUD SAVE",e);toast("Visit saved locally, but cloud save failed. Please retry.","error");return false;}};
+  window.ssCloudDeleteVisit=async function(v){try{await remove(v);return true;}catch(e){console.error("SHREE SHYAM VISIT CLOUD DELETE",e);toast("Deleted locally, but cloud delete failed.","error");return false;}};
+  window.ssCloudRefreshVisits=async function(){try{var cloud=await readAll(),local=Array.isArray(window.R)?window.R:[],merged=[],seen={};cloud.forEach(function(x){merged.push({id:Number(x.id),sp:x.sp||"",vd:x.vd||"",cu:x.cu||"",cc:x.cc||"",co:x.co||"",cc2:x.cc2||"",si:x.si||"",sa:x.sa||"",ar:x.ar||"",gr:x.gr||"",rd:x.rd||"",rm:x.rm||"",cloudKey:x.record_key});seen[String(x.id)]=1;});local.forEach(function(v){if(!seen[String(v.id)])merged.push(v);});merged.sort(function(a,b){return Number(a.id)-Number(b.id);});window.R=merged;if(!cloud.length&&local.length){for(var i=0;i<local.length;i++){try{await upsert(local[i]);}catch(e){console.warn("Initial visit migration failed",e);break;}}}localStorage.setItem("RMC_VISITS",JSON.stringify(window.R));if(typeof window.nRid==="number")window.nRid=Math.max(window.nRid,(window.R||[]).reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0)+1);return true;}catch(e){console.warn("Visit cloud refresh unavailable",e);return false;}};
+  window.ssCloudInitVisits=async function(){var ok=await window.ssCloudRefreshVisits();if(ok){try{if(typeof applyF==="function")applyF();if(typeof popDD==="function")popDD();if(typeof rStats==="function")rStats();}catch(e){}}return ok;};
+})();
+
 function doLogin(){
   var u=(document.getElementById('lUser').value||'').trim().toLowerCase();
   var p=(document.getElementById('lPass').value||'').trim();
@@ -2195,6 +2212,7 @@ function doLogin(){
     applyRoleAccess();
     applyPlantAccess();
     initApp();
+    if(typeof ssCloudInitVisits==="function")ssCloudInitVisits();
     if(typeof ssLoginSmile==="function")ssLoginSmile(CU.name);
     else toast('Welcome, '+CU.name+'!','success');
   }else{
@@ -4083,5 +4101,172 @@ window.addEventListener('storage',function(e){
   }catch(err){console.warn('Live data refresh failed',err);}
 });
 </script>
+
+<script>
+/* =========================================================
+   SHREE SHYAM V25 — FULL CLOUD DATA SYNC
+   Every important ERP key is mirrored to Supabase so data
+   entered from any phone/PC/browser is available to Admin.
+   Existing local data is preserved and merged on first run.
+   ========================================================= */
+(function(){
+  var CLOUD_URL="https://xihbqwhsqlpgrysttwth.supabase.co";
+  var CLOUD_KEY="sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
+  var CLOUD_TABLE="erp_cloud_state";
+  var BOOT_KEY="RMC_V25_CLOUD_BOOTSTRAPPED";
+  var DIRTY_KEY="RMC_V25_CLOUD_DIRTY";
+  var SUPPRESS=false, syncTimers={}, syncing=false;
+  var KEYS=[
+    "RMC_USERS","RMC_SL","RMC_OS","RMC_VISITS","RMC_QUOTATIONS",
+    "RMC_OFFICE_WORK","RMC_ATTENDANCE","RMC_ATTENDANCE_STATE",
+    "RMC_PM_ORDERS","RMC_PM_FLEET","RMC_PM_STAFF","RMC_PM_QC",
+    "RMC_PM_MAT","RMC_PM_BILL","RMC_PM_MAINT","RMC_MASTER_RECORDS",
+    "RMC_ERP_WORKFLOWS","RMC_PHASE1_ACTIVITY"
+  ];
+  var KEYSET={}; KEYS.forEach(function(k){KEYSET[k]=1;});
+  function headers(extra){return Object.assign({apikey:CLOUD_KEY,Authorization:"Bearer "+CLOUD_KEY,"Content-Type":"application/json"},extra||{});}
+  function parse(raw){try{return JSON.parse(raw);}catch(e){return null;}}
+  function rawLocal(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+  function dirtyMap(){var x=parse(rawLocal(DIRTY_KEY));return x&&typeof x==='object'&&!Array.isArray(x)?x:{};}
+  function markDirty(k){if(SUPPRESS||!KEYSET[k])return;try{var d=dirtyMap();d[k]=Date.now();localStorage.setItem(DIRTY_KEY,JSON.stringify(d));}catch(e){}}
+  function mergeArray(local,cloud){
+    if(!Array.isArray(local)||!Array.isArray(cloud))return null;
+    var out=[],idx={};
+    function key(x){
+      if(x&&x.id!=null)return "id:"+String(x.id);
+      if(x&&x.record_key)return "rk:"+String(x.record_key);
+      if(x&&x.cloudKey)return "ck:"+String(x.cloudKey);
+      return null;
+    }
+    local.forEach(function(x){var k=key(x);if(k){idx[k]=out.length;}out.push(x);});
+    cloud.forEach(function(x){var k=key(x);if(k&&idx[k]!=null){out[idx[k]]=Object.assign({},out[idx[k]],x);}else{out.push(x);if(k)idx[k]=out.length-1;}});
+    return out;
+  }
+  function mergeValue(local,cloud){
+    if(Array.isArray(local)&&Array.isArray(cloud))return mergeArray(local,cloud)||local;
+    if(local&&typeof local==='object'&&cloud&&typeof cloud==='object'&&!Array.isArray(local)&&!Array.isArray(cloud))return Object.assign({},cloud,local);
+    return (local!==null&&local!==undefined&&local!=="")?local:cloud;
+  }
+  async function getRows(){
+    var r=await fetch(CLOUD_URL+"/rest/v1/"+CLOUD_TABLE+"?select=state_key,state,updated_at",{headers:headers()});
+    if(!r.ok)throw new Error("Cloud read "+r.status);
+    return await r.json();
+  }
+  async function putKey(k,value){
+    var body={state_key:k,state:value,updated_at:new Date().toISOString()};
+    var r=await fetch(CLOUD_URL+"/rest/v1/"+CLOUD_TABLE+"?on_conflict=state_key",{method:"POST",headers:headers({Prefer:"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(body)});
+    if(!r.ok){var t=await r.text();throw new Error("Cloud save "+k+" "+r.status+" "+t.slice(0,160));}
+  }
+  async function saveKey(k){
+    if(!KEYSET[k])return false;
+    var raw=rawLocal(k);if(raw===null)return false;
+    var val=parse(raw);if(val===null)return false;
+    try{
+      /* Merge array/object data with the cloud copy before writing. This prevents
+         a device with older local data from wiping newer cloud records. */
+      var rows=await getRows();
+      var row=rows.filter(function(x){return x.state_key===k;})[0];
+      var merged=row?mergeValue(val,row.state):val;
+      SUPPRESS=true;try{localStorage.setItem(k,JSON.stringify(merged));}finally{SUPPRESS=false;}
+      await putKey(k,merged);
+      return true;
+    }catch(e){console.error("SHREE SHYAM CLOUD SAVE",k,e);return false;}
+  }
+  async function pullAll(){
+    var rows=await getRows(), by={};rows.forEach(function(r){by[r.state_key]=r;});
+    var dirty=dirtyMap();
+    SUPPRESS=true;
+    try{
+      for(var i=0;i<KEYS.length;i++){
+        var k=KEYS[i],row=by[k],local=parse(rawLocal(k));
+        if(!row){
+          if(local!==null){try{await putKey(k,local);}catch(e){console.warn("Initial cloud upload failed",k,e);}}
+          continue;
+        }
+        var cloudTime=new Date(row.updated_at||0).getTime()||0;
+        var localDirty=Number(dirty[k]||0);
+        if(localDirty>cloudTime){
+          /* local is newer: merge first, then wait for the confirmed cloud write. */
+          var merged=mergeValue(local,row.state);
+          localStorage.setItem(k,JSON.stringify(merged));
+          try{await putKey(k,merged);}catch(e){console.warn("Dirty upload failed",k,e);}
+        }else{
+          var merged2=mergeValue(local,row.state);
+          localStorage.setItem(k,JSON.stringify(merged2));
+        }
+      }
+      localStorage.setItem(DIRTY_KEY,JSON.stringify({}));
+      localStorage.setItem("RMC_V25_CLOUD_LAST_PULL",new Date().toISOString());
+    }finally{SUPPRESS=false;}
+    return true;
+  }
+  async function bootstrap(){
+    if(syncing)return;syncing=true;
+    try{
+      var rows=await getRows(), hasCloud=rows.some(function(r){return KEYSET[r.state_key];});
+      if(!localStorage.getItem(BOOT_KEY)){
+        /* First V25 run: merge the current device's data with cloud instead of
+           replacing either side. This is the critical no-data-loss migration. */
+        var by={};rows.forEach(function(r){by[r.state_key]=r;});
+        SUPPRESS=true;
+        try{
+          for(var i=0;i<KEYS.length;i++){
+            var k=KEYS[i],local=parse(rawLocal(k)),row=by[k],merged;
+            if(row) merged=mergeValue(local,row.state);
+            else merged=local;
+            if(merged!==null&&merged!==undefined){localStorage.setItem(k,JSON.stringify(merged));await putKey(k,merged);}
+          }
+          localStorage.setItem(BOOT_KEY,"DONE");
+          localStorage.setItem(DIRTY_KEY,"{}");
+        }finally{SUPPRESS=false;}
+      }else{
+        await pullAll();
+      }
+      window.RMC_CLOUD_READY=true;
+      try{
+        if(typeof ssLoadCore==='function')ssLoadCore();
+        if(typeof loadUsers==='function')loadUsers();
+        if(typeof pmLoad==='function')pmLoad();
+        if(typeof masterLoad==='function')masterLoad();
+        if(typeof popDD==='function')popDD();
+        if(typeof rWL==='function')rWL();
+        if(typeof rQt==='function')rQt();
+        if(typeof rStats==='function')rStats();
+        if(typeof rStg==='function')rStg();
+        if(typeof rOS==='function')rOS();
+        if(typeof masterRenderAll==='function')masterRenderAll();
+      }catch(e){console.warn("Cloud UI refresh failed",e);}
+    }catch(e){console.warn("SHREE SHYAM V25 cloud bootstrap unavailable",e);}
+    finally{syncing=false;}
+  }
+  function schedule(k){
+    if(!KEYSET[k]||SUPPRESS)return;
+    clearTimeout(syncTimers[k]);
+    syncTimers[k]=setTimeout(function(){saveKey(k);},900);
+  }
+  /* Watch every important local save made by the existing application. */
+  try{
+    var origSet=Storage.prototype.setItem;
+    Storage.prototype.setItem=function(k,v){
+      var r=origSet.apply(this,arguments);
+      if(this===localStorage&&KEYSET[k])markDirty(k),schedule(k);
+      return r;
+    };
+  }catch(e){console.warn("Storage cloud watcher unavailable",e);}
+  window.ssCloudSyncAllV25=async function(){
+    if(syncing)return false;syncing=true;
+    try{await pullAll();return true;}catch(e){console.warn("Manual cloud sync failed",e);return false;}finally{syncing=false;}
+  };
+  window.ssCloudSaveAllV25=async function(){
+    if(syncing)return false;syncing=true;
+    try{for(var i=0;i<KEYS.length;i++)await saveKey(KEYS[i]);return true;}catch(e){return false;}finally{syncing=false;}
+  };
+  /* Refresh every 20 seconds so Admin and staff on separate devices converge. */
+  setInterval(function(){if(document.visibilityState!=="hidden"&&!syncing)window.ssCloudSyncAllV25();},20000);
+  /* Run after the original application has declared all arrays/functions. */
+  setTimeout(bootstrap,1200);
+})();
+</script>
+
 </body>
 </html>
