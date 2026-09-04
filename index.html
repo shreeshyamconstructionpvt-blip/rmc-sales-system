@@ -1375,6 +1375,208 @@ body{--gold:#c91435}
 .mm-pdf:hover{background:#fff1f2;transform:translateY(-1px);box-shadow:0 4px 12px rgba(153,27,27,.10)}
 @media(max-width:650px){.mm-pdf,.mm-new{font-size:.62rem;padding:6px 8px}}
 </style>
+<style id="ssEnterpriseTheme">
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+/* =========================================================
+   SHREE SHYAM V31 — ENTERPRISE THEME (Brand Red + Deep Navy)
+   Pure CSS layer. No markup / JS behaviour changes.
+   ========================================================= */
+:root{
+  --p:#C8102E;--d:#A50D26;--a:#D97706;--s:#0E7C66;--pu:#4C3FB5;--tl:#0E7490;
+  --navy:#0B1F3A;--navy2:#132F5B;--navy3:#1C3F76;--gold:#F5B335;
+  --bg:#F1F4F9;--card:#FFFFFF;--b:#E3E8F0;--b2:#D7DEE8;--t:#0F172A;--m:#64748B;
+  --r:12px;--sh:0 1px 2px rgba(15,23,42,.04),0 10px 28px -14px rgba(15,23,42,.14);
+  --sh2:0 2px 4px rgba(15,23,42,.05),0 18px 40px -18px rgba(15,23,42,.25);
+  --font:'Inter','Segoe UI',Arial,sans-serif;--display:'Plus Jakarta Sans','Inter','Segoe UI',Arial,sans-serif;
+}
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+body{font-family:var(--font)!important;background:var(--bg)!important;color:var(--t)}
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(900px 400px at 100% -10%,rgba(200,16,46,.06),transparent 60%),radial-gradient(800px 400px at -10% 110%,rgba(11,31,58,.07),transparent 60%)}
+h1,h2,h3,h4,.sv,.dw-title,.pm-title,.master-title,.tch h2,.login-logo h1,.erp-stat strong,.pm-stat strong,.master-kpi strong,.pm-kpi strong{font-family:var(--display)!important;letter-spacing:-.015em}
+button,input,select,textarea{font-family:var(--font)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--navy)!important;outline-offset:2px}
+
+/* ---------- LOGIN ---------- */
+.login-wrap{background:radial-gradient(1200px 700px at 85% -10%,rgba(200,16,46,.38),transparent 60%),radial-gradient(900px 600px at -10% 110%,rgba(19,47,91,.9),transparent 60%),linear-gradient(160deg,#07162B 0%,#0B1F3A 55%,#160B14 100%)!important}
+.login-wrap::before{background:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px)!important;background-size:44px 44px!important;width:100%!important;height:100%!important;top:0!important;left:0!important;-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%)}
+.login-wrap::after{display:none!important}
+.login-orbit,.login-particle,.login-grid{display:none!important}
+.login-aurora{opacity:.35!important}
+.login-box{background:#fff!important;border-radius:22px!important;padding:38px 38px 30px!important;max-width:440px!important;box-shadow:0 40px 90px -30px rgba(0,0,0,.65),0 0 0 1px rgba(255,255,255,.08)!important;border-top:5px solid var(--p)!important;position:relative}
+.login-box::before{display:none!important}
+.login-box::after{content:'Enterprise Management System  \2022  Secure Access'!important;position:static!important;inset:auto!important;background:none!important;border-radius:0!important;display:block;text-align:center;margin-top:14px;font-size:.66rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#94A3B8}
+.login-logo .logo-img{width:80px!important;height:80px!important;border-radius:18px!important;box-shadow:0 10px 24px -10px rgba(11,31,58,.5)!important;border:1px solid var(--b)}
+.login-logo h1{color:var(--navy)!important;font-size:1.3rem!important}
+.login-logo .co-name{color:var(--navy)!important;letter-spacing:.14em!important;font-size:.76rem!important}
+.role-tabs{background:#EEF2F7!important;border-radius:12px!important;padding:4px!important;border:1px solid var(--b)}
+.role-tab{border-radius:9px!important;color:#475569!important;font-weight:700!important}
+.role-tab.act{background:var(--navy)!important;color:#fff!important;box-shadow:0 8px 18px -10px rgba(11,31,58,.7)!important}
+.login-field label{color:#475569!important;letter-spacing:.1em!important}
+.login-field input{background:#fff!important;border:1.5px solid var(--b2)!important;border-radius:10px!important;padding:13px 16px!important;font-size:.95rem!important}
+.login-field input:focus{border-color:var(--navy)!important;box-shadow:0 0 0 4px rgba(11,31,58,.1)!important}
+.login-btn{background:linear-gradient(135deg,#D01230,#8F0B21)!important;border-radius:12px!important;padding:14px!important;letter-spacing:.02em!important;box-shadow:0 14px 28px -14px rgba(200,16,46,.8)!important}
+.login-btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.login-divider{color:#94A3B8!important;letter-spacing:.06em}
+.login-security,.login-footer-brand{color:rgba(255,255,255,.7)!important}
+
+/* ---------- HEADER / TOP NAV ---------- */
+header{background:linear-gradient(90deg,#07162B 0%,#0B1F3A 55%,#132F5B 100%)!important;border-bottom:3px solid var(--p)!important;box-shadow:0 14px 30px -18px rgba(0,0,0,.7)!important;min-height:66px!important;padding:0 20px!important;position:sticky;top:0}
+header::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,var(--p),var(--gold) 60%,transparent);opacity:.9}
+.hl img,.hl .logo-img{width:42px!important;height:42px!important;border-radius:10px!important;background:#fff;padding:2px;box-shadow:0 6px 14px -6px rgba(0,0,0,.6)}
+.ht h1{font-family:var(--display)!important;font-size:1.06rem!important;font-weight:800!important;letter-spacing:-.01em!important;color:#fff!important}
+.ht p{font-size:.62rem!important;font-weight:600!important;letter-spacing:.14em!important;text-transform:uppercase!important;color:rgba(255,255,255,.65)!important;opacity:1!important}
+.ha{gap:6px!important;padding:8px 0!important}
+.ha .btn{border-radius:9px!important;padding:8px 13px!important;font-size:.78rem!important;font-weight:600!important;letter-spacing:0!important;box-shadow:none!important}
+.ha .btn.bw{background:rgba(255,255,255,.08)!important;color:#fff!important;border:1px solid rgba(255,255,255,.14)!important;backdrop-filter:blur(6px)}
+.ha .btn.bw:hover{background:rgba(255,255,255,.16)!important;border-color:rgba(255,255,255,.3)!important}
+.ha .btn.ba{background:linear-gradient(135deg,#D01230,#A50D26)!important;color:#fff!important;border:1px solid rgba(255,255,255,.12)!important}
+.ha .btn.bp{background:linear-gradient(135deg,#1C3F76,#132F5B)!important;color:#fff!important;border:1px solid rgba(255,255,255,.14)!important}
+.ha .btn.bp:hover,.ha .btn.ba:hover{filter:brightness(1.1)}
+.ha .btn.bd{background:transparent!important;color:#FDA4AF!important;border:1px solid rgba(253,164,175,.45)!important}
+.ha .btn.bd:hover{background:rgba(200,16,46,.25)!important;color:#fff!important}
+.user-badge{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:10px!important;padding:7px 12px!important;font-size:.76rem!important;color:#fff!important}
+.user-badge span,.user-badge .plant-badge,.user-badge .staff-badge{border-radius:6px!important}
+
+/* ---------- MAIN / HERO ---------- */
+main{max-width:1520px!important;padding:20px 18px 40px!important}
+.dashboard-welcome,.pm-hero,.master-hero,.profile-hero,.phase1-head,.erp-phase-head,.command-strip{background:radial-gradient(700px 300px at 100% 0%,rgba(200,16,46,.45),transparent 60%),linear-gradient(135deg,#0B1F3A 0%,#132F5B 65%,#24102A 100%)!important;color:#fff!important;border-radius:18px!important;border:1px solid rgba(255,255,255,.08)!important;box-shadow:var(--sh2)!important;position:relative;overflow:hidden}
+.dashboard-welcome::after,.pm-hero::after,.master-hero::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:36px 36px;-webkit-mask-image:linear-gradient(90deg,transparent 40%,#000);mask-image:linear-gradient(90deg,transparent 40%,#000)}
+.dw-kicker,.pm-kicker,.master-kicker{color:var(--gold)!important;font-weight:700!important;letter-spacing:.16em!important;text-transform:uppercase!important;font-size:.64rem!important}
+.dw-title,.pm-title,.master-title{font-family:var(--display)!important;font-weight:800!important;letter-spacing:-.02em!important;color:#fff!important}
+.dw-sub,.pm-sub{color:rgba(255,255,255,.75)!important}
+.dw-actions .btn.bs,.pm-hero .btn.bs{background:linear-gradient(135deg,#D01230,#A50D26)!important;box-shadow:0 12px 24px -12px rgba(200,16,46,.9)!important}
+.dw-actions .btn.bw,.pm-hero .btn.bw{background:rgba(255,255,255,.1)!important;color:#fff!important;border:1px solid rgba(255,255,255,.2)!important}
+.pm-chip,.erp-chip,.er-pill,.master-access-strip span{border-radius:8px!important;background:rgba(255,255,255,.1)!important;border:1px solid rgba(255,255,255,.16)!important;color:#fff!important}
+
+/* ---------- KPI CARDS ---------- */
+.sg{gap:14px!important;margin-bottom:18px!important}
+.sc{background:#fff!important;border:1px solid var(--b)!important;border-left:1px solid var(--b)!important;border-top:3px solid var(--p)!important;border-radius:14px!important;padding:18px 18px 16px!important;box-shadow:var(--sh)!important;position:relative;overflow:hidden}
+.sc::before{display:none!important}
+.sc::after{content:'';position:absolute;right:-24px!important;top:-24px!important;left:auto!important;bottom:auto!important;width:84px!important;height:84px!important;border-radius:50%!important;background:rgba(200,16,46,.06)!important}
+.sc.a{border-top-color:var(--a)!important}.sc.a::after{background:rgba(217,119,6,.08)!important}
+.sc.s{border-top-color:var(--s)!important}.sc.s::after{background:rgba(14,124,102,.08)!important}
+.sc.d{border-top-color:var(--d)!important}.sc.d::after{background:rgba(165,13,38,.07)!important}
+.sc.pu{border-top-color:var(--pu)!important}.sc.pu::after{background:rgba(76,63,181,.08)!important}
+.sc.tl{border-top-color:var(--tl)!important}.sc.tl::after{background:rgba(14,116,144,.08)!important}
+.sc:hover{transform:translateY(-3px)!important;box-shadow:var(--sh2)!important}
+.sl{font-size:.66rem!important;letter-spacing:.12em!important;color:var(--m)!important;font-weight:700!important}
+.sv{font-size:1.9rem!important;font-weight:800!important;color:var(--navy)!important;letter-spacing:-.03em!important;font-variant-numeric:tabular-nums}
+.erp-stat,.pm-stat,.master-kpi,.pm-kpi{background:#fff!important;border:1px solid var(--b)!important;border-radius:14px!important;box-shadow:var(--sh)!important}
+
+/* ---------- TABS (segmented control) ---------- */
+.tabs{background:#fff!important;border:1px solid var(--b)!important;border-bottom:1px solid var(--b)!important;border-radius:14px!important;padding:6px!important;gap:4px!important;margin-bottom:18px!important;box-shadow:var(--sh)!important;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs .tb{border-radius:10px!important;border-bottom:0!important;margin-bottom:0!important;padding:9px 16px!important;font-weight:600!important;color:#475569!important;transition:all .18s!important}
+.tabs .tb:hover{background:#F1F4F9!important;color:var(--navy)!important}
+.tabs .tb.act{background:var(--navy)!important;color:#fff!important;box-shadow:0 10px 20px -12px rgba(11,31,58,.8)!important;font-weight:700!important}
+.erp-phase-nav,.erp-phase-btn{border-radius:10px!important}
+.erp-phase-btn.act{background:var(--navy)!important;color:#fff!important}
+
+/* ---------- TOOLBAR / FILTERS ---------- */
+.toolbar,.pm-toolbar,.erp-filter{background:#fff!important;border:1px solid var(--b)!important;border-radius:14px!important;box-shadow:var(--sh)!important;padding:12px 14px!important}
+.sw input,.pm-search input{background:#fff!important;border:1.5px solid var(--b2)!important;border-radius:10px!important;padding:10px 12px 10px 38px!important}
+.sw input:focus,.pm-search input:focus{border-color:var(--navy)!important;box-shadow:0 0 0 4px rgba(11,31,58,.08)!important}
+select.fs{border:1.5px solid var(--b2)!important;border-radius:9px!important;padding:8px 30px 8px 10px!important;font-weight:500;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%2364748B' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>") no-repeat right 10px center!important;-webkit-appearance:none;appearance:none}
+select.fs:focus{border-color:var(--navy)!important}
+
+/* ---------- BUTTONS ---------- */
+.btn{border-radius:10px!important;font-weight:600!important;letter-spacing:0!important;padding:9px 15px!important;box-shadow:0 1px 2px rgba(15,23,42,.06)!important;transition:transform .15s,box-shadow .15s,filter .15s,background .15s!important}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 18px -10px rgba(15,23,42,.35)!important}
+.btn:active{transform:translateY(0)}
+.btn.bsm{padding:6px 10px!important;font-size:.76rem!important}
+.bw{background:#fff!important;color:var(--navy)!important;border:1px solid var(--b2)!important}.bw:hover{background:#F6F8FB!important}
+.bs{background:var(--s)!important;color:#fff!important}.bs:hover{background:#0B6B58!important}
+.ba{background:var(--a)!important;color:#fff!important}.ba:hover{background:#B45309!important}
+.bd{background:var(--p)!important;color:#fff!important}.bd:hover{background:var(--d)!important}
+.bp{background:var(--navy2)!important;color:#fff!important}.bp:hover{background:var(--navy3)!important}
+.bo{background:#fff!important;color:var(--navy)!important;border:1.5px solid var(--navy)!important}.bo:hover{background:#EEF2F7!important}
+.bwa{background:#1FA855!important;color:#fff!important}.bwa:hover{background:#178A45!important}
+.ib{border-radius:7px!important;padding:5px 6px!important;color:#475569}.ib:hover{background:#EEF2F7!important;color:var(--navy)}
+
+/* ---------- TABLE CARDS ---------- */
+.tc,.pm-table-wrap,.erp-card,.master-module-card,.master-workspace-card,.erp-report-card,.plant-panel,.ss-hr-card{background:#fff!important;border:1px solid var(--b)!important;border-radius:16px!important;box-shadow:var(--sh)!important}
+.tch,.erp-card-head,.pm-mini-head{background:#fff!important;border-bottom:1px solid var(--b)!important;padding:16px 20px!important}
+.tch h2,.erp-card-head h3,.erp-card-head h2{font-family:var(--display)!important;font-size:1rem!important;font-weight:800!important;color:var(--navy)!important;display:flex;align-items:center;gap:10px}
+.tch h2::before,.erp-card-head h3::before{content:'';display:inline-block;width:4px;height:18px;border-radius:2px;background:linear-gradient(180deg,var(--p),var(--gold));flex-shrink:0}
+table{font-size:.79rem!important}
+thead th{background:#F6F8FB!important;color:#334155!important;font-size:.67rem!important;letter-spacing:.08em!important;padding:12px 14px!important;border-bottom:1px solid var(--b)!important;text-transform:uppercase!important}
+thead th:hover{background:#EEF2F7!important}
+tbody tr:nth-child(even),tbody tr:nth-child(even):hover{background:#fff!important}
+tbody tr{border-bottom:1px solid #EEF2F7}
+tbody tr:hover{background:#F8FAFD!important}
+td{padding:11px 14px!important;border-bottom:1px solid #EEF2F7!important;color:#1E293B}
+td strong{color:var(--navy);font-weight:700}
+.nd{padding:44px!important;color:#94A3B8!important;font-weight:500}
+.pm-table th{background:#F6F8FB!important;color:#334155!important}
+.badge{border-radius:6px!important;padding:3px 9px!important;font-size:.67rem!important;letter-spacing:.04em!important;font-weight:700!important;text-transform:uppercase}
+.bb{background:#FDE8EC!important;color:#9B1C2E!important}.bg{background:#DDF4EC!important;color:#0B6B58!important}.by{background:#FEF3C7!important;color:#92400E!important}
+.br{background:#FEE2E2!important;color:#991B1B!important}.bgy{background:#EEF2F7!important;color:#334155!important}.bpu{background:#E7E5F9!important;color:#3B2FA0!important}.bor{background:#FFEDD5!important;color:#9A3412!important}
+.pag{border-top:1px solid var(--b)!important;padding:12px 18px!important;background:#FBFCFE}
+.pb{border-radius:8px!important;border:1px solid var(--b2)!important;font-weight:600!important}
+.pb:hover,.pb.act{background:var(--navy)!important;border-color:var(--navy)!important;color:#fff!important}
+
+/* ---------- CARDS (staff / attendance) ---------- */
+.scard,.att-card,.ss-emp,.pm-row,.master-module{background:#fff!important;border:1px solid var(--b)!important;border-radius:14px!important;box-shadow:var(--sh)!important}
+.scard:hover,.att-card:hover,.pm-row:hover{border-color:#C9D3E2!important;box-shadow:var(--sh2)!important}
+.sav{border-radius:12px!important;box-shadow:0 8px 16px -8px rgba(11,31,58,.5)}
+.att-btn{border-radius:8px!important;font-weight:700!important}
+
+/* ---------- MODALS / FORMS ---------- */
+.mo{background:rgba(7,22,43,.6)!important;backdrop-filter:blur(4px)}
+.md{border-radius:18px!important;box-shadow:0 40px 90px -30px rgba(0,0,0,.6)!important;border:1px solid rgba(255,255,255,.2)}
+.mh{background:linear-gradient(90deg,#0B1F3A,#132F5B)!important;color:#fff!important;border-bottom:3px solid var(--p)!important;padding:16px 22px!important;border-radius:18px 18px 0 0}
+.mh h3{color:#fff!important;font-family:var(--display)!important;font-weight:800!important}
+.mcl{color:rgba(255,255,255,.8)!important;border-radius:8px!important}.mcl:hover{background:rgba(255,255,255,.14)!important;color:#fff!important}
+.mb2{padding:22px!important}
+.mf2{border-top:1px solid var(--b)!important;padding:14px 22px!important;background:#FBFCFE;border-radius:0 0 18px 18px}
+.fi label{color:#475569!important;letter-spacing:.08em!important;font-size:.68rem!important}
+.fi input,.fi select,.fi textarea{background:#fff!important;border:1.5px solid var(--b2)!important;border-radius:10px!important;padding:11px 13px!important;color:var(--t)!important}
+.fi input:focus,.fi select:focus,.fi textarea:focus{border-color:var(--navy)!important;box-shadow:0 0 0 4px rgba(11,31,58,.09)!important}
+.lam-card{border-radius:18px!important;border-top:5px solid var(--p)}
+
+/* ---------- ALERTS / TOASTS ---------- */
+.alert-banner{background:#FFFBEB!important;border:1px solid #FCD34D!important;border-left:5px solid var(--a)!important;border-radius:14px!important;box-shadow:var(--sh)}
+.erp-alert{border-radius:12px!important}
+.tc2{bottom:140px!important;right:14px!important}
+.toast{border-radius:10px!important;font-weight:600!important;padding:11px 16px!important;box-shadow:0 18px 40px -16px rgba(15,23,42,.6)!important;border:1px solid rgba(255,255,255,.15)}
+.toast.info{background:var(--navy)!important}
+
+/* ---------- FLOATING UTILITIES (cloud pill / report / alerts) ---------- */
+#ssCloudPill,#ssDailyBtn,#ssPushBtn{font-family:var(--font)!important;font-weight:700!important;letter-spacing:.01em;box-shadow:0 12px 24px -10px rgba(15,23,42,.55)!important;border:1px solid rgba(255,255,255,.28)!important;padding:8px 14px!important}
+#ssDailyBtn{background:linear-gradient(135deg,#132F5B,#0B1F3A)!important}
+
+/* ---------- ENTERPRISE FOOTER (injected by V31 JS) ---------- */
+.ss-ent-footer{max-width:1520px;margin:10px auto 0;padding:18px 18px 26px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;color:#64748B;font-size:.72rem;border-top:1px solid var(--b)}
+.ss-ent-footer strong{color:var(--navy);font-family:var(--display);font-weight:800;letter-spacing:.02em}
+.ss-ent-footer .ss-ent-badges{display:flex;gap:6px;flex-wrap:wrap}
+.ss-ent-footer .ss-ent-badges span{border:1px solid var(--b);border-radius:6px;padding:3px 8px;background:#fff;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:.62rem;color:#475569}
+
+/* ---------- SCROLLBAR / MISC ---------- */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#B7C2D3!important;border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:var(--navy)!important}
+::selection{background:rgba(200,16,46,.18)}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:900px){
+  .ha .btn{padding:7px 10px!important;font-size:.72rem!important}
+  .sv{font-size:1.55rem!important}
+  main{padding:14px 12px 32px!important}
+}
+@media(max-width:640px){
+  header{padding:8px 12px!important}
+  .login-box{padding:28px 22px 22px!important;border-radius:18px!important}
+  .tabs{border-radius:12px!important;padding:4px!important}
+  .tabs .tb{padding:8px 12px!important;font-size:.76rem!important}
+  .tch{padding:14px 14px!important}
+  td,thead th{padding:9px 10px!important}
+  .ss-ent-footer{justify-content:center;text-align:center}
+}
+@media print{body::before,.ss-ent-footer,#ssCloudPill,#ssDailyBtn,#ssPushBtn{display:none!important}}
+
+</style>
 </head>
 <body>
 <!-- LOGIN PAGE -->
@@ -2029,7 +2231,7 @@ function visitHTML(r){r=r||{};
 return "<div class='fg'><div class='fi'><label>Salesperson *</label><select id='vsp'>"+(sps.length?sps.map(function(s){return"<option "+(r.sp===s?"selected":"")+">"+s+"</option>";}).join(""):"<option>Parvinder Kumar</option><option>Pawan Kumar</option>")+"</select></div><div class='fi'><label>Visit Date *</label><input id='vvd' type='date' value='"+(r.vd||new Date().toISOString().slice(0,10))+"'></div><div class='fi'><label>Customer/Company</label><input id='vcu' value='"+(r.cu||"")+"' placeholder='Customer name'></div><div class='fi'><label>Customer Contact</label><input id='vcc' value='"+(r.cc||"")+"' placeholder='Phone number'></div><div class='fi'><label>Contractor Name *</label><input id='vco' value='"+(r.co||"")+"' placeholder='Contractor name'></div><div class='fi'><label>Contractor No.</label><input id='vcc2' value='"+(r.cc2||"")+"' placeholder='Phone number'></div><div class='fi'><label>Site / Project *</label><input id='vsi' value='"+(r.si||"")+"' placeholder='Site or project name'></div><div class='fi full'><label>Site Address</label><input id='vsa' value='"+(r.sa||"")+"' placeholder='Full address'></div><div class='fi'><label>Area (sqft)</label><input id='var' type='number' value='"+(r.ar||"")+"' placeholder='e.g. 1000'></div><div class='fi'><label>Concrete Grade</label><select id='vgr'><option value=''>-- Select --</option>"+(grs.map(function(g){return"<option "+(r.gr===g?"selected":"")+">"+g+"</option>";})).join("")+"</select></div><div class='fi'><label>Required Date</label><input id='vrd' type='date' value='"+(r.rd||"")+"'></div><div class='fi full'><label>Remarks</label><textarea id='vrm'>"+(r.rm||"")+"</textarea></div></div>";}
 function openAddVisitModal(){if(!canAddVisit()){toast("Please login first","error");return;}eid=null;document.getElementById("mt").textContent="Add Visit";document.getElementById("mb2").innerHTML=visitHTML();document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveVisit()'>Save</button>";openModal();}
 function openEditVisitModal(id){var r=R.filter(function(x){return x.id===id;})[0];if(!r)return;if(!(CU&&(CU.accountKind==='admin'||CU.accountKind==='staff'&&r.sp===CU.name))){toast("You can only update your own visit","error");return;}eid=id;document.getElementById("mt").textContent="Edit Visit";document.getElementById("mb2").innerHTML=visitHTML(r);document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveVisit()'>Update</button>";openModal();}
-async function saveVisit(){if(!canAddVisit()){toast("Please login first","error");return;}var co=document.getElementById("vco").value.trim(),vd=document.getElementById("vvd").value;if(!co||!vd){toast("Contractor & Date required","error");return;}var d={sp:(CU&&CU.accountKind==="staff"?CU.name:document.getElementById("vsp").value),vd:vd,cu:document.getElementById("vcu").value.trim(),cc:document.getElementById("vcc").value.trim(),co:co,cc2:document.getElementById("vcc2").value.trim(),si:document.getElementById("vsi").value.trim(),sa:document.getElementById("vsa").value.trim(),ar:document.getElementById("var").value,gr:document.getElementById("vgr").value,rd:document.getElementById("vrd").value,rm:document.getElementById("vrm").value.trim()};var savedRow=null;if(eid){var ix=R.map(function(x){return x.id;}).indexOf(eid);if(ix<0){toast("Visit record not found","error");return;}R[ix]=Object.assign({},R[ix],d);savedRow=R[ix];toast("Updated!","success");}else{d.id=nRid++;R.push(d);savedRow=d;toast("Visit added!","success");}ssSaveCore();if(typeof ssCloudSaveVisit==="function")await ssCloudSaveVisit(savedRow);closeModal();popDD();applyF();rStats();}
+async function saveVisit(){if(!canAddVisit()){toast("Please login first","error");return;}var co=document.getElementById("vco").value.trim(),vd=document.getElementById("vvd").value;if(!co||!vd){toast("Contractor & Date required","error");return;}var d={sp:(CU&&CU.accountKind==="staff"?CU.name:document.getElementById("vsp").value),vd:vd,cu:document.getElementById("vcu").value.trim(),cc:document.getElementById("vcc").value.trim(),co:co,cc2:document.getElementById("vcc2").value.trim(),si:document.getElementById("vsi").value.trim(),sa:document.getElementById("vsa").value.trim(),ar:document.getElementById("var").value,gr:document.getElementById("vgr").value,rd:document.getElementById("vrd").value,rm:document.getElementById("vrm").value.trim()};var savedRow=null;if(eid){var ix=R.map(function(x){return x.id;}).indexOf(eid);if(ix<0){toast("Visit record not found","error");return;}R[ix]=Object.assign({},R[ix],d);savedRow=R[ix];toast("Updated!","success");}else{d.id=ssUniqueId();R.push(d);savedRow=d;toast("Visit added!","success");}ssSaveCore();if(typeof ssCloudSaveVisit==="function")await ssCloudSaveVisit(savedRow);closeModal();popDD();applyF();rStats();}
 async function delR(id){if(!canEdit()){toast("Admin only","error");return;}if(!confirm("Delete this visit?"))return;var old=R.filter(function(x){return x.id===id;})[0];R=R.filter(function(x){return x.id!==id;});ssSaveCore();if(old&&typeof ssCloudDeleteVisit==="function")await ssCloudDeleteVisit(old);applyF();popDD();rStats();toast("Deleted","error");}
 function renderUserList(){
   var el=document.getElementById("userListBox");if(!el)return;
@@ -2155,7 +2357,10 @@ function accountKind(account){
   window.ssCloudSaveVisit=async function(v){try{await upsert(v);localStorage.setItem("RMC_VISIT_CLOUD_OK_AT",new Date().toISOString());return true;}catch(e){console.error("SHREE SHYAM VISIT CLOUD SAVE",e);toast("Visit saved locally, but cloud save failed. Please retry.","error");return false;}};
   window.ssCloudDeleteVisit=async function(v){try{await remove(v);return true;}catch(e){console.error("SHREE SHYAM VISIT CLOUD DELETE",e);toast("Deleted locally, but cloud delete failed.","error");return false;}};
   window.ssCloudRefreshVisits=async function(){try{var cloud=await readAll(),local=Array.isArray(window.R)?window.R:[],merged=[],seen={};cloud.forEach(function(x){merged.push({id:Number(x.id),sp:x.sp||"",vd:x.vd||"",cu:x.cu||"",cc:x.cc||"",co:x.co||"",cc2:x.cc2||"",si:x.si||"",sa:x.sa||"",ar:x.ar||"",gr:x.gr||"",rd:x.rd||"",rm:x.rm||"",cloudKey:x.record_key});seen[String(x.id)]=1;});local.forEach(function(v){if(!seen[String(v.id)])merged.push(v);});merged.sort(function(a,b){return Number(a.id)-Number(b.id);});window.R=merged;if(!cloud.length&&local.length){for(var i=0;i<local.length;i++){try{await upsert(local[i]);}catch(e){console.warn("Initial visit migration failed",e);break;}}}localStorage.setItem("RMC_VISITS",JSON.stringify(window.R));if(typeof window.nRid==="number")window.nRid=Math.max(window.nRid,(window.R||[]).reduce(function(n,x){return Math.max(n,Number(x.id)||0);},0)+1);return true;}catch(e){console.warn("Visit cloud refresh unavailable",e);return false;}};
-  window.ssCloudInitVisits=async function(){var ok=await window.ssCloudRefreshVisits();if(ok){try{if(typeof applyF==="function")applyF();if(typeof popDD==="function")popDD();if(typeof rStats==="function")rStats();}catch(e){}}return ok;};
+  window.ssCloudInitVisits=async function(){var ok=await window.ssCloudRefreshVisits();if(ok){try{if(typeof applyF==="function")applyF();if(typeof popDD==="function")popDD();if(typeof rStats==="function")rStats();if(typeof rWL==="function")rWL();}catch(e){}}return ok;};
+  // Auto-refresh visits every 8s + on focus so admin sees staff entries live.
+  setInterval(function(){if(document.visibilityState!=="hidden"&&typeof window.ssCloudInitVisits==="function")window.ssCloudInitVisits();},8000);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&typeof window.ssCloudInitVisits==='function')window.ssCloudInitVisits();});
 })();
 
 function doLogin(){
@@ -2257,6 +2462,7 @@ function swPlantTab(btn,tid){
 }
 function doLogout(){
   if(!confirm('Logout?'))return;
+  try{if(typeof window.ssAuthSession==='function'&&window.ssAuthSession()){localStorage.removeItem('RMC_SS_SESSION');}}catch(e){}
   CU=null;
   var app=document.getElementById('app'),lp=document.getElementById('loginPage');
   if(app){app.style.display='none';app.classList.remove('admin-mode','staff-mode','office-mode','plant-mode','master-mode');}
@@ -2339,6 +2545,8 @@ var R=[
   {id:26,sp:"Parvinder Kumar",vd:"2026-08-24",cu:"RAJ KUMAR",         cc:"9818169834", co:"KAPIL",        cc2:"9973066337",si:"Nahri",                        sa:"Nahri",        ar:"10000",gr:"M25",    rd:"2026-09-11", rm:"Discussion done with Mr. RajKumar, price shared. Follow up closely."}
 ];
 var nRid=27,FR=[],sf="vd",sd=-1,pg=1,pgsz=15,eid=null;
+// Cross-device safe numeric IDs: avoids collisions when multiple phones/laptops create records offline.
+function ssUniqueId(){return Date.now()*1000+Math.floor(Math.random()*1000);}
 // ===== UTILS =====
 function fd(d){if(!d)return"-";try{var p=d.split("-");return p[2]+"/"+p[1]+"/"+p[0];}catch(e){return d;}}
 function dl(d){if(!d)return 9999;var t=new Date(d),n=new Date();n.setHours(0,0,0,0);return Math.round((t-n)/864e5);}
@@ -3124,7 +3332,7 @@ function pmOpenOrder(id){
 function pmSaveOrder(){
   var d={order:document.getElementById("po").value.trim(),customer:document.getElementById("pc").value.trim(),site:document.getElementById("ps").value.trim(),grade:document.getElementById("pg").value.trim(),qty:Number(document.getElementById("pq").value)||0,schedule:document.getElementById("pd").value,vehicle:document.getElementById("pv").value,status:document.getElementById("pst").value,address:document.getElementById("pa").value.trim(),remarks:document.getElementById("pr").value.trim()};
   if(!d.order||!d.customer||!d.site||!d.grade||!d.schedule){toast("Order, customer, site, grade and schedule are required","error");return;}
-  if(window.pmEditId){var i=PM_ORDERS.findIndex(x=>x.id===window.pmEditId);PM_ORDERS[i]=Object.assign({},PM_ORDERS[i],d);}else{d.id=pmIds.o++;PM_ORDERS.push(d);}
+  if(window.pmEditId){var i=PM_ORDERS.findIndex(x=>x.id===window.pmEditId);PM_ORDERS[i]=Object.assign({},PM_ORDERS[i],d);}else{d.id=ssUniqueId();PM_ORDERS.push(d);}
   pmSave();closeModal();pmRenderAll();toast("Concrete order saved","success");
 }
 function pmRenderFleet(){
@@ -3145,7 +3353,7 @@ function pmOpenFleet(id){
 function pmSaveFleet(){
   var d={vehicle:document.getElementById("fv").value.trim(),driver:document.getElementById("fd").value.trim(),cap:Number(document.getElementById("fc").value)||0,trips:Number(document.getElementById("ft").value)||0,status:document.getElementById("fst").value,last:document.getElementById("fl").value.trim()};
   if(!d.vehicle||!d.driver){toast("Vehicle and driver are required","error");return;}
-  if(window.pmEditId){var i=PM_FLEET.findIndex(x=>x.id===window.pmEditId);PM_FLEET[i]=Object.assign({},PM_FLEET[i],d);}else{d.id=pmIds.f++;PM_FLEET.push(d);}
+  if(window.pmEditId){var i=PM_FLEET.findIndex(x=>x.id===window.pmEditId);PM_FLEET[i]=Object.assign({},PM_FLEET[i],d);}else{d.id=ssUniqueId();PM_FLEET.push(d);}
   pmSave();closeModal();pmRenderAll();toast("Fleet record saved","success");
 }
 function pmRenderStaff(){
@@ -3166,7 +3374,7 @@ function pmOpenStaff(id){
 function pmSaveStaff(){
   var d={name:document.getElementById("sn").value.trim(),role:document.getElementById("sr").value.trim(),dept:document.getElementById("sd").value.trim(),phone:document.getElementById("sp").value.trim(),shift:document.getElementById("ss").value.trim(),status:document.getElementById("sst2").value};
   if(!d.name||!d.role){toast("Name and role are required","error");return;}
-  if(window.pmEditId){var i=PM_STAFF.findIndex(x=>x.id===window.pmEditId);PM_STAFF[i]=Object.assign({},PM_STAFF[i],d);}else{d.id=pmIds.s++;PM_STAFF.push(d);}
+  if(window.pmEditId){var i=PM_STAFF.findIndex(x=>x.id===window.pmEditId);PM_STAFF[i]=Object.assign({},PM_STAFF[i],d);}else{d.id=ssUniqueId();PM_STAFF.push(d);}
   pmSave();closeModal();pmRenderAll();toast("Plant staff saved","success");
 }
 function pmRenderQC(){
@@ -3189,7 +3397,7 @@ function pmOpenQC(id){
 function pmSaveQC(){
   var d={date:document.getElementById("qd").value,batch:document.getElementById("qb").value.trim(),grade:document.getElementById("qg").value.trim(),slump:Number(document.getElementById("qs").value)||0,c7:document.getElementById("q7").value.trim(),c28:document.getElementById("q28").value.trim(),status:document.getElementById("qst").value,by:document.getElementById("qby").value.trim()};
   if(!d.date||!d.batch||!d.grade){toast("Date, batch/order and grade are required","error");return;}
-  if(window.pmEditId){var i=PM_QC.findIndex(x=>x.id===window.pmEditId);PM_QC[i]=Object.assign({},PM_QC[i],d);}else{d.id=pmIds.q++;PM_QC.push(d);}
+  if(window.pmEditId){var i=PM_QC.findIndex(x=>x.id===window.pmEditId);PM_QC[i]=Object.assign({},PM_QC[i],d);}else{d.id=ssUniqueId();PM_QC.push(d);}
   pmSave();closeModal();pmRenderAll();toast("QC record saved","success");
 }
 function pmNum(v){
@@ -3280,7 +3488,7 @@ function pmSaveMaterial(){
     var i=PM_MAT.findIndex(function(x){return Number(x.id)===Number(window.pmEditId);});
     if(i<0){toast("Material record not found","error");return;}
     PM_MAT[i]=Object.assign({},PM_MAT[i],d);
-  }else{d.id=pmIds.m++;PM_MAT.push(d);}
+  }else{d.id=ssUniqueId();PM_MAT.push(d);}
   pmNormalizeMaterials();
   pmSave();
   pmRenderMat();
@@ -3311,7 +3519,7 @@ function pmSaveBill(){
   var amount=Number(document.getElementById("bam").value)||0,paid=Number(document.getElementById("bp2").value)||0;
   var d={inv:document.getElementById("bi").value.trim(),customer:document.getElementById("bc").value.trim(),order:document.getElementById("bo2").value.trim(),amount:amount,paid:paid,outstanding:Math.max(0,amount-paid),due:document.getElementById("bd2").value,status:document.getElementById("bst").value};
   if(!d.inv||!d.customer){toast("Invoice and customer are required","error");return;}
-  if(window.pmEditId){var i=PM_BILL.findIndex(x=>x.id===window.pmEditId);PM_BILL[i]=Object.assign({},PM_BILL[i],d);}else{d.id=pmIds.b++;PM_BILL.push(d);}
+  if(window.pmEditId){var i=PM_BILL.findIndex(x=>x.id===window.pmEditId);PM_BILL[i]=Object.assign({},PM_BILL[i],d);}else{d.id=ssUniqueId();PM_BILL.push(d);}
   pmSave();closeModal();pmRenderAll();toast("Billing record saved","success");
 }
 function pmMaintDate(v){
@@ -3516,7 +3724,7 @@ function pmSaveMaint(){
     serviceType:document.getElementById("xsvc").value.trim(),serviceDate:document.getElementById("xsd").value,serviceAllottedTo:document.getElementById("xby").value.trim(),by:document.getElementById("xby").value.trim(),nextServiceDate:document.getElementById("xnsd").value,
     serviceDone:document.getElementById("xsd").value,serviceDue:document.getElementById("xnsd").value,status:"Open",remarks:document.getElementById("xrm").value.trim(),issue:document.getElementById("xrm").value.trim(),type:document.getElementById("xsvc").value.trim()||"Service",priority:"Medium",ocrText:(document.getElementById("xocr")||{}).value||"",attachment:window.pmPendingAttachment||"",attachmentName:window.pmPendingAttachmentName||""
   };
-  if(!d.vehicleType){toast("Vehicle Type is required","error");return;}if(!d.vehicleNo){toast("Vehicle No. is required","error");return;}if(window.pmEditId){var i=PM_MAINT.findIndex(function(a){return a.id===window.pmEditId;});if(i<0){toast("Maintenance record not found","error");return;}PM_MAINT[i]=Object.assign({},PM_MAINT[i],d);}else{d.id=pmIds.x++;PM_MAINT.push(d);}pmSave();closeModal();pmRenderAll();toast("Maintenance record saved successfully","success");
+  if(!d.vehicleType){toast("Vehicle Type is required","error");return;}if(!d.vehicleNo){toast("Vehicle No. is required","error");return;}if(window.pmEditId){var i=PM_MAINT.findIndex(function(a){return a.id===window.pmEditId;});if(i<0){toast("Maintenance record not found","error");return;}PM_MAINT[i]=Object.assign({},PM_MAINT[i],d);}else{d.id=ssUniqueId();PM_MAINT.push(d);}pmSave();closeModal();pmRenderAll();toast("Maintenance record saved successfully","success");
 }
 
 function pmDelete(type,id){
@@ -4104,18 +4312,18 @@ window.addEventListener('storage',function(e){
 
 <script>
 /* =========================================================
-   SHREE SHYAM V25 — FULL CLOUD DATA SYNC
-   Every important ERP key is mirrored to Supabase so data
-   entered from any phone/PC/browser is available to Admin.
-   Existing local data is preserved and merged on first run.
+   SHREE SHYAM V26 — CLOUD-FIRST DATA SYNC (bug-fixed)
+   - Supabase erp_cloud_state is the source of truth.
+   - Local-only records are pushed up; cloud wins conflicts.
+   - Every successful pull re-renders the admin UI.
    ========================================================= */
 (function(){
   var CLOUD_URL="https://xihbqwhsqlpgrysttwth.supabase.co";
   var CLOUD_KEY="sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
   var CLOUD_TABLE="erp_cloud_state";
-  var BOOT_KEY="RMC_V25_CLOUD_BOOTSTRAPPED";
-  var DIRTY_KEY="RMC_V25_CLOUD_DIRTY";
-  var SUPPRESS=false, syncTimers={}, syncing=false;
+  var DIRTY_KEY="RMC_V26_CLOUD_DIRTY";
+  var LAST_PULL="RMC_V26_LAST_PULL";
+  var SUPPRESS=false, syncTimers={}, syncing=false, uiTimer=null;
   var KEYS=[
     "RMC_USERS","RMC_SL","RMC_OS","RMC_VISITS","RMC_QUOTATIONS",
     "RMC_OFFICE_WORK","RMC_ATTENDANCE","RMC_ATTENDANCE_STATE",
@@ -4129,26 +4337,57 @@ window.addEventListener('storage',function(e){
   function rawLocal(k){try{return localStorage.getItem(k);}catch(e){return null;}}
   function dirtyMap(){var x=parse(rawLocal(DIRTY_KEY));return x&&typeof x==='object'&&!Array.isArray(x)?x:{};}
   function markDirty(k){if(SUPPRESS||!KEYSET[k])return;try{var d=dirtyMap();d[k]=Date.now();localStorage.setItem(DIRTY_KEY,JSON.stringify(d));}catch(e){}}
+  function clearDirty(k){try{var d=dirtyMap();delete d[k];localStorage.setItem(DIRTY_KEY,JSON.stringify(d));}catch(e){}}
+  function recKey(x){
+    if(x==null||typeof x!=='object')return null;
+    if(x.id!=null && x.id!=="")return "id:"+String(x.id);
+    if(x.record_key)return "rk:"+String(x.record_key);
+    if(x.cloudKey)return "ck:"+String(x.cloudKey);
+    if(x.uid)return "uid:"+String(x.uid);
+    if(x.key)return "kk:"+String(x.key);
+    return null;
+  }
+  // CLOUD-FIRST array merge: cloud wins per record; local-only records kept & pushed.
   function mergeArray(local,cloud){
-    if(!Array.isArray(local)||!Array.isArray(cloud))return null;
+    if(!Array.isArray(local))local=[];
+    if(!Array.isArray(cloud))cloud=[];
     var out=[],idx={};
-    function key(x){
-      if(x&&x.id!=null)return "id:"+String(x.id);
-      if(x&&x.record_key)return "rk:"+String(x.record_key);
-      if(x&&x.cloudKey)return "ck:"+String(x.cloudKey);
-      return null;
-    }
-    local.forEach(function(x){var k=key(x);if(k){idx[k]=out.length;}out.push(x);});
-    cloud.forEach(function(x){var k=key(x);if(k&&idx[k]!=null){out[idx[k]]=Object.assign({},out[idx[k]],x);}else{out.push(x);if(k)idx[k]=out.length-1;}});
+    // Seed with cloud first (authoritative)
+    cloud.forEach(function(x){
+      var k=recKey(x);
+      if(k){idx[k]=out.length;out.push(x);}
+      else out.push(x);
+    });
+    // Add local-only records that cloud doesn't have
+    local.forEach(function(x){
+      var k=recKey(x);
+      if(k==null){out.push(x);return;}
+      if(idx[k]==null){idx[k]=out.length;out.push(x);}
+      // If key exists in both, cloud copy stays (already in out)
+    });
     return out;
   }
-  function mergeValue(local,cloud){
-    if(Array.isArray(local)&&Array.isArray(cloud))return mergeArray(local,cloud)||local;
-    if(local&&typeof local==='object'&&cloud&&typeof cloud==='object'&&!Array.isArray(local)&&!Array.isArray(cloud))return Object.assign({},cloud,local);
-    return (local!==null&&local!==undefined&&local!=="")?local:cloud;
+  // CLOUD-FIRST object merge: cloud wins per property; local-only props preserved.
+  function mergeObject(local,cloud){
+    if(local && typeof local==='object' && !Array.isArray(local)){
+      if(cloud && typeof cloud==='object' && !Array.isArray(cloud)){
+        return Object.assign({}, local, cloud);
+      }
+      return local;
+    }
+    return cloud;
+  }
+  function mergeValue(local,cloud,localIsNewer){
+    if(Array.isArray(local)||Array.isArray(cloud))return mergeArray(local,cloud);
+    if((local&&typeof local==='object')||(cloud&&typeof cloud==='object')){
+      // For objects: if local is dirty (newer) let local win, else cloud wins.
+      return localIsNewer?Object.assign({},cloud||{},local||{}):mergeObject(local,cloud);
+    }
+    if(localIsNewer)return (local!==undefined&&local!==null&&local!=="")?local:cloud;
+    return (cloud!==undefined&&cloud!==null)?cloud:local;
   }
   async function getRows(){
-    var r=await fetch(CLOUD_URL+"/rest/v1/"+CLOUD_TABLE+"?select=state_key,state,updated_at",{headers:headers()});
+    var r=await fetch(CLOUD_URL+"/rest/v1/"+CLOUD_TABLE+"?select=state_key,state,updated_at",{headers:headers(),cache:"no-store"});
     if(!r.ok)throw new Error("Cloud read "+r.status);
     return await r.json();
   }
@@ -4157,72 +4396,10 @@ window.addEventListener('storage',function(e){
     var r=await fetch(CLOUD_URL+"/rest/v1/"+CLOUD_TABLE+"?on_conflict=state_key",{method:"POST",headers:headers({Prefer:"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(body)});
     if(!r.ok){var t=await r.text();throw new Error("Cloud save "+k+" "+r.status+" "+t.slice(0,160));}
   }
-  async function saveKey(k){
-    if(!KEYSET[k])return false;
-    var raw=rawLocal(k);if(raw===null)return false;
-    var val=parse(raw);if(val===null)return false;
-    try{
-      /* Merge array/object data with the cloud copy before writing. This prevents
-         a device with older local data from wiping newer cloud records. */
-      var rows=await getRows();
-      var row=rows.filter(function(x){return x.state_key===k;})[0];
-      var merged=row?mergeValue(val,row.state):val;
-      SUPPRESS=true;try{localStorage.setItem(k,JSON.stringify(merged));}finally{SUPPRESS=false;}
-      await putKey(k,merged);
-      return true;
-    }catch(e){console.error("SHREE SHYAM CLOUD SAVE",k,e);return false;}
-  }
-  async function pullAll(){
-    var rows=await getRows(), by={};rows.forEach(function(r){by[r.state_key]=r;});
-    var dirty=dirtyMap();
-    SUPPRESS=true;
-    try{
-      for(var i=0;i<KEYS.length;i++){
-        var k=KEYS[i],row=by[k],local=parse(rawLocal(k));
-        if(!row){
-          if(local!==null){try{await putKey(k,local);}catch(e){console.warn("Initial cloud upload failed",k,e);}}
-          continue;
-        }
-        var cloudTime=new Date(row.updated_at||0).getTime()||0;
-        var localDirty=Number(dirty[k]||0);
-        if(localDirty>cloudTime){
-          /* local is newer: merge first, then wait for the confirmed cloud write. */
-          var merged=mergeValue(local,row.state);
-          localStorage.setItem(k,JSON.stringify(merged));
-          try{await putKey(k,merged);}catch(e){console.warn("Dirty upload failed",k,e);}
-        }else{
-          var merged2=mergeValue(local,row.state);
-          localStorage.setItem(k,JSON.stringify(merged2));
-        }
-      }
-      localStorage.setItem(DIRTY_KEY,JSON.stringify({}));
-      localStorage.setItem("RMC_V25_CLOUD_LAST_PULL",new Date().toISOString());
-    }finally{SUPPRESS=false;}
-    return true;
-  }
-  async function bootstrap(){
-    if(syncing)return;syncing=true;
-    try{
-      var rows=await getRows(), hasCloud=rows.some(function(r){return KEYSET[r.state_key];});
-      if(!localStorage.getItem(BOOT_KEY)){
-        /* First V25 run: merge the current device's data with cloud instead of
-           replacing either side. This is the critical no-data-loss migration. */
-        var by={};rows.forEach(function(r){by[r.state_key]=r;});
-        SUPPRESS=true;
-        try{
-          for(var i=0;i<KEYS.length;i++){
-            var k=KEYS[i],local=parse(rawLocal(k)),row=by[k],merged;
-            if(row) merged=mergeValue(local,row.state);
-            else merged=local;
-            if(merged!==null&&merged!==undefined){localStorage.setItem(k,JSON.stringify(merged));await putKey(k,merged);}
-          }
-          localStorage.setItem(BOOT_KEY,"DONE");
-          localStorage.setItem(DIRTY_KEY,"{}");
-        }finally{SUPPRESS=false;}
-      }else{
-        await pullAll();
-      }
-      window.RMC_CLOUD_READY=true;
+  function scheduleUIRefresh(){
+    if(uiTimer)return;
+    uiTimer=setTimeout(function(){
+      uiTimer=null;
       try{
         if(typeof ssLoadCore==='function')ssLoadCore();
         if(typeof loadUsers==='function')loadUsers();
@@ -4234,39 +4411,1300 @@ window.addEventListener('storage',function(e){
         if(typeof rStats==='function')rStats();
         if(typeof rStg==='function')rStg();
         if(typeof rOS==='function')rOS();
+        if(typeof applyF==='function')applyF();
         if(typeof masterRenderAll==='function')masterRenderAll();
-      }catch(e){console.warn("Cloud UI refresh failed",e);}
-    }catch(e){console.warn("SHREE SHYAM V25 cloud bootstrap unavailable",e);}
+        if(typeof renderAdminReportCentre==='function')renderAdminReportCentre();
+        if(typeof window.ssCloudRefreshVisits==='function')window.ssCloudRefreshVisits();
+      }catch(e){console.warn("V26 UI refresh failed",e);}
+    },120);
+  }
+  async function saveKey(k){
+    if(!KEYSET[k])return false;
+    var raw=rawLocal(k);if(raw===null)return false;
+    var val=parse(raw);if(val===null)return false;
+    try{
+      var rows=await getRows();
+      var row=rows.filter(function(x){return x.state_key===k;})[0];
+      // Local was just modified => localIsNewer=true.
+      var merged=row?mergeValue(val,row.state,true):val;
+      SUPPRESS=true;try{localStorage.setItem(k,JSON.stringify(merged));}finally{SUPPRESS=false;}
+      await putKey(k,merged);
+      clearDirty(k);
+      return true;
+    }catch(e){console.error("V26 CLOUD SAVE",k,e);return false;}
+  }
+  async function pullAll(silent){
+    if(syncing)return false;syncing=true;
+    var changed=false;
+    try{
+      var rows=await getRows(), by={};rows.forEach(function(r){by[r.state_key]=r;});
+      var dirty=dirtyMap();
+      SUPPRESS=true;
+      try{
+        for(var i=0;i<KEYS.length;i++){
+          var k=KEYS[i],row=by[k],local=parse(rawLocal(k));
+          if(!row){
+            // Cloud has nothing yet for this key: seed cloud with local if we have anything.
+            if(local!==null){try{await putKey(k,local);}catch(e){console.warn("V26 seed failed",k,e);}}
+            continue;
+          }
+          var cloudTime=new Date(row.updated_at||0).getTime()||0;
+          var localDirty=Number(dirty[k]||0);
+          var localIsNewer = localDirty>cloudTime;
+          var merged = mergeValue(local, row.state, localIsNewer);
+          var prev = rawLocal(k);
+          var next = JSON.stringify(merged);
+          if(prev!==next){localStorage.setItem(k,next);changed=true;}
+          if(localIsNewer){
+            try{await putKey(k,merged);clearDirty(k);}catch(e){console.warn("V26 dirty upload failed",k,e);}
+          }
+        }
+        localStorage.setItem(LAST_PULL,new Date().toISOString());
+      }finally{SUPPRESS=false;}
+      if(changed && !silent)scheduleUIRefresh();
+      window.RMC_CLOUD_READY=true;
+      return true;
+    }catch(e){console.warn("V26 cloud pull unavailable",e);return false;}
     finally{syncing=false;}
   }
   function schedule(k){
     if(!KEYSET[k]||SUPPRESS)return;
     clearTimeout(syncTimers[k]);
-    syncTimers[k]=setTimeout(function(){saveKey(k);},900);
+    syncTimers[k]=setTimeout(function(){saveKey(k);},600);
   }
-  /* Watch every important local save made by the existing application. */
+  // Watch every localStorage write so any staff action fans out to Supabase.
   try{
     var origSet=Storage.prototype.setItem;
     Storage.prototype.setItem=function(k,v){
       var r=origSet.apply(this,arguments);
-      if(this===localStorage&&KEYSET[k])markDirty(k),schedule(k);
+      if(this===localStorage&&KEYSET[k]){markDirty(k);schedule(k);}
       return r;
     };
-  }catch(e){console.warn("Storage cloud watcher unavailable",e);}
-  window.ssCloudSyncAllV25=async function(){
-    if(syncing)return false;syncing=true;
-    try{await pullAll();return true;}catch(e){console.warn("Manual cloud sync failed",e);return false;}finally{syncing=false;}
-  };
+  }catch(e){console.warn("V26 storage watcher unavailable",e);}
+  window.ssCloudSyncAllV25=async function(){return await pullAll(false);};
+  window.ssCloudSyncAllV26=async function(){return await pullAll(false);};
   window.ssCloudSaveAllV25=async function(){
     if(syncing)return false;syncing=true;
-    try{for(var i=0;i<KEYS.length;i++)await saveKey(KEYS[i]);return true;}catch(e){return false;}finally{syncing=false;}
+    try{for(var i=0;i<KEYS.length;i++)await saveKey(KEYS[i]);return true;}
+    catch(e){return false;}finally{syncing=false;}
   };
-  /* Refresh every 20 seconds so Admin and staff on separate devices converge. */
-  setInterval(function(){if(document.visibilityState!=="hidden"&&!syncing)window.ssCloudSyncAllV25();},20000);
-  /* Run after the original application has declared all arrays/functions. */
-  setTimeout(bootstrap,1200);
+  window.ssCloudForceRefresh=function(){return pullAll(false);};
+  // Boot: always pull cloud state first (cloud is authoritative for cross-device sync).
+  setTimeout(function(){pullAll(false).then(function(){scheduleUIRefresh();});},900);
+  // Periodic sync (fast enough for realtime feel, not so fast to hammer Supabase).
+  setInterval(function(){if(document.visibilityState!=="hidden"&&!syncing)pullAll(false);},8000);
+  // Immediate resync when the tab becomes visible again.
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')pullAll(false);});
+  window.addEventListener('online',function(){pullAll(false);});
 })();
 </script>
 
+
+<script>
+/* =========================================================
+   SHREE SHYAM V27 — Cloud Pill + Realtime Push + Offline Queue
+   ========================================================= */
+(function(){
+  var CLOUD_URL="https://xihbqwhsqlpgrysttwth.supabase.co";
+  var CLOUD_KEY="sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
+  var QUEUE_KEY="RMC_V26_QUEUE";
+  function loadQ(){try{var x=JSON.parse(localStorage.getItem(QUEUE_KEY)||"[]");return Array.isArray(x)?x:[];}catch(e){return[];}}
+  function saveQ(q){try{localStorage.setItem(QUEUE_KEY,JSON.stringify(q||[]));}catch(e){}}
+  function enqueue(item){var q=loadQ();q.push(Object.assign({ts:Date.now()},item));saveQ(q);updatePill();}
+  function pill(){return document.getElementById('ssCloudPill');}
+  function updatePill(msg,color){
+    var p=pill();if(!p)return;
+    if(msg){p.textContent=msg;if(color)p.style.background=color;return;}
+    var q=loadQ();
+    if(!navigator.onLine){p.textContent='☁ Offline ('+q.length+' queued)';p.style.background='#b45309';}
+    else if(q.length){p.textContent='☁ Uploading ('+q.length+')';p.style.background='#0369a1';}
+    else if(window.__ssRealtime){p.textContent='☁ Live sync';p.style.background='#0f766e';}
+    else{p.textContent='☁ Cloud ready';p.style.background='#0f766e';}
+  }
+  function ensurePill(){
+    if(pill())return;
+    var d=document.createElement('div');
+    d.id='ssCloudPill';
+    d.style.cssText='position:fixed;right:10px;bottom:10px;z-index:99999;background:#0f766e;color:#fff;padding:6px 10px;border-radius:999px;font:600 12px system-ui,Arial;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;user-select:none;';
+    d.title='Click to force-sync now';
+    d.onclick=function(){
+      updatePill('☁ Syncing…','#0369a1');
+      Promise.resolve(window.ssCloudForceRefresh?window.ssCloudForceRefresh():null)
+        .then(function(){return drain();})
+        .then(function(){updatePill('☁ Synced '+new Date().toLocaleTimeString(),'#0f766e');})
+        .catch(function(){updatePill('☁ Sync failed','#b91c1c');});
+    };
+    document.body.appendChild(d);
+    updatePill();
+  }
+
+  /* ---------- Offline queue ---------- */
+  async function attempt(item){
+    var res;
+    if(item.kind==='visit'){
+      res=await fetch(CLOUD_URL+"/rest/v1/sales_visit_entries?on_conflict=record_key",
+        {method:"POST",headers:{apikey:CLOUD_KEY,Authorization:"Bearer "+CLOUD_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(item.body)});
+    }else if(item.kind==='state'){
+      res=await fetch(CLOUD_URL+"/rest/v1/erp_cloud_state?on_conflict=state_key",
+        {method:"POST",headers:{apikey:CLOUD_KEY,Authorization:"Bearer "+CLOUD_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(item.body)});
+    }
+    return !!(res&&res.ok);
+  }
+  var draining=false;
+  async function drain(){
+    if(draining)return;draining=true;updatePill();
+    try{
+      var q=loadQ();
+      while(q.length && navigator.onLine){
+        var ok=false;try{ok=await attempt(q[0]);}catch(e){ok=false;}
+        if(!ok)break;
+        q.shift();saveQ(q);updatePill();
+      }
+    }finally{draining=false;updatePill();}
+  }
+  function cleanVisitBody(v){
+    return {record_key:"visit:"+String(v&&v.id!=null?v.id:""),id:Number(v.id),sp:String(v.sp||""),vd:String(v.vd||new Date().toISOString().slice(0,10)),cu:String(v.cu||""),cc:String(v.cc||""),co:String(v.co||""),cc2:String(v.cc2||""),si:String(v.si||""),sa:String(v.sa||""),ar:String(v.ar||""),gr:String(v.gr||""),rd:v.rd?String(v.rd):null,rm:String(v.rm||""),updated_by:(window.CU&&window.CU.name)||"local",updated_at:new Date().toISOString()};
+  }
+  /* Wrap the sales visit save to queue on offline/failure */
+  function wrapVisitSave(){
+    if(typeof window.ssCloudSaveVisit!=='function')return setTimeout(wrapVisitSave,300);
+    if(window.ssCloudSaveVisit.__ssWrapped)return;
+    var orig=window.ssCloudSaveVisit;
+    window.ssCloudSaveVisit=async function(v){
+      if(!navigator.onLine){enqueue({kind:'visit',body:cleanVisitBody(v)});return true;}
+      var ok=false;try{ok=await orig(v);}catch(e){ok=false;}
+      if(!ok){enqueue({kind:'visit',body:cleanVisitBody(v)});}
+      return true;
+    };
+    window.ssCloudSaveVisit.__ssWrapped=true;
+  }
+  wrapVisitSave();
+  window.ssOfflineEnqueueVisit=function(v){enqueue({kind:'visit',body:cleanVisitBody(v)});};
+  window.ssOfflineEnqueueState=function(k,val){enqueue({kind:'state',body:{state_key:k,state:val,updated_at:new Date().toISOString()}});};
+  window.ssOfflineDrain=drain;
+  window.addEventListener('online',function(){updatePill();drain();});
+  window.addEventListener('offline',function(){updatePill();});
+  setInterval(function(){updatePill();if(navigator.onLine)drain();},7000);
+
+  /* ---------- Realtime push ---------- */
+  function loadSupabaseJS(cb){
+    if(window.supabase&&window.supabase.createClient)return cb();
+    var s=document.createElement('script');
+    s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
+    s.onload=cb;
+    s.onerror=function(){console.warn("Supabase JS load failed");};
+    document.head.appendChild(s);
+  }
+  function startRealtime(){
+    try{
+      var client=window.supabase.createClient(CLOUD_URL,CLOUD_KEY,{auth:{persistSession:false},realtime:{params:{eventsPerSecond:5}}});
+      var ch=client.channel('ss-erp-live')
+        .on('postgres_changes',{event:'*',schema:'public',table:'erp_cloud_state'},function(payload){
+          try{
+            var row=payload.new||payload.old;
+            if(row&&row.state_key){
+              try{localStorage.setItem(row.state_key,JSON.stringify(row.state));}catch(e){}
+              if(typeof window.ssCloudForceRefresh==='function')window.ssCloudForceRefresh();
+            }
+          }catch(e){}
+        })
+        .on('postgres_changes',{event:'*',schema:'public',table:'sales_visit_entries'},function(){
+          try{
+            if(typeof window.ssCloudRefreshVisits==='function'){
+              window.ssCloudRefreshVisits().then(function(){
+                try{if(typeof applyF==='function')applyF();if(typeof rStats==='function')rStats();if(typeof rWL==='function')rWL();}catch(e){}
+              });
+            }
+          }catch(e){}
+        })
+        .subscribe(function(status){
+          if(status==='SUBSCRIBED'){window.__ssRealtime=true;updatePill();}
+          else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){window.__ssRealtime=false;updatePill();}
+        });
+      window.ssRealtimeChannel=ch;
+    }catch(e){console.warn("Realtime init failed",e);}
+  }
+  function boot(){
+    ensurePill();
+    updatePill();
+    if(navigator.onLine)drain();
+    loadSupabaseJS(startRealtime);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   SHREE SHYAM V28 — WhatsApp Share + In-App Push + Daily Report
+   ========================================================= */
+(function(){
+  function isAdmin(){return window.CU&&(window.CU.accountKind==='admin'||window.CU.accountKind==='master');}
+
+  // ================= WhatsApp Share =================
+  window.ssWhatsAppShareVisit=function(v){
+    if(!v)return;
+    var phone=String(v.cc||'').replace(/[^0-9]/g,'');
+    if(!phone){alert('No customer mobile number on this visit');return;}
+    if(phone.length===10)phone='91'+phone;
+    var lines=[
+      'SHREE SHYAM READY MIX CONCRETE',
+      '',
+      'Namaste '+(v.co||'Sir/Madam')+',',
+      '',
+      'Site visit summary:',
+      '- Site: '+(v.si||'-'),
+      '- Area: '+(v.ar||'-'),
+      '- Grade: '+(v.gr||'-'),
+      '- Status: '+(v.sa||'-'),
+      v.rm?('- Notes: '+v.rm):null,
+      '',
+      'For quotation or delivery, please reply here.',
+      '- Sales Team'
+    ].filter(Boolean).join('\n');
+    var url='https://wa.me/'+phone+'?text='+encodeURIComponent(lines);
+    window.open(url,'_blank');
+  };
+  function injectRowShareButtons(){
+    try{
+      var visits=Array.isArray(window.R)?window.R:[];
+      if(!visits.length)return;
+      var byMobile={}; visits.forEach(function(v){if(v.cc)byMobile[String(v.cc).replace(/[^0-9]/g,'').slice(-10)]=v;});
+      document.querySelectorAll('table tbody tr:not([data-wa-share])').forEach(function(tr){
+        var text=tr.innerText||'';
+        var m=text.match(/\b([6-9]\d{9})\b/);
+        if(!m)return;
+        var v=byMobile[m[1]]; if(!v)return;
+        tr.setAttribute('data-wa-share','1');
+        var td=tr.querySelector('td:last-child'); if(!td)return;
+        var btn=document.createElement('button');
+        btn.type='button'; btn.title='Share on WhatsApp'; btn.textContent='WhatsApp';
+        btn.style.cssText='margin-left:4px;padding:3px 9px;background:#25D366;color:#fff;border:0;border-radius:6px;cursor:pointer;font:700 11px system-ui;';
+        btn.onclick=function(e){e.stopPropagation();e.preventDefault();window.ssWhatsAppShareVisit(v);};
+        td.appendChild(btn);
+      });
+    }catch(e){}
+  }
+  setInterval(injectRowShareButtons,1500);
+  setTimeout(injectRowShareButtons,1400);
+
+  // ================= In-App Push Notifications =================
+  var seenIds={}, notifReady=false;
+  function askNotif(){
+    if(!('Notification' in window))return;
+    if(Notification.permission==='granted'){notifReady=true;return;}
+    if(Notification.permission==='denied')return;
+    var poll=setInterval(function(){
+      if(isAdmin()){
+        clearInterval(poll);
+        setTimeout(function(){
+          Notification.requestPermission().then(function(p){notifReady=(p==='granted');});
+        },1200);
+      }
+    },1500);
+  }
+  askNotif();
+  function notify(title,body){
+    if(!notifReady||!isAdmin())return;
+    try{
+      var n=new Notification(title,{body:body,tag:'ss-'+Date.now()});
+      n.onclick=function(){window.focus();n.close();};
+      setTimeout(function(){try{n.close();}catch(e){}},9000);
+    }catch(e){}
+  }
+  setTimeout(function(){(window.R||[]).forEach(function(v){seenIds[String(v.id)]=1;});},3000);
+  setInterval(function(){
+    if(!isAdmin())return;
+    (window.R||[]).forEach(function(v){
+      var id=String(v.id||''); if(!id||seenIds[id])return;
+      seenIds[id]=1;
+      var s=(String(v.rm||'')+' '+String(v.sa||'')+' '+String(v.co||'')).toLowerCase();
+      var urgent=/urgent|delay|complaint|critical|escalat|priority/.test(s);
+      var title=urgent?'URGENT: '+(v.co||v.cu||'New visit'):'New Sales Visit';
+      var body='Staff:'+(v.sp||'-')+' | Site:'+(v.si||'-')+' | Grade:'+(v.gr||'-')+(v.rm?(' | '+String(v.rm).slice(0,60)):'');
+      notify(title,body);
+    });
+  },3000);
+  window.ssTestNotification=function(){notifReady=true;notify('Shree Shyam Test','This is a test admin notification');};
+
+  // ================= Manual Daily Report =================
+  function todayISO(){return new Date().toISOString().slice(0,10);}
+  window.ssBuildDailyReport=function(date){
+    date=date||todayISO();
+    function onDate(x,f){return String((x&&(x[f||'vd']||x.date||x.d))||'').slice(0,10)===date;}
+    var visits=(window.R||[]).filter(function(v){return onDate(v,'vd');});
+    var wl=(window.WL||[]).filter(function(w){return onDate(w);});
+    var att=(window.AT||[]).filter(function(a){return onDate(a);});
+    var qt=(window.QT||[]).filter(function(q){return onDate(q,'qd');});
+    var lines=[];
+    lines.push('SHREE SHYAM RMC - DAILY REPORT '+date);
+    lines.push('================================================');
+    lines.push('');
+    lines.push('SALES VISITS ('+visits.length+')');
+    lines.push('------------------------------------------------');
+    if(!visits.length)lines.push('  (none)');
+    visits.forEach(function(v,i){
+      lines.push((i+1)+'. '+(v.co||v.cu||'?')+' | '+(v.cc||'')+' | Staff:'+(v.sp||'-')+' | Grade:'+(v.gr||'-')+' | '+(v.sa||''));
+      if(v.rm)lines.push('   Notes: '+v.rm);
+    });
+    lines.push('');
+    lines.push('OFFICE / DELAY WORK ('+wl.length+')');
+    lines.push('------------------------------------------------');
+    if(!wl.length)lines.push('  (none)');
+    wl.forEach(function(w,i){lines.push((i+1)+'. '+(w.title||w.task||w.desc||w.note||JSON.stringify(w).slice(0,120)));});
+    lines.push('');
+    lines.push('QUOTATIONS ('+qt.length+')');
+    lines.push('------------------------------------------------');
+    if(!qt.length)lines.push('  (none)');
+    qt.forEach(function(q,i){lines.push((i+1)+'. '+(q.cust||q.co||q.customer||'?')+' | '+(q.amt||q.amount||'')+' | '+(q.status||''));});
+    lines.push('');
+    lines.push('ATTENDANCE ('+att.length+')');
+    lines.push('------------------------------------------------');
+    if(!att.length)lines.push('  (none)');
+    att.forEach(function(a){lines.push('  '+(a.name||a.uname||'?')+' - '+(a.status||a.st||'?'));});
+    lines.push('');
+    lines.push('Generated at '+new Date().toLocaleString());
+    lines.push('Open ERP: '+location.origin+'/');
+    return lines.join('\n');
+  };
+  window.ssSendDailyReport=function(date){
+    var body=window.ssBuildDailyReport(date||todayISO());
+    var subject='Shree Shyam Daily Report - '+(date||todayISO());
+    try{navigator.clipboard&&navigator.clipboard.writeText(body);}catch(e){}
+    var m=document.createElement('div');
+    m.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    var esc=body.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});
+    m.innerHTML='<div style="background:#fff;max-width:720px;width:100%;max-height:92vh;overflow:auto;border-radius:10px;padding:18px;font:14px system-ui,Arial;color:#111"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="margin:0">Daily Report - '+(date||todayISO())+'</h3><button id="ssRepClose" style="background:#e11d48;color:#fff;padding:6px 12px;border:0;border-radius:6px;cursor:pointer;font:700 12px system-ui">Close</button></div><p style="color:#0f766e;margin:6px 0">Copied to clipboard. Choose delivery:</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><button id="ssRepEmail" style="background:#0369a1;color:#fff;padding:8px 14px;border:0;border-radius:6px;cursor:pointer;font:700 13px system-ui">Open in Email</button><button id="ssRepWa" style="background:#25D366;color:#fff;padding:8px 14px;border:0;border-radius:6px;cursor:pointer;font:700 13px system-ui">Share on WhatsApp</button><button id="ssRepCopy" style="background:#334155;color:#fff;padding:8px 14px;border:0;border-radius:6px;cursor:pointer;font:700 13px system-ui">Copy Again</button></div><pre style="background:#f4f4f5;padding:12px;border-radius:8px;white-space:pre-wrap;font:12px monospace;border:1px solid #e5e7eb">'+esc+'</pre></div>';
+    document.body.appendChild(m);
+    m.querySelector('#ssRepClose').onclick=function(){m.remove();};
+    m.querySelector('#ssRepEmail').onclick=function(){window.open('mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body),'_blank');};
+    m.querySelector('#ssRepWa').onclick=function(){window.open('https://wa.me/?text='+encodeURIComponent(subject+'\n\n'+body),'_blank');};
+    m.querySelector('#ssRepCopy').onclick=function(){try{navigator.clipboard.writeText(body);}catch(e){}};
+  };
+  function ensureReportBtn(){
+    if(!isAdmin()){var ex=document.getElementById('ssDailyBtn');if(ex)ex.remove();return;}
+    if(document.getElementById('ssDailyBtn'))return;
+    var b=document.createElement('button');
+    b.id='ssDailyBtn';
+    b.textContent='Daily Report';
+    b.style.cssText='position:fixed;right:10px;bottom:52px;z-index:99999;background:#7c3aed;color:#fff;padding:8px 12px;border-radius:999px;font:700 12px system-ui,Arial;border:0;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15);';
+    b.onclick=function(){window.ssSendDailyReport();};
+    document.body.appendChild(b);
+  }
+  setInterval(ensureReportBtn,2000);
+  setTimeout(ensureReportBtn,1500);
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   SHREE SHYAM V29 — Branded PDF on WhatsApp (Visit / Quotation / Daily Report)
+   - Mobile: native share sheet attaches the real PDF in WhatsApp.
+   - Desktop/fallback: PDF uploaded to /api/pdf, WhatsApp message carries the link.
+   ========================================================= */
+(function(){
+  var BRAND_NAME='SHREE SHYAM CONSTRUCTION', BRAND_SUB='Ready Mix Concrete (RMC) Supplier', BC=[145,16,39];
+  var BRAND_ADDR1='V.P.O. Sohti, Main Nahra-Nahri Road, IMT Kharkhoda,', BRAND_ADDR2='Sonipat, Haryana 131402 (Near Minda Plant)';
+  window.SS_BRAND={name:BRAND_NAME,sub:BRAND_SUB,addr1:BRAND_ADDR1,addr2:BRAND_ADDR2,color:BC};
+  var LOGO=null;
+  function logo(){
+    if(LOGO!==null)return LOGO;
+    try{
+      var img=document.querySelector('.login-logo img')||document.querySelector('.hl img')||document.querySelector('img[src^="data:image"]');
+      var src=img&&img.getAttribute('src')||'';
+      LOGO=/^data:image\/(jpeg|jpg|png)/i.test(src)?src:'';
+    }catch(e){LOGO='';}
+    return LOGO;
+  }
+  function T(msg,type){try{if(typeof toast==='function')toast(msg,type);}catch(e){}}
+  function fdate(d){try{return typeof fd==='function'?fd(d):String(d||'-');}catch(e){return String(d||'-');}}
+  function ready(){return !!(window.jspdf&&window.jspdf.jsPDF);}
+  function inr(n){return Number(n||0).toLocaleString('en-IN');}
+  /* Branded header: logo + company name + address block + document title. Returns content start Y. */
+  function header(doc,title,landscape){
+    var W=landscape?297:210;
+    doc.setFillColor(11,31,58);doc.rect(0,0,W,34,'F');
+    doc.setFillColor(BC[0],BC[1],BC[2]);doc.rect(0,34,W,1.8,'F');
+    doc.setFillColor(245,179,53);doc.rect(0,35.8,W,.6,'F');
+    var lg=logo(),x=14;
+    if(lg){try{doc.setFillColor(255,255,255);doc.roundedRect(12,5,24,24,2,2,'F');doc.addImage(lg,lg.indexOf('image/png')>=0?'PNG':'JPEG',13,6,22,22);x=42;}catch(e){x=14;}}
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text(BRAND_NAME,x,13);
+    doc.setFontSize(8.5);doc.setFont('helvetica','normal');doc.setTextColor(245,179,53);doc.text(BRAND_SUB,x,18.5);
+    doc.setFontSize(7.2);doc.setTextColor(210,220,235);doc.text(BRAND_ADDR1,x,24);doc.text(BRAND_ADDR2,x,28);
+    doc.setFontSize(12.5);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);doc.text(title,W-14,14,{align:'right'});
+    doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(210,220,235);doc.text('Date: '+new Date().toLocaleDateString('en-IN'),W-14,20,{align:'right'});
+    doc.text('Generated: '+new Date().toLocaleTimeString('en-IN'),W-14,24.5,{align:'right'});
+    doc.setTextColor(0,0,0);
+    return 42;
+  }
+  window.ssPdfBrandHeader=header;
+  function footer(doc){
+    var h=doc.internal.pageSize.getHeight();
+    doc.setDrawColor(BC[0],BC[1],BC[2]);doc.setLineWidth(.5);doc.line(14,h-18,196,h-18);
+    doc.setFontSize(8);doc.setTextColor(100);
+    doc.text('Thank you for choosing Shree Shyam Construction. For orders & queries, reply on WhatsApp.',14,h-12);
+    doc.text(BRAND_ADDR1+' '+BRAND_ADDR2,14,h-7);
+    doc.text('Generated: '+new Date().toLocaleString('en-IN'),196,h-7,{align:'right'});
+    doc.setTextColor(0);
+  }
+  function kv(doc,rows,startY){
+    doc.autoTable({body:rows,startY:startY,theme:'grid',styles:{fontSize:10,cellPadding:3},columnStyles:{0:{fontStyle:'bold',fillColor:[253,242,242],cellWidth:55}},margin:{left:14,right:14}});
+    return doc.lastAutoTable.finalY;
+  }
+  window.ssBuildVisitPDF=function(r){
+    if(!ready())throw new Error('PDF library not loaded');
+    var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+    header(doc,'SITE VISIT REPORT');
+    doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(11,31,58);doc.text('Visit #'+r.id+'   |   '+fdate(r.vd),14,44);doc.setTextColor(0,0,0);
+    var y=kv(doc,[
+      ['Salesperson',r.sp||'-'],['Visit Date',fdate(r.vd)],
+      ['Customer',(r.cu&&r.cu!=='NA')?r.cu:'-'],['Customer Mobile',(r.cc&&r.cc!=='NA')?r.cc:'-'],
+      ['Contractor',r.co||'-'],['Contractor Mobile',r.cc2||'-'],
+      ['Site',r.si||'-'],['Site Address',r.sa||'-'],
+      ['Area (sqft)',r.ar?inr(r.ar):'-'],['Concrete Grade',(r.gr&&r.gr!=='NA')?r.gr:'-'],
+      ['Required Date',r.rd?fdate(r.rd):'-']
+    ],48);
+    doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('Remarks',14,y+10);
+    doc.setFont('helvetica','normal');doc.setFontSize(10);
+    doc.text(doc.splitTextToSize(r.rm||'-',180),14,y+16);
+    footer(doc);
+    return doc;
+  };
+  window.ssBuildQuotationPDF=function(q){
+    if(!ready())throw new Error('PDF library not loaded');
+    var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+    header(doc,'QUOTATION');
+    doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(11,31,58);doc.text('Quotation #Q-'+q.id+'   |   '+fdate(q.dt),14,44);doc.setTextColor(0,0,0);
+    var y=kv(doc,[['Customer',q.cu||'-'],['Contact',q.cn||'-'],['Contractor',q.co||'-'],['Site',q.si||'-'],['Valid Till',fdate(q.vt)],['Status',q.sts||'-']],48);
+    doc.autoTable({
+      head:[['#','Description','Grade','Qty (m3)','Rate (Rs/m3)','Amount (Rs)']],
+      body:[['1','Ready Mix Concrete supply at site',q.gr||'-',String(q.qty||0),inr(q.rate),inr(q.total)]],
+      foot:[['','','','','TOTAL','Rs. '+inr(q.total)]],
+      startY:y+8,theme:'striped',headStyles:{fillColor:BC},footStyles:{fillColor:[253,242,242],textColor:BC,fontStyle:'bold'},styles:{fontSize:10},margin:{left:14,right:14}
+    });
+    var y2=doc.lastAutoTable.finalY;
+    if(q.nt){var nl=doc.splitTextToSize(q.nt,180);doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('Notes',14,y2+10);doc.setFont('helvetica','normal');doc.text(nl,14,y2+16);y2+=12+nl.length*5;}
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text('Terms & Conditions',14,y2+12);
+    doc.setFont('helvetica','normal');doc.setFontSize(9);
+    doc.text(['1. Rates include transport within city limits; pump charges extra if applicable.','2. GST extra as applicable.','3. Quotation valid till '+fdate(q.vt)+'.','4. Payment terms: as mutually agreed.'],14,y2+18);
+    footer(doc);
+    return doc;
+  };
+  window.ssBuildTextPDF=function(title,text){
+    if(!ready())throw new Error('PDF library not loaded');
+    var doc=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+    header(doc,title);
+    doc.setFont('courier','normal');doc.setFontSize(9);
+    var lines=doc.splitTextToSize(String(text||''),182),y=44,h=doc.internal.pageSize.getHeight();
+    for(var i=0;i<lines.length;i++){if(y>h-24){footer(doc);doc.addPage();header(doc,title);y=44;}doc.text(lines[i],14,y);y+=4.6;}
+    footer(doc);
+    return doc;
+  };
+  function phoneOf(x){var p=String(x||'').replace(/[^0-9]/g,'');if(p.length===10)p='91'+p;return p;}
+  async function uploadPDF(doc,filename,kind,ref){
+    var b64=doc.output('datauristring').split(',')[1];
+    var r=await fetch('/api/pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename:filename,kind:kind,ref:ref,data:b64,created_by:(window.CU&&window.CU.name)||''})});
+    if(!r.ok)throw new Error('upload '+r.status);
+    return await r.json();
+  }
+  /* Core: share a jsPDF doc on WhatsApp. */
+  window.ssSharePDF=async function(doc,filename,phone,caption,kind,ref){
+    var blob=doc.output('blob');
+    // 1) Native share sheet (Android/iOS) => real PDF attachment in WhatsApp
+    if(navigator.share&&navigator.canShare&&window.File){
+      try{
+        var file=new File([blob],filename,{type:'application/pdf'});
+        if(navigator.canShare({files:[file]})){
+          await navigator.share({files:[file],title:filename,text:caption});
+          T('PDF shared','success');return true;
+        }
+      }catch(e){if(e&&e.name==='AbortError'){return false;}}
+    }
+    // 2) Desktop / unsupported => upload PDF, send WhatsApp message with link
+    var w=null;try{w=window.open('about:blank','_blank');}catch(e){}
+    try{
+      T('Preparing PDF link...');
+      var up=await uploadPDF(doc,filename,kind,ref);
+      var msg=caption+'\n\nPDF: '+up.url+'\n\n_Shree Shyam Construction_';
+      var url='https://wa.me/'+(phone||'')+'?text='+encodeURIComponent(msg);
+      if(w&&!w.closed)w.location.href=url;else window.open(url,'_blank');
+      T('PDF link ready - sending on WhatsApp','success');
+      return true;
+    }catch(e){
+      console.warn('ssSharePDF fallback',e);
+      try{doc.save(filename);}catch(_){}
+      var url2='https://wa.me/'+(phone||'')+'?text='+encodeURIComponent(caption);
+      if(w&&!w.closed)w.location.href=url2;else window.open(url2,'_blank');
+      T('PDF downloaded - attach it in WhatsApp manually','error');
+      return false;
+    }
+  };
+  window.ssSendVisitPDF=function(id){
+    var r=(window.R||[]).filter(function(x){return String(x.id)===String(id);})[0];
+    if(!r){T('Visit not found','error');return;}
+    try{
+      var doc=window.ssBuildVisitPDF(r);
+      var cap='*Site Visit Report - Shree Shyam Construction*\nContractor: '+(r.co||'-')+'\nSite: '+(r.si||'-')+(r.gr&&r.gr!=='NA'?'\nGrade: '+r.gr:'')+'\nDate: '+fdate(r.vd);
+      window.ssSharePDF(doc,'Visit_'+(r.co||'Report').replace(/[^a-zA-Z0-9]+/g,'_')+'_'+(r.vd||'')+'.pdf',phoneOf(r.cc||r.cc2),cap,'visit','visit:'+r.id);
+    }catch(e){T('PDF error: '+e.message,'error');}
+  };
+  window.ssSendQtPDF=function(id){
+    var q=(window.QT||[]).filter(function(x){return String(x.id)===String(id);})[0];
+    if(!q){T('Quotation not found','error');return;}
+    try{
+      var doc=window.ssBuildQuotationPDF(q);
+      var cap='*Quotation - Shree Shyam Construction*\nCustomer: '+(q.cu||'-')+'\nGrade: '+(q.gr||'-')+' | Qty: '+(q.qty||0)+' m3\n*Total: Rs. '+inr(q.total)+'*\nValid till: '+fdate(q.vt);
+      window.ssSharePDF(doc,'Quotation_Q'+q.id+'_'+(q.cu||'').replace(/[^a-zA-Z0-9]+/g,'_')+'.pdf',phoneOf(q.cn),cap,'quotation','qt:'+q.id);
+    }catch(e){T('PDF error: '+e.message,'error');}
+  };
+  window.ssSendDailyReportPDF=function(date){
+    try{
+      date=date||new Date().toISOString().slice(0,10);
+      var text=typeof window.ssBuildDailyReport==='function'?window.ssBuildDailyReport(date):'No report';
+      var doc=window.ssBuildTextPDF('DAILY REPORT '+date,text);
+      window.ssSharePDF(doc,'Daily_Report_'+date+'.pdf','', '*Shree Shyam Daily Report - '+date+'*','daily','daily:'+date);
+    }catch(e){T('PDF error: '+e.message,'error');}
+  };
+  /* Inject PDF buttons next to every WhatsApp button (visits, upcoming, quotations). */
+  function mkBtn(title,onclick){
+    var b=document.createElement('button');b.type='button';b.className='ib';b.title=title;b.setAttribute('data-ss-pdf','1');
+    b.innerHTML='&#128196;';b.style.color='#b91c1c';
+    b.onclick=function(e){e.preventDefault();e.stopPropagation();onclick();};
+    return b;
+  }
+  function inject(){
+    try{
+      document.querySelectorAll("button[onclick^='waShare(']:not([data-ss-pdf-done])").forEach(function(b){
+        b.setAttribute('data-ss-pdf-done','1');
+        var m=/waShare\((\d+)\)/.exec(b.getAttribute('onclick')||'');if(!m)return;
+        var id=Number(m[1]);b.parentNode.insertBefore(mkBtn('Send Visit PDF on WhatsApp',function(){window.ssSendVisitPDF(id);}),b.nextSibling);
+      });
+      document.querySelectorAll("button[onclick^='waShareQt(']:not([data-ss-pdf-done])").forEach(function(b){
+        b.setAttribute('data-ss-pdf-done','1');
+        var m=/waShareQt\((\d+)\)/.exec(b.getAttribute('onclick')||'');if(!m)return;
+        var id=Number(m[1]);b.parentNode.insertBefore(mkBtn('Send Quotation PDF on WhatsApp',function(){window.ssSendQtPDF(id);}),b.nextSibling);
+      });
+    }catch(e){}
+  }
+  setInterval(inject,1200);setTimeout(inject,800);
+  /* Add "Share PDF" button into the Daily Report modal */
+  function wrapDaily(){
+    if(typeof window.ssSendDailyReport!=='function')return setTimeout(wrapDaily,400);
+    if(window.ssSendDailyReport.__ssPdf)return;
+    var o=window.ssSendDailyReport;
+    window.ssSendDailyReport=function(date){
+      var r=o.apply(this,arguments);
+      try{
+        var wa=document.getElementById('ssRepWa');
+        if(wa&&!document.getElementById('ssRepPdf')){
+          var b=document.createElement('button');b.id='ssRepPdf';b.textContent='Share PDF on WhatsApp';
+          b.style.cssText='background:#b91c1c;color:#fff;padding:8px 14px;border:0;border-radius:6px;cursor:pointer;font:700 13px system-ui';
+          b.onclick=function(){window.ssSendDailyReportPDF(date);};
+          wa.parentNode.insertBefore(b,wa.nextSibling);
+        }
+      }catch(e){}
+      return r;
+    };
+    window.ssSendDailyReport.__ssPdf=true;
+  }
+  wrapDaily();
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   SHREE SHYAM V30 — Real Web Push (VAPID) for Admin
+   - Admin taps "Enable Alerts" once => browser push subscription saved on server.
+   - Staff saves a visit / quotation => POST /api/push/notify => admin phone buzzes
+     even when the app is closed or the phone is locked.
+   ========================================================= */
+(function(){
+  var API='/api/push', BTN_ID='ssPushBtn', state={sub:false,busy:false};
+  function T(msg,type){try{if(typeof toast==='function')toast(msg,type);}catch(e){}}
+  function isAdmin(){return !!(window.CU&&(window.CU.accountKind==='admin'||window.CU.accountKind==='master'));}
+  function supported(){return ('serviceWorker' in navigator)&&('PushManager' in window)&&('Notification' in window);}
+  function b64ToU8(b){var p='='.repeat((4-b.length%4)%4),s=(b+p).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(s),a=new Uint8Array(raw.length);for(var i=0;i<raw.length;i++)a[i]=raw.charCodeAt(i);return a;}
+  async function reg(){var r=await navigator.serviceWorker.register('/sw.js',{scope:'/'});await navigator.serviceWorker.ready;return r;}
+  async function saveSub(sub){
+    var r=await fetch(API+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON?sub.toJSON():sub,user:(window.CU&&(window.CU.username||window.CU.name))||'',role:(window.CU&&window.CU.accountKind)||'admin',device:navigator.userAgent.slice(0,180),prefs:loadPrefs()})});
+    if(!r.ok)throw new Error('subscribe '+r.status);
+    return await r.json();
+  }
+  /* --------- Alert preferences (per device) --------- */
+  var PREF_KEY='RMC_V30_PUSH_PREFS', DEF_PREFS={visits:true,quotations:true,office:true,attendance:false,urgentOnly:false};
+  function loadPrefs(){try{var x=JSON.parse(localStorage.getItem(PREF_KEY)||'null');return Object.assign({},DEF_PREFS,x&&typeof x==='object'?x:{});}catch(e){return Object.assign({},DEF_PREFS);}}
+  async function savePrefs(p){
+    p=Object.assign({},DEF_PREFS,p||{});
+    try{localStorage.setItem(PREF_KEY,JSON.stringify(p));}catch(e){}
+    try{var r=await navigator.serviceWorker.getRegistration('/');var sub=r&&await r.pushManager.getSubscription();
+      if(sub){await fetch(API+'/prefs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint,prefs:p})});}
+    }catch(e){console.warn('prefs save',e);}
+    return p;
+  }
+  window.ssPushGetPrefs=loadPrefs; window.ssPushSetPrefs=savePrefs;
+  function closePanel(){var p=document.getElementById('ssPushPanel');if(p)p.remove();}
+  function openPanel(){
+    closePanel();
+    var prefs=loadPrefs();
+    var p=document.createElement('div');p.id='ssPushPanel';
+    p.style.cssText='position:fixed;right:10px;bottom:134px;z-index:100000;width:280px;background:#fff;border:1px solid #E3E8F0;border-radius:14px;box-shadow:0 24px 50px -20px rgba(15,23,42,.5);font:13px Inter,system-ui,Arial;color:#0F172A;overflow:hidden';
+    function row(key,label,desc){return '<label style="display:flex;gap:10px;align-items:flex-start;padding:9px 14px;border-top:1px solid #EEF2F7;cursor:pointer"><input type="checkbox" data-k="'+key+'" '+(prefs[key]?'checked':'')+' style="margin-top:3px;accent-color:#0B1F3A"><span><strong style="display:block;font-size:12.5px">'+label+'</strong><span style="color:#64748B;font-size:11px">'+desc+'</span></span></label>';}
+    p.innerHTML='<div style="background:linear-gradient(90deg,#0B1F3A,#132F5B);color:#fff;padding:11px 14px;font-weight:800;font-size:13px;display:flex;justify-content:space-between;align-items:center"><span>\uD83D\uDD14 Alert Settings</span><button id="ssPushClose" style="background:transparent;border:0;color:#fff;font-size:16px;cursor:pointer">\u2715</button></div>'+
+      '<div style="padding:8px 14px 2px;color:#64748B;font-size:11px">Choose which events buzz this phone</div>'+
+      row('visits','Sales Visits','New site visit saved by staff')+
+      row('quotations','Quotations','New quotation created')+
+      row('office','Office Work','Office staff work entries')+
+      row('attendance','Attendance','Daily attendance saved')+
+      row('urgentOnly','Urgent only','Only alerts marked urgent / delay / complaint')+
+      '<div style="display:flex;gap:6px;padding:12px 14px;border-top:1px solid #EEF2F7;background:#FBFCFE"><button id="ssPushTestBtn" style="flex:1;background:#0E7C66;color:#fff;border:0;border-radius:8px;padding:8px;font-weight:700;cursor:pointer">Send Test</button><button id="ssPushOffBtn" style="flex:1;background:#fff;color:#A50D26;border:1px solid #F3C1C9;border-radius:8px;padding:8px;font-weight:700;cursor:pointer">Turn OFF</button></div>';
+    document.body.appendChild(p);
+    p.querySelector('#ssPushClose').onclick=closePanel;
+    p.querySelector('#ssPushTestBtn').onclick=function(){window.ssPushTest();};
+    p.querySelector('#ssPushOffBtn').onclick=function(){closePanel();window.ssPushDisable();};
+    p.querySelectorAll('input[type=checkbox]').forEach(function(cb){cb.onchange=function(){var np=loadPrefs();np[cb.getAttribute('data-k')]=cb.checked;savePrefs(np).then(function(){T('Alert settings saved','success');});};});
+  }
+  window.ssPushOpenSettings=openPanel;
+  window.ssPushEnable=async function(fromGesture){
+    if(!supported()){T('Push not supported on this browser','error');return {ok:false,reason:'unsupported'};}
+    if(!isAdmin())return {ok:false,reason:'not-admin'};
+    if(state.busy)return {ok:false,reason:'busy'};
+    state.busy=true;render();
+    try{
+      var r=await reg();
+      var perm=Notification.permission;
+      if(perm==='default'&&fromGesture)perm=await Notification.requestPermission();
+      if(perm!=='granted'){state.busy=false;render();if(fromGesture)T('Notification permission blocked. Allow it in browser settings.','error');return {ok:false,reason:perm};}
+      var sub=await r.pushManager.getSubscription();
+      if(!sub){
+        var k=await (await fetch(API+'/vapid-public')).json();
+        sub=await r.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64ToU8(k.publicKey)});
+      }
+      await saveSub(sub);
+      state.sub=true;state.busy=false;render();
+      if(fromGesture)T('Push alerts enabled on this device','success');
+      return {ok:true};
+    }catch(e){console.warn('push enable',e);state.busy=false;render();if(fromGesture)T('Push setup failed: '+(e.message||e),'error');return {ok:false,reason:String(e&&e.message||e)};}
+  };
+  window.ssPushDisable=async function(){
+    try{var r=await navigator.serviceWorker.getRegistration('/');var s=r&&await r.pushManager.getSubscription();if(s){await fetch(API+'/unsubscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:s.endpoint})});await s.unsubscribe();}}catch(e){}
+    state.sub=false;closePanel();render();T('Push alerts disabled','success');
+  };
+  window.ssPushNotify=async function(title,body,opts){
+    opts=opts||{};
+    try{
+      var r=await fetch(API+'/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:title,body:body,target:opts.target||'admin',urgent:!!opts.urgent,kind:opts.kind||'general',url:'/erp.html',tag:opts.tag,data:opts.data||{}})});
+      return r.ok?await r.json():{error:r.status};
+    }catch(e){return {error:String(e)};}
+  };
+  window.ssPushTest=function(){return window.ssPushNotify('Shree Shyam Test Alert','Push is working on this device - '+new Date().toLocaleTimeString(),{tag:'ss-test',kind:'test'}).then(function(r){T('Test push sent: '+(r.sent||0)+' device(s)',(r.sent?'success':'error'));return r;});};
+  /* --------- Admin floating button --------- */
+  function render(){
+    var b=document.getElementById(BTN_ID);
+    if(!isAdmin()||!supported()){if(b)b.remove();return;}
+    if(!b){
+      b=document.createElement('button');b.id=BTN_ID;b.type='button';
+      b.style.cssText='position:fixed;right:10px;bottom:94px;z-index:99999;color:#fff;padding:8px 12px;border-radius:999px;font:700 12px system-ui,Arial;border:0;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15);';
+      b.onclick=function(){
+        if(state.busy)return;
+        if(state.sub){if(document.getElementById('ssPushPanel'))closePanel();else openPanel();}
+        else window.ssPushEnable(true).then(function(r){if(r&&r.ok)openPanel();});
+      };
+      document.body.appendChild(b);
+    }
+    if(state.busy){b.textContent='\uD83D\uDD14 Setting up\u2026';b.style.background='#0369a1';}
+    else if(state.sub){b.textContent='\uD83D\uDD14 Alerts ON';b.style.background='#0f766e';}
+    else{b.textContent='\uD83D\uDD14 Enable Alerts';b.style.background='#dc2626';}
+  }
+  async function detect(){
+    if(!supported()||!isAdmin())return;
+    try{var r=await navigator.serviceWorker.getRegistration('/');var s=r&&await r.pushManager.getSubscription();state.sub=!!(s&&Notification.permission==='granted');}catch(e){}
+    render();
+    // Permission already granted (e.g. from V28 prompt) => silently (re)subscribe so server has a fresh endpoint.
+    if(!state.sub&&Notification.permission==='granted')window.ssPushEnable(false);
+    else if(state.sub)window.ssPushEnable(false); // refresh server record (user/role/device)
+  }
+  var lastAdmin=null;
+  setInterval(function(){var a=isAdmin();if(a!==lastAdmin){lastAdmin=a;if(a)detect();else render();}},1500);
+  /* --------- Staff-side triggers: send push to admin on new visit / quotation --------- */
+  function urgentOf(s){return /urgent|delay|complaint|critical|escalat|priority/i.test(String(s||''));}
+  function wrapSave(name,handler){
+    var poll=setInterval(function(){
+      if(typeof window[name]!=='function')return;clearInterval(poll);
+      if(window[name].__ssPush)return;
+      var o=window[name];
+      window[name]=async function(){
+        var ctx={before:null,edit:!!window.eid};
+        try{ctx.before=handler.count();}catch(e){}
+        var res=await o.apply(this,arguments);
+        try{var after=handler.count();if(ctx.before!=null&&after>ctx.before)handler.fire(handler.last(),false);else if(ctx.edit&&handler.editNotify)handler.fire(handler.editing(),true);}catch(e){}
+        return res;
+      };
+      window[name].__ssPush=true;
+    },300);
+  }
+  wrapSave('saveVisit',{
+    count:function(){return (window.R||[]).length;},
+    last:function(){var a=window.R||[];return a[a.length-1];},
+    fire:function(v){
+      if(!v)return;
+      var by=(window.CU&&window.CU.name)||v.sp||'Staff';
+      var u=urgentOf((v.rm||'')+' '+(v.sa||'')+' '+(v.co||''));
+      var title=(u?'URGENT: ':'New Sales Visit: ')+(v.co||v.cu||'-');
+      var body='By '+by+' | Site: '+(v.si||'-')+' | Grade: '+(v.gr&&v.gr!=='NA'?v.gr:'-')+(v.rd?' | Req: '+v.rd:'')+(v.rm?'\n'+String(v.rm).slice(0,90):'');
+      window.ssPushNotify(title,body,{urgent:u,kind:'visits',tag:'visit-'+v.id,data:{kind:'visit',id:v.id}});
+    }
+  });
+  wrapSave('saveQt',{
+    count:function(){return (window.QT||[]).length;},
+    last:function(){var a=window.QT||[];return a[a.length-1];},
+    fire:function(q){
+      if(!q)return;
+      var by=(window.CU&&window.CU.name)||'Staff';
+      window.ssPushNotify('New Quotation: '+(q.cu||'-'),'By '+by+' | '+(q.gr||'-')+' x '+(q.qty||0)+' m3 | Total Rs. '+Number(q.total||0).toLocaleString('en-IN'),{kind:'quotations',tag:'qt-'+q.id,data:{kind:'quotation',id:q.id}});
+    }
+  });
+  wrapSave('saveWL',{
+    count:function(){return (window.WL||[]).length;},
+    last:function(){var a=window.WL||[];return a[a.length-1];},
+    fire:function(w){
+      if(!w)return;
+      var u=urgentOf((w.tk||'')+' '+(w.nt||'')+' '+(w.pr||''))||String(w.pr||'').toLowerCase()==='high';
+      window.ssPushNotify((u?'URGENT Office Work: ':'Office Work: ')+(w.nm||'-'),(w.tk||'-')+' | '+(w.sts||'Pending')+' | Priority: '+(w.pr||'-')+(w.nt?'\n'+String(w.nt).slice(0,80):''),{urgent:u,kind:'office',tag:'wl-'+w.id,data:{kind:'office',id:w.id}});
+    }
+  });
+  /* Attendance: notify when saveAttendance changes any record */
+  (function(){
+    var poll=setInterval(function(){
+      if(typeof window.saveAttendance!=='function')return;clearInterval(poll);
+      if(window.saveAttendance.__ssPush)return;
+      var o=window.saveAttendance;
+      window.saveAttendance=function(){
+        var before='';try{before=JSON.stringify(window.AT||[]);}catch(e){}
+        var res=o.apply(this,arguments);
+        try{
+          var after=JSON.stringify(window.AT||[]);
+          if(after!==before){
+            var dt=(document.getElementById('attDate')||{}).value||new Date().toISOString().slice(0,10);
+            var rows=(window.AT||[]).filter(function(a){return a.dt===dt;}),c={};
+            rows.forEach(function(a){c[a.sts]=(c[a.sts]||0)+1;});
+            var summary=Object.keys(c).map(function(k){return k+':'+c[k];}).join('  ')||'-';
+            var absent=rows.filter(function(a){return /^a/i.test(String(a.sts||''));}).map(function(a){return a.nm;});
+            window.ssPushNotify('Attendance saved - '+(typeof fd==='function'?fd(dt):dt),'By '+((window.CU&&window.CU.name)||'Admin')+' | '+summary+(absent.length?'\nAbsent: '+absent.slice(0,6).join(', '):''),{kind:'attendance',tag:'att-'+dt,data:{kind:'attendance',date:dt}});
+          }
+        }catch(e){}
+        return res;
+      };
+      window.saveAttendance.__ssPush=true;
+    },300);
+  })();
+  /* --------- Register SW early (harmless for staff; needed for admin) --------- */
+  if(supported()){try{navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});}catch(e){}}
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   SHREE SHYAM V31 — Enterprise footer (theme layer companion)
+   ========================================================= */
+(function(){
+  function addFooter(){
+    var app=document.getElementById('app');
+    if(!app||document.querySelector('.ss-ent-footer'))return;
+    var f=document.createElement('footer');
+    f.className='ss-ent-footer';
+    f.innerHTML='<div><strong>SHREE SHYAM CONSTRUCTION</strong> &nbsp;&bull;&nbsp; Ready Mix Concrete &nbsp;&bull;&nbsp; Enterprise Management System</div>'+
+      '<div class="ss-ent-badges"><span>Cloud Synced</span><span>Role Based Access</span><span>Realtime</span><span>&copy; '+new Date().getFullYear()+'</span></div>';
+    app.appendChild(f);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addFooter);else addFooter();
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   SHREE SHYAM V32 — MASTER COMPLETE PDF (all sales + office + plant data)
+   Replaces the "Master Plant PDF" export with a full company report.
+   ========================================================= */
+(function(){
+  var NAVY=[11,31,58],RED=[145,16,39],GOLD=[245,179,53];
+  var DOC_TITLE='MASTER COMPLETE REPORT';
+  function T(m,t){try{if(typeof toast==='function')toast(m,t);}catch(e){}}
+  function fdate(d){try{return d?(typeof fd==='function'?fd(d):String(d)):'-';}catch(e){return String(d||'-');}}
+  function num(n){return Number(n||0).toLocaleString('en-IN');}
+  function money(n){try{return typeof pmMoney==='function'?pmMoney(n||0):'Rs. '+num(n);}catch(e){return 'Rs. '+num(n);}}
+  function arr(x){return Array.isArray(x)?x:[];}
+  function days(d){try{return typeof dl==='function'?dl(d):Math.round((new Date(d)-new Date())/864e5);}catch(e){return null;}}
+  function header(d){
+    var y=window.ssPdfBrandHeader?window.ssPdfBrandHeader(d,DOC_TITLE,true):(function(){d.setFontSize(14);d.text(DOC_TITLE,14,14);return 24;})();
+    d.__hdr[d.internal.getCurrentPageInfo().pageNumber]=1;
+    return y;
+  }
+  function ensurePage(d,y,need){var H=d.internal.pageSize.getHeight();if(y+(need||30)>H-14){d.addPage();return header(d);}return y;}
+  function sectionTitle(d,y,num_,title,count){
+    d.setFillColor(NAVY[0],NAVY[1],NAVY[2]);d.roundedRect(10,y-4.6,8,6.6,1,1,'F');
+    d.setTextColor(255,255,255);d.setFontSize(7.5);d.setFont('helvetica','bold');d.text(String(num_),14,y,{align:'center'});
+    d.setTextColor(NAVY[0],NAVY[1],NAVY[2]);d.setFontSize(11);d.text(title,21,y);
+    if(count!=null){d.setFont('helvetica','normal');d.setFontSize(7.5);d.setTextColor(100,116,139);d.text(count+' record'+(count===1?'':'s'),287,y,{align:'right'});}
+    d.setDrawColor(RED[0],RED[1],RED[2]);d.setLineWidth(.5);d.line(21,y+1.8,287,y+1.8);
+    d.setTextColor(0,0,0);
+  }
+  function table(d,y,num_,title,head,rows,colStyles){
+    y=ensurePage(d,y,34);
+    sectionTitle(d,y,num_,title,rows.length);
+    var body=rows.length?rows:[['-'].concat(head.slice(1).map(function(){return 'No records';}))];
+    d.autoTable({head:[head],body:body,startY:y+4.5,
+      styles:{fontSize:6.6,cellPadding:1.7,overflow:'linebreak',valign:'middle',textColor:[30,41,59],lineColor:[227,232,240],lineWidth:.1},
+      headStyles:{fillColor:NAVY,textColor:255,fontStyle:'bold',fontSize:6.8},
+      alternateRowStyles:{fillColor:[246,248,251]},columnStyles:colStyles||{},
+      margin:{left:10,right:10,top:44,bottom:16},
+      didDrawPage:function(){var pg=d.internal.getCurrentPageInfo().pageNumber;if(!d.__hdr[pg])header(d);}
+    });
+    return d.lastAutoTable.finalY+11;
+  }
+  function kpiGrid(d,y,items){
+    y=ensurePage(d,y,40);
+    var cols=6,gap=4,w=(277-gap*(cols-1))/cols,h=17,x0=10;
+    items.forEach(function(it,i){
+      var r=Math.floor(i/cols),c=i%cols,x=x0+c*(w+gap),yy=y+r*(h+gap);
+      d.setFillColor(255,255,255);d.setDrawColor(227,232,240);d.setLineWidth(.2);d.roundedRect(x,yy,w,h,1.6,1.6,'FD');
+      var col=it.color||RED;d.setFillColor(col[0],col[1],col[2]);d.rect(x,yy,w,1.2,'F');
+      d.setFontSize(6.2);d.setTextColor(100,116,139);d.setFont('helvetica','bold');d.text(String(it.label).toUpperCase(),x+3,yy+6.2);
+      d.setFontSize(11.5);d.setTextColor(NAVY[0],NAVY[1],NAVY[2]);d.text(String(it.value),x+3,yy+13);
+      if(it.sub){d.setFontSize(5.8);d.setFont('helvetica','normal');d.setTextColor(120,130,150);d.text(String(it.sub),x+w-3,yy+13,{align:'right'});}
+    });
+    var rows=Math.ceil(items.length/cols);
+    d.setTextColor(0,0,0);d.setFont('helvetica','normal');
+    return y+rows*(h+gap)+7;
+  }
+  function footerAll(d){
+    var n=d.internal.getNumberOfPages(),H=d.internal.pageSize.getHeight(),W=d.internal.pageSize.getWidth(),B=window.SS_BRAND||{};
+    for(var i=1;i<=n;i++){
+      d.setPage(i);
+      d.setDrawColor(RED[0],RED[1],RED[2]);d.setLineWidth(.4);d.line(10,H-10,W-10,H-10);
+      d.setFontSize(6.5);d.setTextColor(100,116,139);d.setFont('helvetica','normal');
+      d.text('Shree Shyam Construction | IMT Kharkhoda, Sonipat (HR) 131402',10,H-6);
+      d.text('Confidential - Management use only | Generated '+new Date().toLocaleString('en-IN'),W/2+20,H-6,{align:'center'});
+      d.setFont('helvetica','bold');d.setTextColor(NAVY[0],NAVY[1],NAVY[2]);d.text('Page '+i+' of '+n,W-10,H-6,{align:'right'});
+    }
+  }
+  function groupBy(list,keyFn){var m={};list.forEach(function(x){var k=keyFn(x)||'-';(m[k]=m[k]||[]).push(x);});return m;}
+  function statusIs(s,re){return re.test(String(s||''));}
+
+  window.ssExportMasterCompletePDF=function(mode){
+    mode=mode||'download';
+    if(typeof reportCan==='function'&&!reportCan()){T('Admin/Master access required','error');return;}
+    if(!(window.jspdf&&window.jspdf.jsPDF)){T('PDF library not loaded','error');return;}
+    try{if(typeof ssLoadCore==='function')ssLoadCore();if(typeof pmLoad==='function')pmLoad();if(typeof masterLoad==='function')masterLoad();}catch(e){}
+    try{
+      var R_=arr(window.R),QT_=arr(window.QT),WL_=arr(window.WL),AT_=arr(window.AT),SL_=arr(window.SL),OS_=arr(window.OS),U=window.USERS||{};
+      var PO=arr(window.PM_ORDERS),PF=arr(window.PM_FLEET),PS=arr(window.PM_STAFF),PQ=arr(window.PM_QC),PMT=arr(window.PM_MAT),PB=arr(window.PM_BILL),PMN=arr(window.PM_MAINT),MR=arr(window.MASTER_RECORDS);
+      var today=new Date().toISOString().slice(0,10),d30=new Date(Date.now()-30*864e5).toISOString().slice(0,10);
+      var d=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});d.__hdr={};
+      var y=header(d);
+      // ---- Report meta strip
+      d.setFillColor(246,248,251);d.roundedRect(10,y-3,277,9,1.5,1.5,'F');
+      d.setFontSize(7.5);d.setTextColor(51,65,85);d.setFont('helvetica','bold');d.text('Prepared for: '+((window.CU&&window.CU.name)||'Management'),14,y+2.8);
+      d.setFont('helvetica','normal');d.text('Scope: All sales staff | Office staff | Attendance | Login accounts | Complete plant operations',95,y+2.8);
+      d.text('Data as on '+new Date().toLocaleString('en-IN'),283,y+2.8,{align:'right'});
+      y+=13;
+      // ---- 01 Executive summary
+      var area=R_.reduce(function(s,r){return s+(Number(r.ar)||0);},0);
+      var due7=R_.filter(function(r){var n=r.rd?days(r.rd):null;return n!=null&&n>=0&&n<=7;}).length;
+      var overdue=R_.filter(function(r){var n=r.rd?days(r.rd):null;return n!=null&&n<0;}).length;
+      var qAcc=QT_.filter(function(q){return statusIs(q.sts,/accept/i);});
+      var qVal=QT_.reduce(function(s,q){return s+(Number(q.total)||0);},0),qAccVal=qAcc.reduce(function(s,q){return s+(Number(q.total)||0);},0);
+      var wlPending=WL_.filter(function(w){return !statusIs(w.sts,/complet|done/i);}).length;
+      var attToday=AT_.filter(function(a){return a.dt===today;}),attP=attToday.filter(function(a){return statusIs(a.sts,/^p/i);}).length;
+      var outstanding=PB.reduce(function(s,b){return s+(Number(b.outstanding)||0);},0);
+      var reorder=PMT.filter(function(m){try{var z=typeof pmMaterialBalance==='function'?pmMaterialBalance(m):{balance:m.balance,reorder:m.reorder};return Number(z.balance)<=Number(z.reorder);}catch(e){return false;}}).length;
+      sectionTitle(d,y,'01','Executive Summary',null);y+=6;
+      y=kpiGrid(d,y,[
+        {label:'Total Sales Visits',value:num(R_.length),sub:'all staff'},
+        {label:'Total Area (sqft)',value:num(area),sub:'across sites'},
+        {label:'Due in 7 days',value:num(due7),sub:overdue+' overdue',color:GOLD},
+        {label:'Quotations',value:num(QT_.length),sub:money(qVal)},
+        {label:'Accepted Quotes',value:num(qAcc.length),sub:money(qAccVal),color:[14,124,102]},
+        {label:'Sales Staff',value:num(SL_.length),sub:SL_.filter(function(s){return s.st==='Active';}).length+' active'},
+        {label:'Office Staff',value:num(OS_.length),sub:OS_.filter(function(s){return s.st==='Active';}).length+' active'},
+        {label:'Office Tasks',value:num(WL_.length),sub:wlPending+' open',color:GOLD},
+        {label:'Attendance Today',value:attToday.length?attP+'/'+attToday.length:'-',sub:'present / marked',color:[14,124,102]},
+        {label:'Plant Orders',value:num(PO.length),sub:PF.length+' vehicles'},
+        {label:'Billing Outstanding',value:money(outstanding),sub:PB.length+' invoices',color:RED},
+        {label:'Materials to Reorder',value:num(reorder),sub:PMT.length+' items',color:reorder?RED:[14,124,102]}
+      ]);
+      // ---- 02 Sales team performance
+      var bySp=groupBy(R_,function(r){return r.sp;});
+      var spRows=Object.keys(bySp).sort().map(function(sp,i){
+        var v=bySp[sp],sites={},grades={},last='';
+        v.forEach(function(r){if(r.si)sites[r.si]=1;if(r.gr&&r.gr!=='NA')grades[r.gr]=(grades[r.gr]||0)+1;if(String(r.vd||'')>last)last=r.vd;});
+        var d7=v.filter(function(r){var n=r.rd?days(r.rd):null;return n!=null&&n>=0&&n<=7;}).length;
+        var od=v.filter(function(r){var n=r.rd?days(r.rd):null;return n!=null&&n<0;}).length;
+        var m30=v.filter(function(r){return String(r.vd||'')>=d30;}).length;
+        var prof=SL_.filter(function(s){return s.nm===sp;})[0]||{};
+        return [i+1,sp,prof.rl||'Sales',prof.ph||'-',num(v.length),num(m30),num(Object.keys(sites).length),num(v.reduce(function(s,r){return s+(Number(r.ar)||0);},0)),Object.keys(grades).sort(function(a,b){return grades[b]-grades[a];}).slice(0,3).join(', ')||'-',num(d7),num(od),fdate(last)];
+      });
+      y=table(d,y,'02','Sales Team Performance (staff-wise)',['#','Salesperson','Role','Phone','Visits','Last 30d','Sites','Area sqft','Top Grades','Due 7d','Overdue','Last Visit'],spRows);
+      // ---- 03 Sales visits register
+      var vis=R_.slice().sort(function(a,b){return String(b.vd||'').localeCompare(String(a.vd||''));});
+      y=table(d,y,'03','Sales Visits - Complete Register (all staff)',['#','Staff','Date','Customer','Contact','Contractor','Cont. No.','Site / Project','Address','Area','Grade','Req. Date','Remarks'],
+        vis.map(function(r,i){return [i+1,r.sp||'-',fdate(r.vd),(r.cu&&r.cu!=='NA')?r.cu:'-',(r.cc&&r.cc!=='NA')?r.cc:'-',r.co||'-',r.cc2||'-',r.si||'-',r.sa||'-',r.ar?num(r.ar):'-',(r.gr&&r.gr!=='NA')?r.gr:'-',r.rd?fdate(r.rd):'-',r.rm||'-'];}),
+        {12:{cellWidth:48},8:{cellWidth:30}});
+      // ---- 04 Quotations
+      var qs=QT_.slice().sort(function(a,b){return String(b.dt||'').localeCompare(String(a.dt||''));});
+      y=table(d,y,'04','Quotations Register',['#','Date','Customer','Contact','Contractor','Site','Grade','Qty m3','Rate','Total','Status','Valid Till','Notes'],
+        qs.map(function(q,i){return [i+1,fdate(q.dt),q.cu||'-',q.cn||'-',q.co||'-',q.si||'-',q.gr||'-',num(q.qty),money(q.rate),money(q.total),q.sts||'-',fdate(q.vt),q.nt||'-'];}),{12:{cellWidth:40}});
+      // ---- 05 Office staff summary
+      var byNm=groupBy(WL_,function(w){return w.nm;});
+      var allOffice={};OS_.forEach(function(s){allOffice[s.nm]=1;});Object.keys(byNm).forEach(function(k){allOffice[k]=1;});
+      var osRows=Object.keys(allOffice).sort().map(function(nm,i){
+        var w=byNm[nm]||[],prof=OS_.filter(function(s){return s.nm===nm;})[0]||{};
+        var done=w.filter(function(x){return statusIs(x.sts,/complet|done/i);}).length,prog=w.filter(function(x){return statusIs(x.sts,/progress/i);}).length,pend=w.length-done-prog;
+        var hi=w.filter(function(x){return statusIs(x.pr,/high|urgent/i);}).length,last='';w.forEach(function(x){if(String(x.dt||'')>last)last=x.dt;});
+        var att=AT_.filter(function(a){return a.nm===nm&&a.dt>=d30;}),p=att.filter(function(a){return statusIs(a.sts,/^p/i);}).length;
+        return [i+1,nm,prof.rl||'-',prof.dp||'-',prof.ph||'-',prof.st||'-',num(w.length),num(done),num(prog),num(pend),num(hi),fdate(last),att.length?p+'/'+att.length:'-'];
+      });
+      y=table(d,y,'05','Office Staff Work Summary',['#','Staff','Role','Department','Phone','Status','Tasks','Completed','In Progress','Pending','High Priority','Last Entry','Attendance 30d'],osRows);
+      // ---- 06 Office work register
+      var wl=WL_.slice().sort(function(a,b){return String(b.dt||'').localeCompare(String(a.dt||''));});
+      y=table(d,y,'06','Office Work - Complete Register',['#','Staff','Date','Task / Work','Status','Priority','Notes'],
+        wl.map(function(w,i){return [i+1,w.nm||'-',fdate(w.dt),w.tk||'-',w.sts||'Pending',w.pr||'-',w.nt||'-'];}),{3:{cellWidth:80},6:{cellWidth:80}});
+      // ---- 07 Attendance summary (30 days)
+      var at30=AT_.filter(function(a){return String(a.dt||'')>=d30;});
+      var byStaff=groupBy(at30,function(a){return a.nm;});
+      var people={};SL_.concat(OS_).forEach(function(s){people[s.nm]={dp:s.dp,rl:s.rl};});Object.keys(byStaff).forEach(function(k){people[k]=people[k]||{};});
+      var attRows=Object.keys(people).sort().map(function(nm,i){
+        var a=byStaff[nm]||[],c={P:0,A:0,H:0,L:0};
+        a.forEach(function(x){var s=String(x.sts||'').toUpperCase();var k=s[0];if(/^P/.test(s))c.P++;else if(/^A/.test(s))c.A++;else if(/^H/.test(s))c.H++;else if(/^L/.test(s))c.L++;});
+        var pct=a.length?Math.round(c.P/a.length*100)+'%':'-';
+        return [i+1,nm,people[nm].rl||'-',people[nm].dp||'-',num(a.length),num(c.P),num(c.A),num(c.H),num(c.L),pct];
+      });
+      y=table(d,y,'07','Attendance Summary (last 30 days)',['#','Staff','Role','Department','Marked Days','Present','Absent','Half Day','Leave','Present %'],attRows);
+      // ---- 08 Attendance register
+      var atRows=at30.slice().sort(function(a,b){return String(b.dt||'').localeCompare(String(a.dt||''))||String(a.nm).localeCompare(String(b.nm));}).map(function(a,i){return [i+1,fdate(a.dt),a.nm||'-',a.dp||'-',a.sts||'-',a.nt||'-'];});
+      y=table(d,y,'08','Attendance Register (last 30 days)',['#','Date','Staff','Department','Status','Note'],atRows);
+      // ---- 09 Login accounts (passwords intentionally hidden)
+      var uRows=Object.keys(U).sort().map(function(k,i){var a=U[k]||{},kind=(typeof accountKind==='function'?accountKind(a):(a.role||'-'));var prof=(kind==='office'?OS_:SL_).filter(function(x){return x.nm===a.name;})[0]||{};return [i+1,a.name||'-',kind,k,prof.ph||a.phone||'-',prof.em||'-',prof.st||'Active'];});
+      y=table(d,y,'09','Login Accounts (passwords hidden for security)',['#','Name','Role','Login ID','Phone','Email','Status'],uRows);
+      // ---- Plant sections
+      function saved(x){try{return typeof ssPdfSavedAt==='function'?ssPdfSavedAt(x):'-';}catch(e){return '-';}}
+      y=table(d,y,'10','Plant - Concrete Orders & Dispatch',['#','Order','Customer','Site','Grade','Qty m3','Schedule','Vehicle','Status','Saved'],PO.map(function(x,i){return [i+1,x.order||'-',x.customer||'-',x.site||'-',x.grade||'-',x.qty||0,x.schedule||'-',x.vehicle||'-',x.status||'-',saved(x)];}));
+      y=table(d,y,'11','Plant - Fleet & Vehicles',['#','Vehicle','Driver','Capacity','Trips','Status','Last Trip / Issue','Saved'],PF.map(function(x,i){return [i+1,x.vehicle||'-',x.driver||'-',x.cap||x.capacity||'-',x.trips||0,x.status||'-',x.last||'-',saved(x)];}));
+      y=table(d,y,'12','Plant - Staff & Operators',['#','Name','Role','Department','Phone','Shift','Status','Saved'],PS.map(function(x,i){return [i+1,x.name||'-',x.role||'-',x.dept||'-',x.phone||'-',x.shift||'-',x.status||'-',saved(x)];}));
+      y=table(d,y,'13','Plant - Quality Control',['#','Date','Batch / Order','Grade','Slump','Cube 7d','Cube 28d','Status','Tested By','Saved'],PQ.map(function(x,i){return [i+1,x.date||'-',x.order||x.batch||'-',x.grade||'-',x.slump||'-',x.cube7||x.cube7d||'-',x.cube28||x.cube28d||'-',x.status||'-',x.by||'-',saved(x)];}));
+      y=table(d,y,'14','Plant - Raw Material Stock & Consumption',['#','Material','Unit','Opening','Received','Consumed','Current','Reorder Level','Status','Saved'],PMT.map(function(x,i){var z;try{z=typeof pmMaterialBalance==='function'?pmMaterialBalance(x):{opening:x.opening,received:x.received,consumed:x.consumed,balance:x.balance,reorder:x.reorder};}catch(e){z={};}return [i+1,x.name||'-',x.unit||'-',z.opening!=null?z.opening:'-',z.received!=null?z.received:'-',z.consumed!=null?z.consumed:'-',z.balance!=null?z.balance:'-',z.reorder!=null?z.reorder:'-',(Number(z.balance)<=Number(z.reorder)?'REORDER':'OK'),saved(x)];}));
+      y=table(d,y,'15','Plant - Billing & Payments',['#','Invoice','Customer','Order','Amount','Paid','Outstanding','Due','Status','Saved'],PB.map(function(x,i){return [i+1,x.inv||x.invoice||'-',x.customer||'-',x.order||'-',money(x.amount||0),money(x.paid||0),money(x.outstanding||0),x.due||'-',x.status||'-',saved(x)];}));
+      y=table(d,y,'16','Plant - Vehicle Maintenance Register',['Sr.','Vehicle Type','Vehicle No.','Primary Engine KM','2nd Engine KM','Service Type','Service Date','Allotted To','Next Service','Remarks','Saved'],PMN.map(function(raw,i){var x=raw;try{if(typeof pmMaintNormalizeRow==='function')x=pmMaintNormalizeRow(raw,i);}catch(e){}function dd(v){try{return typeof pmMaintDisplayDate==='function'?pmMaintDisplayDate(v):(v||'-');}catch(e){return v||'-';}}return [x.serial||i+1,x.vehicleType||'-',x.vehicleNo||'-',x.primaryKm||'-',x.secondKm||'-',x.serviceType||'-',dd(x.serviceDate),x.serviceAllottedTo||'-',dd(x.nextServiceDate),x.remarks||'-',saved(raw)];}));
+      var mr=MR.filter(function(x){return x&&x.module;});
+      y=table(d,y,'17','Integrated ERP Records (all modules)',['#','Module','Reference','Name / Party','Status','Amount','Details','Saved'],mr.map(function(x,i){var det='-';try{det=typeof ssModuleFieldSummary==='function'?ssModuleFieldSummary(x):'-';}catch(e){}return [i+1,x.module||'-',x.ref||'-',x.name||'-',x.status||'-',money(x.amount||0),det,saved(x)];}),{6:{cellWidth:80}});
+      footerAll(d);
+      var file='Master_Complete_Report_'+today+'.pdf';
+      if(mode==='whatsapp'&&typeof window.ssSharePDF==='function'){
+        window.ssSharePDF(d,file,'','*Shree Shyam Construction - Master Complete Report ('+today+')*\nAll sales staff, office staff, attendance, logins & complete plant data ('+d.internal.getNumberOfPages()+' pages).','master','master:'+today);
+      }else if(mode==='email'){
+        (async function(){
+          try{
+            T('Preparing email...');
+            var b64=d.output('datauristring').split(',')[1];
+            var r=await fetch('/api/pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({filename:file,kind:'master',ref:'master:'+today,data:b64,created_by:(window.CU&&window.CU.name)||''})});
+            if(!r.ok)throw new Error('upload '+r.status);
+            var up=await r.json();
+            var subject='Shree Shyam Construction - Master Complete Report ('+today+')';
+            var body='Dear Sir/Madam,\n\nPlease find the Master Complete Report for '+today+' covering all sales staff, office staff, attendance, login accounts and complete plant operations ('+d.internal.getNumberOfPages()+' pages).\n\nDownload PDF: '+up.url+'\n\nRegards,\nShree Shyam Construction\n'+((window.SS_BRAND||{}).addr1||'')+' '+((window.SS_BRAND||{}).addr2||'');
+            window.location.href='mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+            T('Email draft opened with PDF link','success');
+          }catch(e){console.warn(e);try{d.save(file);}catch(_){}T('Could not create link - PDF downloaded instead','error');}
+        })();
+      }else{
+        d.save(file);
+        T('Master Complete PDF downloaded: '+file,'success');
+      }
+      return d;
+    }catch(e){console.error('Master PDF',e);T('Master PDF error: '+(e.message||e),'error');}
+  };
+  /* Route the existing "Master Plant PDF" button to the complete report; keep plant-only export available. */
+  function hook(){
+    if(typeof window.exportMasterPlantCompletePDF!=='function')return setTimeout(hook,400);
+    if(window.exportMasterPlantCompletePDF.__ssFull)return;
+    window.exportMasterPlantCompletePDF_plantOnly=window.exportMasterPlantCompletePDF;
+    window.exportMasterPlantCompletePDF=function(){window.ssMasterPdfChooser();};
+    window.exportMasterPlantCompletePDF.__ssFull=true;
+  }
+  hook();
+  /* Chooser: Download / WhatsApp / Email */
+  window.ssMasterPdfChooser=function(){
+    var old=document.getElementById('ssMasterChooser');if(old)old.remove();
+    var o=document.createElement('div');o.id='ssMasterChooser';
+    o.style.cssText='position:fixed;inset:0;z-index:100001;background:rgba(7,22,43,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px';
+    o.innerHTML='<div style="background:#fff;border-radius:18px;width:100%;max-width:420px;box-shadow:0 40px 90px -30px rgba(0,0,0,.6);overflow:hidden;font-family:Inter,system-ui,Arial">'+
+      '<div style="background:linear-gradient(90deg,#0B1F3A,#132F5B);border-bottom:3px solid #C8102E;color:#fff;padding:14px 18px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:800;font-size:15px">&#127970; Master PDF (All Data)</div><div style="font-size:11px;opacity:.75;margin-top:2px">Sales + Office + Attendance + Logins + Plant</div></div><button id="ssMcClose" style="background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer">&#10005;</button></div>'+
+      '<div style="padding:16px 18px;display:grid;gap:10px">'+
+      '<button data-m="download" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #E3E8F0;border-radius:12px;background:#fff;cursor:pointer;text-align:left"><span style="font-size:22px">&#11015;&#65039;</span><span><strong style="display:block;font-size:13.5px;color:#0B1F3A">Download PDF</strong><span style="font-size:11.5px;color:#64748B">Save the full report on this device</span></span></button>'+
+      '<button data-m="whatsapp" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #BBF7D0;border-radius:12px;background:#F0FDF4;cursor:pointer;text-align:left"><span style="font-size:22px">&#128241;</span><span><strong style="display:block;font-size:13.5px;color:#14532D">Send on WhatsApp</strong><span style="font-size:11.5px;color:#64748B">Attach PDF (mobile) or share secure link</span></span></button>'+
+      '<button data-m="email" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #DBEAFE;border-radius:12px;background:#EFF6FF;cursor:pointer;text-align:left"><span style="font-size:22px">&#128231;</span><span><strong style="display:block;font-size:13.5px;color:#1E3A8A">Send by Email</strong><span style="font-size:11.5px;color:#64748B">Opens your mail app with the PDF link</span></span></button>'+
+      '</div></div>';
+    document.body.appendChild(o);
+    o.querySelector('#ssMcClose').onclick=function(){o.remove();};
+    o.addEventListener('click',function(e){if(e.target===o)o.remove();});
+    o.querySelectorAll('button[data-m]').forEach(function(b){b.onclick=function(){var m=b.getAttribute('data-m');o.remove();window.ssExportMasterCompletePDF(m);};});
+  };
+  function relabel(){
+    document.querySelectorAll("button[onclick*='exportMasterPlantCompletePDF']").forEach(function(b){
+      if(b.getAttribute('data-ss-relabel'))return;b.setAttribute('data-ss-relabel','1');
+      b.innerHTML='&#127970; Master PDF (All Data)';b.title='Complete company report: all sales staff, office staff, attendance, logins and full plant operations';
+    });
+  }
+  setInterval(relabel,2000);setTimeout(relabel,600);
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   SHREE SHYAM V33 — SUPABASE AUTH MIGRATION
+   - Login is verified by Supabase Auth via /api/auth/login (server holds the secret key).
+   - Every ERP user gets a real Supabase account (auto-provisioned & kept in sync by admin devices).
+   - The user's JWT is attached to every Supabase REST/Realtime call => RLS policies apply.
+   - Offline fallback: only when the auth server is unreachable (never on wrong password).
+   ========================================================= */
+(function(){
+  var SB_URL='https://xihbqwhsqlpgrysttwth.supabase.co', PUB='sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct', SKEY='RMC_SS_SESSION', S=null, status={provisioned:null};
+  /* BUG FIX: original doLogin() calls initApp() which was never defined -> threw after UI setup,
+     so ssCloudInitVisits() and the welcome toast never ran. Define a safe no-op. */
+  if(typeof window.initApp!=='function')window.initApp=function(){};
+  function callOrig(fn,ctx,args){try{return fn.apply(ctx,args);}catch(e){console.warn('legacy doLogin error',e);}}
+  function T(m,t){try{if(typeof toast==='function')toast(m,t);}catch(e){}}
+  function now(){return Math.floor(Date.now()/1000);}
+  function load(){try{S=JSON.parse(localStorage.getItem(SKEY)||'null');}catch(e){S=null;} if(S&&(!S.access_token||!S.expires_at))S=null;}
+  function save(s){S=s;try{if(s)localStorage.setItem(SKEY,JSON.stringify(s));else localStorage.removeItem(SKEY);}catch(e){} applyRealtimeAuth();}
+  function valid(){return !!(S&&S.access_token&&S.expires_at&&S.expires_at>now()+30);}
+  window.ssAuthSession=function(){return S;};
+  window.ssAuthToken=function(){return valid()?S.access_token:null;};
+  window.ssAuthUser=function(){return S&&S.user||null;};
+  load();
+
+  /* ---- attach user JWT to all Supabase calls made by the legacy app ---- */
+  var _fetch=window.fetch.bind(window);
+  window.fetch=function(input,init){
+    try{
+      var url=typeof input==='string'?input:(input&&input.url)||'';
+      if(typeof input==='string'&&url.indexOf(SB_URL)===0&&valid()){
+        init=init||{};
+        var headers=new Headers(init.headers||{});
+        var auth=headers.get('Authorization')||'';
+        if(!auth||auth==='Bearer '+PUB)headers.set('Authorization','Bearer '+S.access_token);
+        if(!headers.get('apikey'))headers.set('apikey',PUB);
+        init=Object.assign({},init,{headers:headers});
+      }
+    }catch(e){}
+    return _fetch(input,init);
+  };
+
+  /* ---- realtime: apply JWT to supabase-js clients created by the app ---- */
+  var clients=[];
+  function applyRealtimeAuth(){clients.forEach(function(c){try{if(c.realtime&&c.realtime.setAuth)c.realtime.setAuth(valid()?S.access_token:PUB);}catch(e){}});}
+  function hookSupabase(){
+    if(!(window.supabase&&window.supabase.createClient))return setTimeout(hookSupabase,300);
+    if(window.supabase.createClient.__ss)return;
+    var oc=window.supabase.createClient;
+    window.supabase.createClient=function(){var c=oc.apply(this,arguments);clients.push(c);try{if(valid()&&c.realtime)c.realtime.setAuth(S.access_token);}catch(e){}return c;};
+    window.supabase.createClient.__ss=true;
+  }
+  hookSupabase();
+
+  /* ---- token refresh ---- */
+  var refreshing=false;
+  async function refresh(force){
+    if(!S||!S.refresh_token||refreshing)return false;
+    if(!force&&S.expires_at>now()+300)return true;
+    refreshing=true;
+    try{
+      // Static HTML fallback: refresh directly with Supabase Auth.
+      var r=await _fetch(SB_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'Content-Type':'application/json','apikey':PUB},body:JSON.stringify({refresh_token:S.refresh_token})});
+      if(r.status===401){save(null);return false;}
+      if(!r.ok)return false;
+      var raw=await r.json();
+      if(raw&&raw.access_token){
+        var su=raw.user||{};var am=su.app_metadata||{},um=su.user_metadata||{};
+        raw.user={id:su.id,username:am.username||um.username||'',name:am.name||um.name||'',role:am.role||um.role||'staff',type:am.type||um.type||'',accountKind:am.accountKind||um.accountKind||am.role||um.role||'staff',email:su.email};
+        save(raw);return true;
+      }
+    }catch(e){}
+    finally{refreshing=false;}
+    return false;
+  }
+  window.ssAuthRefresh=refresh;
+  setInterval(function(){refresh(false);},60000);
+  window.addEventListener('online',function(){refresh(false);});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh(false);});
+  if(S&&S.expires_at<=now()+300)refresh(true);
+
+  async function fetchStatus(){
+    try{
+      // The static HTML has no Next.js /api routes; Supabase Auth itself is the authority.
+      var r=await _fetch(SB_URL+'/auth/v1/settings',{headers:{apikey:PUB,'Content-Type':'application/json'},cache:'no-store'});
+      if(r.ok){status={configured:true,provisioned:true,count:0,static:true};return status;}
+    }catch(e){}
+    try{var r2=await _fetch('/api/auth/status');var d=await r2.json();status=d;return d;}catch(e){return {configured:true,provisioned:true,count:0,static:true};}
+  }
+  fetchStatus();
+
+  /* ---- provisioning (admin devices keep Supabase accounts in sync with USERS) ---- */
+  function usersPayload(){
+    var U=window.USERS||{};
+    return Object.keys(U).map(function(k){var a=U[k]||{};return {username:k,password:a.pass||'',role:a.role||'staff',type:a.type||'',name:a.name||k,phone:a.phone||'',email:a.email||''};});
+  }
+  var lastNames=null,syncTimer=null,syncing=false;
+  window.ssAuthSyncUsers=async function(opts){
+    opts=opts||{};
+    if(syncing)return null;syncing=true;
+    try{
+      var st=status&&status.provisioned!=null?status:(await fetchStatus()||{});
+      var headers={'Content-Type':'application/json'};
+      var isAdmin=!!(window.CU&&(window.CU.accountKind==='admin'||window.CU.accountKind==='master'));
+      if(st.provisioned&&!(isAdmin&&valid()))return null;   // only admins with a session may sync after bootstrap
+      if(valid())headers.Authorization='Bearer '+S.access_token;
+      var payload=usersPayload();
+      var r=await _fetch('/api/auth/provision',{method:'POST',headers:headers,body:JSON.stringify({users:payload})});
+      var d=await r.json().catch(function(){return {};});
+      if(!r.ok){if(!opts.silent)T('Auth sync failed: '+(d.error||r.status),'error');return d;}
+      // deprovision removed accounts
+      var names=payload.map(function(x){return x.username;});
+      if(lastNames&&isAdmin&&valid()){
+        var removed=lastNames.filter(function(n){return names.indexOf(n)<0;});
+        for(var i=0;i<removed.length;i++){try{await _fetch('/api/auth/deprovision',{method:'POST',headers:headers,body:JSON.stringify({username:removed[i]})});}catch(e){}}
+        if(removed.length)d.removed=removed;
+      }
+      lastNames=names;status.provisioned=true;status.count=names.length;
+      if(!opts.silent){var msg='Supabase Auth synced: '+((d.created||[]).length)+' created, '+((d.updated||[]).length)+' updated'+((d.errors||[]).length?', '+d.errors.length+' errors':'');T(msg,(d.errors||[]).length?'error':'success');}
+      renderAuthBox();
+      return d;
+    }catch(e){if(!opts.silent)T('Auth sync error: '+(e.message||e),'error');return null;}
+    finally{syncing=false;}
+  };
+  function scheduleSync(){clearTimeout(syncTimer);syncTimer=setTimeout(function(){window.ssAuthSyncUsers({silent:true});},1500);}
+  function wrapSaveUsers(){
+    if(typeof window.saveUsers!=='function')return setTimeout(wrapSaveUsers,300);
+    if(window.saveUsers.__ss)return;
+    var o=window.saveUsers;
+    window.saveUsers=function(){var r=o.apply(this,arguments);try{if(window.CU&&(window.CU.accountKind==='admin'||window.CU.accountKind==='master'))scheduleSync();}catch(e){}return r;};
+    window.saveUsers.__ss=true;
+  }
+  wrapSaveUsers();
+
+  /* ---- login: verified by Supabase Auth ---- */
+  function ssSyntheticEmail(username){
+    var local=String(username||'').trim().toLowerCase().replace(/[^a-z0-9._-]/g,'-').replace(/^[._-]+/,'');
+    if(!local)local='user';
+    return local+'@erp.shreeshyam.local';
+  }
+  async function serverLogin(u,p){
+    // First use the existing Emergent API when it is available.
+    try{
+      var r=await _fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+      var d=await r.json().catch(function(){return {};});
+      if(r.status===200&&d&&d.access_token)return {status:200,data:d};
+      if(r.status===401)return {status:401,data:d};
+    }catch(e){}
+    // Static/GitHub/normal hosting fallback: authenticate directly with Supabase Auth.
+    try{
+      var r2=await _fetch(SB_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'Content-Type':'application/json','apikey':PUB},body:JSON.stringify({email:ssSyntheticEmail(u),password:p})});
+      var raw=await r2.json().catch(function(){return {};});
+      if(r2.status===200&&raw&&raw.access_token){
+        var su=raw.user||{},am=su.app_metadata||{},um=su.user_metadata||{},localAcc=(window.USERS||{})[u]||{};
+        raw.user={id:su.id,username:am.username||um.username||u,name:am.name||um.name||localAcc.name||u,role:am.role||um.role||localAcc.role||'staff',type:am.type||um.type||localAcc.type||'',accountKind:am.accountKind||um.accountKind||localAcc.role||'staff',email:su.email};
+        return {status:200,data:raw};
+      }
+      return {status:r2.status||401,data:{error:'Invalid username or password'}};
+    }catch(e){return {status:0,data:null};}
+  }
+  function wrapLogin(){
+    if(typeof window.doLogin!=='function')return setTimeout(wrapLogin,300);
+    if(window.doLogin.__ss)return;
+    var orig=window.doLogin;
+    window.doLogin=async function(){
+      var uEl=document.getElementById('lUser'),pEl=document.getElementById('lPass'),err=document.getElementById('lErr');
+      var u=(uEl&&uEl.value||'').trim().toLowerCase(),p=(pEl&&pEl.value||'').trim();
+      if(!u||!p)return orig.apply(this,arguments);
+      var btn=document.querySelector('.login-btn'),oldTxt=btn&&btn.innerHTML;
+      if(btn){btn.disabled=true;btn.textContent='Verifying securely...';}
+      if(err)err.style.display='none';
+      var res=await serverLogin(u,p);
+      if(btn){btn.disabled=false;btn.innerHTML=oldTxt;}
+      if(res.status===200&&res.data&&res.data.access_token){
+        save(res.data);
+        var U=window.USERS||(window.USERS={}),acc=U[u],su=res.data.user||{};
+        if(!acc){U[u]={pass:p,role:su.role||'staff',type:su.type||'',name:su.name||u,phone:su.phone||'',email:su.email||''};}
+        else if(acc.pass!==p){acc.pass=p;}
+        var r=callOrig(orig,this,arguments);
+        setTimeout(function(){if(window.CU){T('Secure login verified by Supabase Auth','success');if(window.CU.accountKind==='admin'||window.CU.accountKind==='master')window.ssAuthSyncUsers({silent:true});}},600);
+        return r;
+      }
+      if(res.status===401){
+        var st=await fetchStatus();
+        if(st&&st.provisioned===false){
+          // BOOTSTRAP: accounts not yet created in Supabase -> legacy check, then provision everyone.
+          var account=(window.USERS||{})[u];
+          if(account&&account.pass===p){
+            var r2=callOrig(orig,this,arguments);
+            setTimeout(async function(){
+              if(!window.CU)return;
+              T('Setting up secure Supabase accounts...','info');
+              var d=await window.ssAuthSyncUsers({silent:true});
+              if(d&&!d.error){var l=await serverLogin(u,p);if(l.status===200&&l.data&&l.data.access_token){save(l.data);T('Secure accounts created ('+((d.created||[]).length)+'). Supabase Auth active.','success');}}
+              else T('Could not create Supabase accounts yet. Will retry on next admin login.','error');
+            },500);
+            return r2;
+          }
+        }
+        if(err){err.style.display='block';err.textContent='Invalid username or password';}
+        if(pEl)pEl.value='';
+        return;
+      }
+      // 0 / 5xx: auth service unreachable -> offline fallback (local check)
+      T('Auth server unreachable - offline login (limited)','error');
+      return callOrig(orig,this,arguments);
+    };
+    window.doLogin.__ss=true;
+  }
+  wrapLogin();
+
+  /* ---- logout clears the session ---- */
+  function wrapLogout(){
+    if(typeof window.doLogout!=='function')return setTimeout(wrapLogout,300);
+    if(window.doLogout.__ss)return;
+    var o=window.doLogout;
+    window.doLogout=function(){var r=o.apply(this,arguments);try{if(!window.CU)save(null);}catch(e){}return r;};
+    window.doLogout.__ss=true;
+  }
+  wrapLogout();
+
+  /* ---- admin: auth status box inside "Login Users" modal ---- */
+  function renderAuthBox(){
+    var box=document.getElementById('userListBox');if(!box||!box.firstChild)return;
+    var el=document.getElementById('ssAuthBox');
+    if(!el){el=document.createElement('div');el.id='ssAuthBox';box.insertBefore(el,box.firstChild);}
+    var ok=status&&status.provisioned,me=S&&S.user;
+    el.innerHTML='<div style="margin-top:14px;padding:12px 14px;border-radius:12px;border:1px solid '+(ok?'#BBF7D0':'#FDE68A')+';background:'+(ok?'#F0FDF4':'#FFFBEB')+';display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">'+
+      '<div><div style="font-weight:800;font-size:.85rem;color:#0B1F3A">'+(ok?'&#128274; Supabase Auth ACTIVE':'&#9888; Supabase Auth not set up yet')+'</div>'+
+      '<div style="font-size:.7rem;color:#475569;margin-top:2px">'+(ok?(status.count||0)+' secure accounts | You: '+(me?me.username+' ('+me.role+')':'legacy session'):'Click Sync to create secure accounts for every user')+'</div></div>'+
+      '<button type="button" id="ssAuthSyncBtn" class="btn bp bsm">&#8635; Sync to Supabase Auth</button></div>';
+    var b=document.getElementById('ssAuthSyncBtn');if(b)b.onclick=function(){b.disabled=true;b.textContent='Syncing...';window.ssAuthSyncUsers({}).then(function(){b.disabled=false;b.innerHTML='&#8635; Sync to Supabase Auth';});};
+  }
+  setInterval(function(){try{var box=document.getElementById('userListBox');if(box&&box.offsetParent&&!document.getElementById('ssAuthBox'))renderAuthBox();}catch(e){}},1000);
+})();
+</script>
+
+<script>
+/* SHREE SHYAM STATIC HTML SAFETY PATCH */
+(function(){
+  window.addEventListener('online',function(){try{if(window.ssCloudForceRefresh)window.ssCloudForceRefresh();}catch(e){}});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden){try{if(window.ssCloudForceRefresh)window.ssCloudForceRefresh();}catch(e){}}});
+})();
+</script>
 </body>
 </html>
