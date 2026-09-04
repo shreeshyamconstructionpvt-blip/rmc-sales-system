@@ -2083,8 +2083,7 @@ var USERS = {
   master:    {pass:"Master@2026", role:"master", name:"Master Control"},
   parvinder: {pass:"staff@123", role:"staff", name:"Parvinder Kumar"},
   pawan:     {pass:"staff@123", role:"staff", name:"Pawan Kumar"},
-  rupesh:    {pass:"plant@123", role:"office", type:"office", name:"Rupesh Sharma"},
-  punit:     {pass:"plant@123", role:"office", type:"office", name:"Punit"},
+punit:     {pass:"plant@123", role:"office", type:"office", name:"Punit"},
   raj:       {pass:"plant@123", role:"office", type:"office", name:"Raj Sing"},
   yoginder:  {pass:"plant@123", role:"office", type:"office", name:"Yoginder"},
   parveen:   {pass:"plant 123", role:"plant", type:"plant", name:"Parveen Dahiya"}
@@ -2098,7 +2097,7 @@ function loadUsers(){
     var saved=localStorage.getItem("RMC_USERS");
     if(saved){
       var parsed=JSON.parse(saved);
-      if(parsed&&typeof parsed==="object") USERS=Object.assign({},USERS,parsed);
+      if(parsed&&typeof parsed==="object"){ delete parsed.rupesh; USERS=Object.assign({},USERS,parsed); }
     }
   }catch(e){}
 }
@@ -2503,8 +2502,7 @@ var OS=[
   {id:1,nm:"Rajesh Sharma",rl:"Office Manager",dp:"Admin",ph:"9998000001",st:"Active",cl:"#7c3aed"},
   {id:2,nm:"Sunita Devi",  rl:"Accountant",   dp:"Finance",ph:"9998000002",st:"Active",cl:"#e02424"},
   {id:3,nm:"Amit Verma",   rl:"Data Entry",   dp:"Admin",  ph:"9998000003",st:"Active",cl:"#f59e0b"},
-  {id:4,nm:"Rupesh Sharma",rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#0891b2",loginId:"rupesh"},
-  {id:5,nm:"Punit",        rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#16a34a",loginId:"punit"},
+{id:5,nm:"Punit",        rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#16a34a",loginId:"punit"},
   {id:6,nm:"Raj Sing",     rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#ea580c",loginId:"raj"},
   {id:7,nm:"Yoginder",     rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#7c3aed",loginId:"yoginder"}
 ];
@@ -4459,6 +4457,15 @@ window.addEventListener('storage',function(e){
             try{await putKey(k,merged);clearDirty(k);}catch(e){console.warn("V26 dirty upload failed",k,e);}
           }
         }
+        // Permanent cleanup: Rupesh Sharma account/work data must never be restored from cloud.
+        try{
+          var ru=rawLocal("RMC_USERS");
+          var ro=rawLocal("RMC_OFFICE_WORK");
+          var rv=rawLocal("RMC_VISITS");
+          if(ru){ var uo=parse(ru)||{}; if(uo && typeof uo==="object" && !Array.isArray(uo)){ delete uo.rupesh; localStorage.setItem("RMC_USERS",JSON.stringify(uo)); await putKey("RMC_USERS",uo); } }
+          if(ro){ var oa=parse(ro); if(Array.isArray(oa)){ oa=oa.filter(function(x){return String((x&&x.nm)||"").trim().toLowerCase()!=="rupesh sharma";}); localStorage.setItem("RMC_OFFICE_WORK",JSON.stringify(oa)); await putKey("RMC_OFFICE_WORK",oa); } }
+          if(rv){ var va=parse(rv); if(Array.isArray(va)){ va=va.filter(function(x){return String((x&&x.sp)||"").trim().toLowerCase()!=="rupesh" && String((x&&x.sp)||"").trim().toLowerCase()!=="rupesh sharma";}); localStorage.setItem("RMC_VISITS",JSON.stringify(va)); await putKey("RMC_VISITS",va); } }
+        }catch(cleanErr){ console.warn("Rupesh cleanup skipped until authenticated cloud access is available",cleanErr); }
         localStorage.setItem(LAST_PULL,new Date().toISOString());
       }finally{SUPPRESS=false;}
       if(changed && !silent)scheduleUIRefresh();
@@ -5603,6 +5610,7 @@ window.addEventListener('storage',function(e){
     return local+'@erp.shreeshyam.local';
   }
   async function serverLogin(u,p){
+  if(String(u||'').trim().toLowerCase()==='rupesh'){ throw new Error('Rupesh account has been deleted.'); }
     // First use the existing Emergent API when it is available.
     try{
       var r=await _fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
@@ -5699,11 +5707,28 @@ window.addEventListener('storage',function(e){
 })();
 </script>
 
+
+
 <script>
 /* SHREE SHYAM STATIC HTML SAFETY PATCH */
 (function(){
   window.addEventListener('online',function(){try{if(window.ssCloudForceRefresh)window.ssCloudForceRefresh();}catch(e){}});
   document.addEventListener('visibilitychange',function(){if(!document.hidden){try{if(window.ssCloudForceRefresh)window.ssCloudForceRefresh();}catch(e){}}});
+})();
+</script>
+<script>
+(function(){
+  try{
+    ['RMC_OFFICE_WORK','RMC_VISITS'].forEach(function(k){
+      var a=JSON.parse(localStorage.getItem(k)||'[]');
+      if(Array.isArray(a)){
+        a=a.filter(function(x){return String((x&&x.nm)||'').trim().toLowerCase()!=='rupesh sharma' && String((x&&x.sp)||'').trim().toLowerCase()!=='rupesh';});
+        localStorage.setItem(k,JSON.stringify(a));
+      }
+    });
+    var u=JSON.parse(localStorage.getItem('RMC_USERS')||'{}');
+    if(u && typeof u==='object'){ delete u.rupesh; localStorage.setItem('RMC_USERS',JSON.stringify(u)); }
+  }catch(e){}
 })();
 </script>
 </body>
