@@ -116,7 +116,7 @@ td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:top}
 .toast{background:var(--t);color:#fff;padding:10px 15px;border-radius:8px;font-size:.83rem;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:sIn .22s ease}
 .toast.success{background:var(--s)}.toast.error{background:var(--d)}.toast.info{background:var(--p)}
 @keyframes sIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.admin-only{display:none}.admin-mode .admin-only,.office-mode .office-access{display:inline-flex}
+.admin-only{display:none}.admin-mode .admin-only,.owner-mode .admin-only,.office-mode .office-access{display:inline-flex}
 .plant-badge{background:#e0f2fe;color:#075985;border:1px solid #38bdf8;border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:700}.staff-badge{background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:700}
 .ph{display:none;text-align:center;margin-bottom:10px}
 @media print{header,.toolbar,.sg,.tch .btn,.ra,.pag,.mo,.tc2,.tabs,.alert-banner,.dashboard-welcome,.login-wrap{display:none!important}body{background:#fff}main{padding:0;max-width:100%}.tc{box-shadow:none;border:1px solid #ccc}.ph{display:block!important}table{font-size:8pt}.tp{display:block!important}#tp-2,#tp-3,#tp-4,#tp-5,#tp-6,#tp-7{display:none!important}}
@@ -1399,6 +1399,7 @@ body{--gold:#c91435}
     </div>
     <div class="role-tabs">
       <button class="role-tab act" onclick="setRole('admin',this)">&#128737; Admin / Master Login</button>
+      <button class="role-tab" onclick="setRole('owner',this)">&#127968; Plant Owner Login</button>
       <button class="role-tab" onclick="setRole('staff',this)">&#128100; Staff Login</button>
     </div>
     <div class="login-field">
@@ -1882,18 +1883,30 @@ body{--gold:#c91435}
 <script>
 // ===== USER ACCOUNTS =====
 var USERS = {
-  admin:     {pass:"admin@123", role:"admin", name:"Administrator"},
-  master:    {pass:"Master@2026", role:"master", name:"Master Control"},
-  parvinder: {pass:"staff@123", role:"staff", name:"Parvinder Kumar"},
-  pawan:     {pass:"staff@123", role:"staff", name:"Pawan Kumar"},
-  rupesh:    {pass:"plant@123", role:"office", type:"office", name:"Rupesh Sharma"},
-  punit:     {pass:"plant@123", role:"office", type:"office", name:"Punit"},
-  raj:       {pass:"plant@123", role:"office", type:"office", name:"Raj Sing"},
-  yoginder:  {pass:"plant@123", role:"office", type:"office", name:"Yoginder"},
-  parveen:   {pass:"plant 123", role:"plant", type:"plant", name:"Parveen Dahiya"}
+  admin:  {pass:"admin@123", role:"admin", name:"Software Administrator"},
+  master: {pass:"Master@2026", role:"master", name:"Master Control"}
 };
 var CU = null; // current user
 var selectedLoginRole = 'admin';
+
+// WHITE-LABEL FRESH LOGIN MIGRATION: remove only the old demo/staff login accounts.
+// Existing work/report records are intentionally preserved. Future staff are created by the owner/admin.
+(function(){
+  try{
+    var legacyIds=["parvinder","pawan","rupesh","punit","raj","yoginder","parveen"];
+    var raw=localStorage.getItem("RMC_USERS");
+    if(raw){
+      var u=JSON.parse(raw)||{}; legacyIds.forEach(function(k){delete u[k];}); localStorage.setItem("RMC_USERS",JSON.stringify(u));
+    }
+    ["RMC_SL","RMC_OS"].forEach(function(key){
+      var raw2=localStorage.getItem(key); if(!raw2)return; var arr=JSON.parse(raw2)||[];
+      var names=["Parvinder Kumar","Pawan Kumar","Rupesh Sharma","Punit","Raj Sing","Yoginder","Parveen Dahiya"];
+      arr=arr.filter(function(x){return names.indexOf(String(x.nm||x.name||""))<0 && legacyIds.indexOf(String(x.loginId||x.login||"" ).toLowerCase())<0;});
+      localStorage.setItem(key,JSON.stringify(arr));
+    });
+    localStorage.setItem("RMC_WHITE_LABEL_LOGIN_RESET","2026-09-09");
+  }catch(e){}
+})();
 
 // Admin-created accounts are persisted in this browser.
 function loadUsers(){
@@ -2117,6 +2130,7 @@ function setRole(r,btn){
   var hint=document.getElementById('lHint');
   if(hint)hint.innerHTML = r==='admin'
     ? '<strong>Admin / Master:</strong> use your authorized Admin or Master Login ID and password'
+    : r==='owner' ? '<strong>Plant Owner:</strong> use the owner Login ID provided by the software administrator'
     : '<strong>Staff:</strong> use your Sales / Office Staff Login ID and password';
 }
 function togglePassword(){
@@ -2142,6 +2156,7 @@ function accountKind(account){
   if(!account)return "staff";
   if(account.role==="master" || account.type==="master")return "master";
   if(account.role==="admin" || account.type==="admin")return "admin";
+  if(account.role==="owner" || account.type==="owner")return "owner";
   if(account.role==="office" || account.type==="office")return "office";
   if(account.role==="plant" || account.type==="plant")return "plant";
   return "staff";
@@ -2219,7 +2234,7 @@ function doLogin(){
   if(account && account.pass===p){
     var kind=accountKind(account);
 
-    if(selectedLoginRole==="admin" && kind!=="admin" && kind!=="master"){
+    if(selectedLoginRole==="admin" && kind!=="admin" && kind!=="master" && kind!=="owner"){
       showLoginAccessModal("Staff Account Detected",
         kind==="office"
           ? "You are an Office Staff user. Kindly select the Staff Login section and sign in with your Office Staff credentials."
@@ -2228,11 +2243,15 @@ function doLogin(){
           : "You are a Staff user. Kindly select the Staff Login section and sign in with your Staff credentials.");
       return;
     }
-    if(selectedLoginRole==="staff" && (kind==="admin"||kind==="master")){
+    if(selectedLoginRole==="staff" && (kind==="admin"||kind==="master"||kind==="owner")){
       showLoginAccessModal(kind==="master"?"Master Account Detected":"Admin Account Detected",
         kind==="master"
           ? "You are a Master user. Kindly select the Admin Login section and sign in with your Master credentials."
           : "You are an Admin user. Kindly select the Admin Login section and sign in with your Admin credentials.");
+      return;
+    }
+    if(selectedLoginRole==="owner" && kind!=="owner"){
+      showLoginAccessModal("Plant Owner Login", "This Login ID is not a Plant Owner account. Kindly use the correct login section.");
       return;
     }
 
@@ -2244,8 +2263,8 @@ function doLogin(){
     if(lp)lp.style.display='none';
     if(app){
       app.style.display='block';
-      app.classList.remove('admin-mode','staff-mode','office-mode','plant-mode','master-mode');
-      app.classList.add(kind==='master'?'master-mode':kind==='admin'?'admin-mode':kind==='office'?'office-mode':kind==='plant'?'plant-mode':'staff-mode');
+      app.classList.remove('admin-mode','owner-mode','staff-mode','office-mode','plant-mode','master-mode');
+      app.classList.add(kind==='master'?'master-mode':kind==='admin'?'admin-mode':kind==='owner'?'owner-mode':kind==='office'?'office-mode':kind==='plant'?'plant-mode':'staff-mode');
     }
 
     var ub=document.getElementById('userBadge');
@@ -2257,6 +2276,7 @@ function doLogin(){
     var hs=document.getElementById('hSub');
     if(hs)hs.textContent=kind==='master'?'Master Control — Full Enterprise Access':
       kind==='admin'?'Admin Mode — Full Access':
+      kind==='owner'?'Plant Owner Mode — Staff & Plant Management':
       kind==='office'?'Office Staff Mode — My Work Only':
       kind==='plant'?'Plant Manager Mode — Plant Operations & Dispatch':
       'Sales Staff Mode — My Visits Only';
@@ -2311,12 +2331,12 @@ function doLogout(){
   if(!confirm('Logout?'))return;
   CU=null;
   var app=document.getElementById('app'),lp=document.getElementById('loginPage');
-  if(app){app.style.display='none';app.classList.remove('admin-mode','staff-mode','office-mode','plant-mode','master-mode');}
+  if(app){app.style.display='none';app.classList.remove('admin-mode','owner-mode','staff-mode','office-mode','plant-mode','master-mode');}
   if(lp)lp.style.display='flex';
   var u=document.getElementById('lUser'),p=document.getElementById('lPass'),e=document.getElementById('lErr');
   if(u)u.value='';if(p)p.value='';if(e)e.style.display='none';
 }
-function canEdit(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'));}
+function canEdit(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'||CU.accountKind==='owner'));}
 function canAddVisit(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'||CU.accountKind==='staff'));}
 function canOfficeWork(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'||CU.accountKind==='office'));}
 function isMySalesName(n){return !!(CU&&(CU.accountKind==='staff'||CU.accountKind==='master')&&String(n||'')===String(CU.name||''));}
@@ -2330,31 +2350,24 @@ var QT=[
   {id:3,dt:"2026-08-24",cu:"KEC/Maruti",cn:"7499922442",co:"Mr. Ravi",si:"IMT Kharkhoda",gr:"Multiple",qty:1000,rate:5200,total:5200000,sts:"Draft",vt:"2026-10-15",nt:"Multiple grades required"}
 ];
 var nQid=4,FQ=[].concat(QT),sqf="dt",sqd=-1;
-var SL=[
-  {id:1,nm:"Parvinder Kumar",rl:"Sales Executive",dp:"Sales",ph:"9999000001",em:"parvinder@rmc.com",jd:"2025-01-01",st:"Active",cl:"#1a56db"},
-  {id:2,nm:"Pawan Kumar",    rl:"Sales Executive",dp:"Sales",ph:"9999000002",em:"pawan@rmc.com",    jd:"2025-01-01",st:"Active",cl:"#057a55"}
-];
-var nSid=3;
+var SL=[];
+var nSid=1;
 try{
   var savedSL=localStorage.getItem("RMC_SL");
   if(savedSL){
     var parsedSL=JSON.parse(savedSL);
-    if(Array.isArray(parsedSL)&&parsedSL.length){
-      SL=parsedSL;
-      nSid=Math.max.apply(null,SL.map(function(s){return Number(s.id)||0;}))+1;
-    }
+    if(Array.isArray(parsedSL)){SL=parsedSL;nSid=Math.max.apply(null,[0].concat(SL.map(function(x){return Number(x.id)||0;})))+1;}
   }
 }catch(e){}
-var OS=[
-  {id:1,nm:"Rajesh Sharma",rl:"Office Manager",dp:"Admin",ph:"9998000001",st:"Active",cl:"#7c3aed"},
-  {id:2,nm:"Sunita Devi",  rl:"Accountant",   dp:"Finance",ph:"9998000002",st:"Active",cl:"#e02424"},
-  {id:3,nm:"Amit Verma",   rl:"Data Entry",   dp:"Admin",  ph:"9998000003",st:"Active",cl:"#f59e0b"},
-  {id:4,nm:"Rupesh Sharma",rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#0891b2",loginId:"rupesh"},
-  {id:5,nm:"Punit",        rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#16a34a",loginId:"punit"},
-  {id:6,nm:"Raj Sing",     rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#ea580c",loginId:"raj"},
-  {id:7,nm:"Yoginder",     rl:"Office Staff",dp:"Office",ph:"",st:"Active",cl:"#7c3aed",loginId:"yoginder"}
-];
-var nOid=8;
+var OS=[];
+var nOid=1;
+try{
+  var savedOS=localStorage.getItem("RMC_OS");
+  if(savedOS){
+    var parsedOS=JSON.parse(savedOS);
+    if(Array.isArray(parsedOS)){OS=parsedOS;nOid=Math.max.apply(null,[0].concat(OS.map(function(x){return Number(x.id)||0;})))+1;}
+  }
+}catch(e){}
 var WL=[
   {id:1,nm:"Rajesh Sharma",dt:"2026-08-22",tk:"Monthly MIS Report",sts:"Completed",pr:"High",nt:"Sent to MD"},
   {id:2,nm:"Sunita Devi",  dt:"2026-08-23",tk:"Invoice Processing",sts:"In Progress",pr:"Medium",nt:"30 invoices"},
@@ -2402,7 +2415,7 @@ function hoc(e){if(e.target===document.getElementById("mo"))closeModal();}
 function swTab(btn,tid){
   if(!CU)return;
   var allowed=CU.accountKind==='master' ? ['tp-master','tp-1','tp-2','tp-3','tp-4','tp-5','tp-6','tp-7','tp-plant'] :
-    CU.accountKind==='admin' ? ['tp-1','tp-2','tp-3','tp-4','tp-5','tp-6','tp-7'] :
+    CU.accountKind==='admin'||CU.accountKind==='owner' ? ['tp-1','tp-2','tp-3','tp-4','tp-5','tp-6','tp-7'] :
     CU.accountKind==='office' ? ['tp-4'] :
     CU.accountKind==='plant' ? ['tp-plant'] : ['tp-1','tp-2'];
   if(allowed.indexOf(tid)<0){
@@ -3601,7 +3614,7 @@ window.ssCloudRefreshWork=async function(){
 };
 
 // ===== ADMIN REPORT CENTRE / SEPARATE PDF EXPORTS =====
-function reportCan(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'));}
+function reportCan(){return !!(CU&&(CU.accountKind==='admin'||CU.accountKind==='master'||CU.accountKind==='owner'));}
 async function renderAdminReportCentre(){
   if(!reportCan())return;
   await ssCloudRefreshWork();
@@ -4481,5 +4494,105 @@ window.addEventListener('storage',function(e){
   };
 })();
 </script>
+
+<script>
+/* =========================================================
+   WHITE-LABEL COMMERCIAL V1.1
+   Plant Owner hierarchy + Sales Daily Work + Bike KM
+   Existing records are preserved. New sales work is stored
+   under a separate cloud key so it syncs across devices.
+   ========================================================= */
+(function(){
+  var CLOUD_URL="https://xihbqwhsqlpgrysttwth.supabase.co";
+  var CLOUD_KEY="sb_publishable_unS4unpIcU9F3YecyKXWzw_2MkD4_ct";
+  function H(extra){return Object.assign({apikey:CLOUD_KEY,Authorization:"Bearer "+CLOUD_KEY,"Content-Type":"application/json"},extra||{});}
+  async function cloudPut(key,value){
+    try{
+      var r=await fetch(CLOUD_URL+"/rest/v1/erp_cloud_state?on_conflict=state_key",{method:"POST",headers:H({Prefer:"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify({state_key:key,state:value,updated_at:new Date().toISOString()})});
+      if(!r.ok)throw new Error(await r.text()); return true;
+    }catch(e){console.warn("Commercial cloud save",key,e);return false;}
+  }
+  async function cloudGet(key){
+    var r=await fetch(CLOUD_URL+"/rest/v1/erp_cloud_state?select=state_key,state&state_key=eq."+encodeURIComponent(key),{headers:H()});
+    if(!r.ok)throw new Error(await r.text()); var a=await r.json(); return a[0]&&a[0].state;
+  }
+
+  /* Owner can create staff from the same Staff + Login button. */
+  window.createPlantOwner=function(){
+    if(!CU||CU.accountKind!=="admin"&&CU.accountKind!=="master"){toast("Admin/Master only","error");return;}
+    eid=null;
+    document.getElementById("mt").textContent="Create Plant Owner Login";
+    document.getElementById("mb2").innerHTML="<div class='fg'>"+
+      "<div class='fi'><label>Owner / Company Name *</label><input id='ponm' placeholder='e.g. ABC RMC Pvt Ltd'></div>"+
+      "<div class='fi'><label>Login ID *</label><input id='poun' autocomplete='off' placeholder='e.g. abcowner'></div>"+
+      "<div class='fi'><label>Password *</label><input id='popw' type='password' autocomplete='new-password' placeholder='Create password'></div>"+
+      "<div class='fi'><label>Plant Name</label><input id='popl' placeholder='e.g. Main RMC Plant'></div>"+
+      "<div class='fi'><label>Owner Mobile</label><input id='poph' placeholder='Mobile number'></div>"+
+      "<div class='fi full'><div style='padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0;color:#475569;font-size:.75rem'>The owner can log in remotely, create Sales Staff and Office Staff IDs, and view plant/staff reports.</div></div>"+
+      "</div>";
+    document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='savePlantOwner()'>Create Owner Login</button>";
+    openModal();
+  };
+  window.savePlantOwner=async function(){
+    if(!CU||CU.accountKind!=="admin"&&CU.accountKind!=="master")return;
+    var nm=(document.getElementById("ponm").value||"").trim(),u=(document.getElementById("poun").value||"").trim().toLowerCase(),pw=(document.getElementById("popw").value||"").trim(),pl=(document.getElementById("popl").value||"").trim(),ph=(document.getElementById("poph").value||"").trim();
+    if(!nm||!/^[a-z0-9._-]{3,30}$/.test(u)||pw.length<4){toast("Enter company/owner name, valid Login ID and 4+ character password","error");return;}
+    if(userExists(u)){toast("Login ID already exists","error");return;}
+    USERS[u]={pass:pw,role:"owner",type:"owner",name:nm,plantName:pl,phone:ph,createdAt:new Date().toISOString()};
+    saveUsers();
+    var ok=await cloudPut("RMC_USERS",USERS);
+    closeModal(); if(typeof renderUserList==='function')renderUserList();
+    toast(ok?"Plant Owner login created and saved to cloud":"Owner created on this device; cloud save failed — retry online","success");
+  };
+
+  /* Sales staff daily work report with Bike KM. */
+  function salesWorkForm(w){w=w||{};var d=new Date().toISOString().slice(0,10);return "<div class='fg'>"+
+    "<div class='fi'><label>Staff</label><input value='"+(CU&&CU.name||"").replace(/'/g,"&#39;")+"' disabled></div>"+
+    "<div class='fi'><label>Date *</label><input id='swdt' type='date' value='"+(w.dt||d)+"'></div>"+
+    "<div class='fi full'><label>Daily Work / Field Activity *</label><textarea id='swtk' style='min-height:100px' placeholder='Enter today\'s sales visits, calls, follow-ups, meetings, collection work...'>"+(w.tk||"")+"</textarea></div>"+
+    "<div class='fi'><label>Bike KM Start</label><input id='swks' type='number' min='0' step='0.1' value='"+(w.kms||"") +"' placeholder='Start meter'></div>"+
+    "<div class='fi'><label>Bike KM End</label><input id='swke' type='number' min='0' step='0.1' value='"+(w.kme||"") +"' placeholder='End meter'></div>"+
+    "<div class='fi'><label>Bike KM Run (Auto)</label><input id='swkt' type='number' min='0' step='0.1' value='"+(w.kmt||"") +"' readonly></div>"+
+    "<div class='fi'><label>Status</label><select id='swst'><option>Pending</option><option "+(w.sts==='In Progress'?'selected':'')+">In Progress</option><option "+(w.sts==='Completed'?'selected':'')+">Completed</option></select></div>"+
+    "<div class='fi full'><label>Notes / Update Details</label><textarea id='swnt' placeholder='Additional details...'>"+(w.nt||"")+"</textarea></div></div>";}
+  window.openSalesWorkModal=function(id){
+    if(!CU||CU.accountKind!=="staff"){toast("Sales Staff login required","error");return;}
+    var w=null;if(id){var a=JSON.parse(localStorage.getItem("RMC_SALES_WORK")||"[]");w=a.filter(function(x){return String(x.id)===String(id);})[0];}
+    document.getElementById("mt").textContent=id?"Update Sales Daily Work":"Sales Daily Work Report";
+    document.getElementById("mb2").innerHTML=salesWorkForm(w||{});
+    document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Cancel</button><button class='btn bs' onclick='saveSalesWork()'>Save Work Report</button>";
+    openModal();
+    var a=document.getElementById("swks"),b=document.getElementById("swke"),t=document.getElementById("swkt");function calc(){var x=parseFloat(a.value),y=parseFloat(b.value);t.value=(isFinite(x)&&isFinite(y)&&y>=x)?(y-x).toFixed(1):"";}a.oninput=calc;b.oninput=calc;calc();
+  };
+  window.saveSalesWork=async function(){
+    if(!CU||CU.accountKind!=="staff")return;
+    var task=(document.getElementById("swtk").value||"").trim(),dt=document.getElementById("swdt").value,a=parseFloat(document.getElementById("swks").value),b=parseFloat(document.getElementById("swke").value);
+    if(!task||!dt){toast("Date and work description required","error");return;}
+    if(isFinite(a)&&isFinite(b)&&b<a){toast("Bike KM End cannot be less than Start","error");return;}
+    var arr=JSON.parse(localStorage.getItem("RMC_SALES_WORK")||"[]"), id=Date.now(), rec={id:id,nm:CU.name,loginId:CU.uname,dt:dt,tk:task,kms:isFinite(a)?a:"",kme:isFinite(b)?b:"",kmt:isFinite(a)&&isFinite(b)?Number((b-a).toFixed(1)):"",sts:document.getElementById("swst").value,nt:(document.getElementById("swnt").value||"").trim(),updatedAt:new Date().toISOString()};
+    arr.push(rec);localStorage.setItem("RMC_SALES_WORK",JSON.stringify(arr));
+    var cloud=await cloudGet("RMC_SALES_WORK").catch(function(){return [];});if(!Array.isArray(cloud))cloud=[];
+    var map={};cloud.concat(arr).forEach(function(x){map[String(x.id)]=x;});var merged=Object.keys(map).map(function(k){return map[k];}).sort(function(x,y){return String(y.dt).localeCompare(String(x.dt));});
+    var ok=await cloudPut("RMC_SALES_WORK",merged);localStorage.setItem("RMC_SALES_WORK",JSON.stringify(merged));closeModal();toast(ok?"Sales work report saved to cloud":"Saved on device; cloud save failed — retry online",ok?"success":"error");
+  };
+  window.showSalesWorkList=function(){
+    if(!CU||!(CU.accountKind==='admin'||CU.accountKind==='master'||CU.accountKind==='owner'))return;
+    var arr=JSON.parse(localStorage.getItem("RMC_SALES_WORK")||"[]");arr=arr.filter(function(x){return CU.accountKind==='admin'||CU.accountKind==='master'||CU.accountKind==='owner'?true:x.nm===CU.name;});
+    document.getElementById("mt").textContent="Sales Staff Daily Work Reports";
+    document.getElementById("mb2").innerHTML=arr.length?"<div style='display:flex;flex-direction:column;gap:8px'>"+arr.map(function(x){return "<div style='padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff'><b>"+x.nm+"</b> · "+fd(x.dt)+"<br><span style='color:#475569'>"+x.tk.replace(/</g,'&lt;')+"</span><br><b>Bike KM Run: "+(x.kmt===''?'-':x.kmt+" km")+"</b> · "+x.sts+(x.nt?"<br><small>"+x.nt.replace(/</g,'&lt;')+"</small>":"")+"</div>";}).join("")+"</div>":"<div style='padding:25px;text-align:center;color:#64748b'>No sales work reports yet.</div>";
+    document.getElementById("mf2").innerHTML="<button class='btn bo' onclick='closeModal()'>Close</button>";openModal();
+  };
+
+  function addButtons(){
+    var ha=document.querySelector('.ha');if(!ha)return;
+    if(!document.getElementById('owner-create-btn')){var b=document.createElement('button');b.id='owner-create-btn';b.className='btn bp admin-only';b.innerHTML='&#127968; Create Plant Owner';b.onclick=window.createPlantOwner;ha.insertBefore(b,ha.firstChild);}
+    if(!document.getElementById('sales-work-btn')){var b2=document.createElement('button');b2.id='sales-work-btn';b2.className='btn bw sales-work-access';b2.innerHTML='&#128221; Daily Work + Bike KM';b2.onclick=window.openSalesWorkModal;ha.insertBefore(b2,ha.firstChild);}
+    if(!document.getElementById('sales-work-view-btn')){var b3=document.createElement('button');b3.id='sales-work-view-btn';b3.className='btn bw owner-only';b3.innerHTML='&#128202; Sales Work Reports';b3.onclick=window.showSalesWorkList;ha.insertBefore(b3,ha.firstChild);}
+  }
+  var st=document.createElement('style');st.textContent='.owner-mode .owner-only{display:inline-flex!important}.sales-work-access{display:none}.staff-mode .sales-work-access{display:inline-flex!important}.owner-mode .admin-only{display:inline-flex!important}';document.head.appendChild(st);
+  setTimeout(addButtons,500);setTimeout(addButtons,1500);
+})();
+</script>
+
 </body>
 </html>
