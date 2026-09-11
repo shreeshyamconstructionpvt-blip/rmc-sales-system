@@ -375,6 +375,7 @@ async function deleteCloudRecord(module,recordId){const {error}=await supabaseCl
 function el(id){return document.getElementById(id)}
 function showToast(msg){let t=el("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2400)}
 function toggleSide(){el("sidebar").classList.toggle("open")}
+function openCloudSetup(){ const modal=el("cloudSetupModal"); if(!modal){showToast("Cloud setup window is unavailable."); return;} const c=getConfig(); if(c){el("sbUrl").value=c.url||""; el("sbKey").value=c.key||"";} el("cloudStatus").textContent=""; modal.classList.add("show"); }
 function openModal(id){populateDynamic();el(id).classList.add("show")}
 function closeModal(id){el(id).classList.remove("show")}
 
