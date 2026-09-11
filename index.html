@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Numberdar Enterprises Solar Energy | CRM & Staff ERP</title>
+<title>Numberdar Enterprises Solar Energy | CRM & Staff ERP V6 Cloud</title>
 <meta name="description" content="Numberdar Enterprises Solar Energy CRM, staff management, sales, projects, inventory, finance and service system.">
 <style>
 :root{
@@ -45,6 +45,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
  body{background:#fff}.sidebar,.top,.mobileBar,.noPrint,.btn,.toolbar{display:none!important}.main{margin:0}.content{padding:0}.page{display:none!important}.page.printing{display:block!important}.printOnly{display:block}.card{box-shadow:none;border:1px solid #ccc}.reportHero{color:#000;background:#fff;border:1px solid #ccc}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -60,7 +61,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
       <div class="loginField"><label>PASSWORD</label><input id="loginPass" type="password" autocomplete="current-password" required placeholder="Enter password"></div>
       <button class="btn primary" style="width:100%;padding:12px" type="submit">Secure Login →</button>
     </form>
-    <div class="loginHint"><b>Demo Admin:</b> admin / admin123<br>Admin creates staff Login ID + temporary password and assigns a company profile. Each profile receives its permitted modules.</div>
+    <div class="loginHint"><b>Cloud CRM:</b> Connect your Supabase project below. All company records are stored in Supabase and shared across computers.</div><button type="button" class="btn light" style="width:100%;margin-top:8px" onclick="openCloudSetup()">☁ Supabase Cloud Setup</button>
   </div>
 </div>
 
@@ -90,7 +91,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
     <div class="energyOrb"><i></i></div>
   </div>
   <div class="grid stats" style="margin-top:15px">
-    <div class="card stat"><div class="label">Total Leads</div><div class="value" id="dashLeads">0</div><div class="change">Live browser data</div></div>
+    <div class="card stat"><div class="label">Total Leads</div><div class="value" id="dashLeads">0</div><div class="change">Live Supabase cloud data</div></div>
     <div class="card stat"><div class="label">Customers</div><div class="value" id="dashCustomers">0</div><div class="change">Active records</div></div>
     <div class="card stat"><div class="label">Staff</div><div class="value" id="dashStaff">0</div><div class="change">Profiles created</div></div>
     <div class="card stat"><div class="label">Projects</div><div class="value" id="dashProjects">0</div><div class="change">Solar projects</div></div>
@@ -139,12 +140,12 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 </section>
 
 <section class="page" id="approvals">
- <div class="pageHead"><div><h1>DISCOM / PM Surya Ghar</h1><div class="sub">Application, approval, inspection, meter and commissioning tracker.</div></div></div>
+ <div class="pageHead"><div><h1>DISCOM / PM Surya Ghar</h1><div class="sub">Application, approval, inspection, meter and commissioning tracker.</div></div><button class="btn primary" onclick="openModal('approvalModal')">+ Add Application</button></div>
  <div class="card tablewrap"><table><thead><tr><th>Application</th><th>Customer</th><th>DISCOM</th><th>Capacity</th><th>Date</th><th>Status</th></tr></thead><tbody id="approvalTable"></tbody></table></div>
 </section>
 
 <section class="page" id="installation">
- <div class="pageHead"><div><h1>Installation Jobs</h1><div class="sub">Team assignments, checklist and completion progress.</div></div></div>
+ <div class="pageHead"><div><h1>Installation Jobs</h1><div class="sub">Team assignments, checklist and completion progress.</div></div><button class="btn primary" onclick="openModal('installationModal')">+ New Installation</button></div>
  <div class="card tablewrap"><table><thead><tr><th>Job</th><th>Project</th><th>Team</th><th>Date</th><th>Progress</th><th>Status</th></tr></thead><tbody id="installationTable"></tbody></table></div>
 </section>
 
@@ -154,21 +155,21 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 </section>
 
 <section class="page" id="suppliers">
- <div class="pageHead"><div><h1>Suppliers & Procurement</h1><div class="sub">Vendors, purchase orders and material supply.</div></div></div>
+ <div class="pageHead"><div><h1>Suppliers & Procurement</h1><div class="sub">Vendors, purchase orders and material supply.</div></div><button class="btn primary" onclick="openModal('supplierModal')">+ Add Supplier</button></div>
  <div class="card tablewrap"><table><thead><tr><th>Supplier</th><th>Contact</th><th>Phone</th><th>Products</th><th>Outstanding</th><th>Status</th></tr></thead><tbody id="supplierTable"></tbody></table></div>
 </section>
 
 <section class="page" id="service">
- <div class="pageHead"><div><h1>Service & Warranty</h1><div class="sub">Complaints, warranty, technician visits and O&M.</div></div></div>
+ <div class="pageHead"><div><h1>Service & Warranty</h1><div class="sub">Complaints, warranty, technician visits and O&M.</div></div><button class="btn primary" onclick="openModal('serviceModal')">+ New Ticket</button></div>
  <div class="card tablewrap"><table><thead><tr><th>Ticket</th><th>Customer</th><th>Issue</th><th>Technician</th><th>Priority</th><th>Status</th></tr></thead><tbody id="serviceTable"></tbody></table></div>
 </section>
 
 <section class="page" id="finance">
- <div class="pageHead"><div><h1>Finance & Payments</h1><div class="sub">Project collections and outstanding amounts.</div></div></div>
+ <div class="pageHead"><div><h1>Finance & Payments</h1><div class="sub">Project collections and outstanding amounts.</div></div><button class="btn primary" onclick="openModal('paymentModal')">+ Add Payment</button></div>
  <div class="grid stats">
   <div class="card stat"><div class="label">Total Sales</div><div class="value">₹24.8L</div></div><div class="card stat"><div class="label">Received</div><div class="value">₹18.4L</div></div><div class="card stat"><div class="label">Outstanding</div><div class="value">₹6.4L</div></div><div class="card stat"><div class="label">Overdue</div><div class="value">₹1.8L</div></div><div class="card stat"><div class="label">Collection</div><div class="value">74%</div></div>
  </div>
- <div class="card tablewrap"><table><thead><tr><th>Project</th><th>Customer</th><th>Total</th><th>Received</th><th>Pending</th><th>Due</th></tr></thead><tbody><tr><td>NSE-2026-0012</td><td>Raj Kumar</td><td>₹3,25,000</td><td>₹2,25,000</td><td>₹1,00,000</td><td><span class="badge bad">Overdue</span></td></tr><tr><td>NSE-2026-0018</td><td>ABC Traders</td><td>₹10,80,000</td><td>₹9,80,000</td><td>₹1,00,000</td><td><span class="badge wait">18 Sep</span></td></tr></tbody></table></div>
+ <div class="card tablewrap"><table><thead><tr><th>Project</th><th>Customer</th><th>Total</th><th>Received</th><th>Pending</th><th>Due</th></tr></thead><tbody id="paymentTable"></tbody></table></div>
 </section>
 
 <section class="page" id="staff">
@@ -288,7 +289,37 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 
 <div class="modal" id="inventoryModal"><div class="modalbox"><div class="mh"><h2>Add Inventory Item</h2><button class="close" onclick="closeModal('inventoryModal')">×</button></div><form id="inventoryForm" class="formgrid"><div class="field"><label>SKU *</label><input id="is" required></div><div class="field"><label>Product *</label><input id="ip" required></div><div class="field"><label>Brand</label><input id="ib"></div><div class="field"><label>Model</label><input id="im"></div><div class="field"><label>Quantity</label><input id="iq" type="number" value="0"></div><div class="field"><label>Reserved</label><input id="ir" type="number" value="0"></div><div class="full"><button class="btn primary">Save Inventory</button></div></form></div></div>
 
-<div id="toast" class="toast"></div>
+
+<div class="modal" id="approvalModal"><div class="modalbox"><div class="mh"><h2>Add DISCOM / PM Surya Ghar Record</h2><button class="close" onclick="closeModal('approvalModal')">×</button></div><form id="approvalForm" class="formgrid">
+<div class="field"><label>Application ID *</label><input id="apid" required></div><div class="field"><label>Customer *</label><input id="apcustomer" required></div>
+<div class="field"><label>DISCOM</label><input id="apdiscom" value="DHBVN"></div><div class="field"><label>Capacity kW</label><input id="apkw" type="number" step=".1"></div>
+<div class="field"><label>Date</label><input id="apdate" type="date"></div><div class="field"><label>Status</label><select id="apstatus"><option>Application Created</option><option>Documents Submitted</option><option>Technical Feasibility</option><option>Approval Pending</option><option>Approval Received</option><option>Installation Pending</option><option>Installation Completed</option><option>Inspection Pending</option><option>Inspection Completed</option><option>Meter Pending</option><option>Meter Installed</option><option>Commissioned</option><option>Subsidy Pending</option><option>Subsidy Received</option><option>Closed</option></select></div>
+<div class="field full"><label>Remarks</label><textarea id="apremarks"></textarea></div><div class="full"><button class="btn primary">Save Application</button></div></form></div></div>
+
+<div class="modal" id="installationModal"><div class="modalbox"><div class="mh"><h2>Create Installation Job</h2><button class="close" onclick="closeModal('installationModal')">×</button></div><form id="installationForm" class="formgrid">
+<div class="field"><label>Installation ID *</label><input id="inid" required></div><div class="field"><label>Project ID *</label><input id="inproject" required></div>
+<div class="field"><label>Team Leader</label><input id="inteam" value="Site Supervisor"></div><div class="field"><label>Date</label><input id="indate" type="date"></div>
+<div class="field"><label>Progress %</label><input id="inprogress" type="number" min="0" max="100" value="0"></div><div class="field"><label>Status</label><select id="instatus"><option>Not Scheduled</option><option>Scheduled</option><option>Team Assigned</option><option>Material Ready</option><option>Installation Started</option><option>Installation Completed</option><option>Testing</option><option>Completed</option></select></div>
+<div class="field full"><label>Remarks</label><textarea id="inremarks"></textarea></div><div class="full"><button class="btn primary">Save Installation Job</button></div></form></div></div>
+
+<div class="modal" id="supplierModal"><div class="modalbox"><div class="mh"><h2>Add Supplier</h2><button class="close" onclick="closeModal('supplierModal')">×</button></div><form id="supplierForm" class="formgrid">
+<div class="field"><label>Supplier *</label><input id="supname" required></div><div class="field"><label>Contact Person</label><input id="supcontact"></div>
+<div class="field"><label>Phone</label><input id="supphone"></div><div class="field"><label>Products</label><input id="supproducts"></div>
+<div class="field"><label>Outstanding ₹</label><input id="supout" type="number" value="0"></div><div class="field"><label>Status</label><select id="supstatus"><option>Active</option><option>Inactive</option></select></div>
+<div class="full"><button class="btn primary">Save Supplier</button></div></form></div></div>
+
+<div class="modal" id="serviceModal"><div class="modalbox"><div class="mh"><h2>Create Service Ticket</h2><button class="close" onclick="closeModal('serviceModal')">×</button></div><form id="serviceForm" class="formgrid">
+<div class="field"><label>Ticket ID *</label><input id="srvid" required></div><div class="field"><label>Customer *</label><input id="srvcustomer" required></div>
+<div class="field"><label>Issue *</label><input id="srvissue" required></div><div class="field"><label>Technician</label><input id="srvtech"></div>
+<div class="field"><label>Priority</label><select id="srvpriority"><option>Low</option><option selected>Normal</option><option>High</option><option>Critical</option></select></div><div class="field"><label>Status</label><select id="srvstatus"><option>Open</option><option>Assigned</option><option>Visit Scheduled</option><option>In Progress</option><option>Resolved</option><option>Closed</option></select></div>
+<div class="field full"><label>Remarks</label><textarea id="srvremarks"></textarea></div><div class="full"><button class="btn primary">Save Service Ticket</button></div></form></div></div>
+
+<div class="modal" id="paymentModal"><div class="modalbox"><div class="mh"><h2>Add Project Payment</h2><button class="close" onclick="closeModal('paymentModal')">×</button></div><form id="paymentForm" class="formgrid">
+<div class="field"><label>Project ID *</label><input id="payproject" required></div><div class="field"><label>Customer *</label><input id="paycustomer" required></div>
+<div class="field"><label>Total Project Value ₹</label><input id="paytotal" type="number" value="0"></div><div class="field"><label>Amount Received ₹ *</label><input id="payreceived" type="number" required value="0"></div>
+<div class="field"><label>Due Date</label><input id="paydue" type="date"></div><div class="field"><label>Payment Mode</label><select id="paymode"><option>Bank Transfer</option><option>UPI</option><option>Cash</option><option>Cheque</option><option>Other</option></select></div>
+<div class="field full"><label>Remarks</label><textarea id="payremarks"></textarea></div><div class="full"><button class="btn primary">Save Payment</button></div></form></div></div>
+<div class="modal" id="cloudSetupModal"><div class="modalbox"><div class="mh"><h2>Supabase Cloud Setup</h2><button class="close" onclick="closeModal('cloudSetupModal')">×</button></div><p class="sub">Use the Project URL and anon/public key from Supabase. Never put the service-role key in this HTML file.</p><form id="cloudSetupForm" class="formgrid"><div class="field full"><label>Project URL *</label><input id="sbUrl" placeholder="https://your-project.supabase.co" required></div><div class="field full"><label>Anon / Public Key *</label><textarea id="sbKey" rows="3" required></textarea></div><div class="full"><button class="btn primary">Connect & Test</button></div></form><div id="cloudStatus" class="sub" style="margin-top:10px"></div></div></div><div id="toast" class="toast"></div>
 
 <script>
 /* ===== NUMBERDAR SOLAR CRM - STANDALONE GITHUB VERSION ===== */
@@ -327,67 +358,29 @@ dashboard:["⌂","Dashboard","Overview"],leads:["◉","Leads & Sales","Sales CRM
 surveys:["⌖","Site Surveys","Projects"],projects:["▣","Solar Projects","Projects"],approvals:["✓","DISCOM / PM Surya Ghar","Projects"],installation:["⚙","Installation","Operations"],dnc:["⇄","DNC Operations","Operations"],inventory:["▥","Inventory & Stock","Operations"],suppliers:["♜","Suppliers","Operations"],service:["♧","Service & Warranty","Operations"],kyc:["✓","KYC Management","KYC"],finance:["₹","Finance","Finance"],staff:["♙","Staff & Login Management","Management"],workreports:["▤","Staff Working Reports","Management"],reports:["▥","Reports","Management"],settings:["⚙","Settings","Management"]
 };
 const STAGES=["New Lead","Survey","Quotation","Negotiation","Booking","Won"];
-const KEY="numberdar_solar_v3";
-let db=JSON.parse(localStorage.getItem(KEY)||"null");
-if(!db){
- db={
-  staff:[{employeeId:"NSE-ADMIN-001",name:"Company Owner",loginId:"admin",password:"admin123",role:"Owner / Super Admin",department:"Management",mobile:"",email:"",joiningDate:"",status:"Active",remarks:"Full company access"}],
-  leads:[
-   {name:"Raj Kumar",mobile:"98XXXXXX21",property:"Residential",stage:"New Lead",assigned:"Sales Team"},
-   {name:"ABC Traders",mobile:"97XXXXXX44",property:"Commercial",stage:"Quotation",assigned:"Sales Executive"},
-   {name:"Sunita Devi",mobile:"99XXXXXX18",property:"Residential",stage:"Survey",assigned:"Sales Executive"},
-   {name:"Sharma Factory",mobile:"88XXXXXX09",property:"Industrial",stage:"Negotiation",assigned:"Sales Manager"}
-  ],
-  customers:[
-   {id:"CUS-001",name:"Raj Kumar",mobile:"98XXXXXX21",property:"Residential",system:"5 kW",status:"Active"},
-   {id:"CUS-002",name:"ABC Traders",mobile:"97XXXXXX44",property:"Commercial",system:"20 kW",status:"Project"}
-  ],
-  work:[
-   {id:1,staff:"Company Owner",date:"2026-09-11",type:"Management",hours:8,details:"Reviewed sales pipeline, project progress and pending payments.",remarks:"Daily management review"},
-   {id:2,staff:"Sales Executive",date:"2026-09-11",type:"Sales Calling",hours:7,details:"Followed up with new residential leads and quotation prospects.",remarks:"Follow-ups completed"}
-  ],
-  inventory:[
-   {sku:"PNL-550",product:"Solar Panel 550W",brand:"Configure",model:"Mono",stock:120,reserved:20},
-   {sku:"INV-5K",product:"Solar Inverter 5kW",brand:"Configure",model:"On-grid",stock:14,reserved:4},
-   {sku:"BAT-150",product:"Battery 150Ah",brand:"Configure",model:"150Ah",stock:22,reserved:5}
-  ],
-  deals:[
-   {id:"DEAL-2026-0001",customer:"Raj Kumar",sales:"Sales Head",presales:"Presales Executive",survey:"Completed",kyc:"Document Verification",ops:"Stock Ready",status:"Active"},
-   {id:"DEAL-2026-0002",customer:"ABC Traders",sales:"SR. Telesales",presales:"Presales Executive",survey:"Pending",kyc:"Not Started",ops:"Not Started",status:"Qualified"}
-  ],
-  kyc:[
-   {deal:"DEAL-2026-0001",customer:"Raj Kumar",owner:"KYC CRM",documents:"Received",verification:"Pending",stage:"Document Verification",remarks:"Check customer documents"},
-   {deal:"DEAL-2026-0002",customer:"ABC Traders",owner:"KYC Executive",documents:"Pending",verification:"Not Started",stage:"Documents Requested",remarks:"Documents required"}
-  ],
-  dnc:[
-   {deal:"DEAL-2026-0001",customer:"Raj Kumar",owner:"DNC Management Executive",stock:"Ready",supervisor:"Site Supervisor",report:"Pending",status:"Ready for Site"},
-   {deal:"DEAL-2026-0002",customer:"ABC Traders",owner:"DNC Head",stock:"Pending",supervisor:"Site Supervisor",report:"Not Started",status:"Waiting Stock"}
-  ]
- };
- save();
-}
+const SUPABASE_CONFIG_KEY="numberdar_supabase_config_v2";
+const CLOUD_MODULES=["leads","customers","work","inventory","deals","kyc","dnc","surveys","quotations","approvals","installations","suppliers","serviceTickets","payments","projects","followups"];
+let supabaseClient=null;
+let cloudReady=false;
 let currentUser=null;
-
-function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+let db={staff:[],leads:[],customers:[],work:[],inventory:[],deals:[],kyc:[],dnc:[],surveys:[],quotations:[],approvals:[],installations:[],suppliers:[],serviceTickets:[],payments:[],projects:[],followups:[]};
+function getConfig(){try{return JSON.parse(localStorage.getItem(SUPABASE_CONFIG_KEY)||"null")}catch(e){return null}}
+function createCloudClient(){const c=getConfig();return c?.url&&c?.key?window.supabase.createClient(c.url,c.key,{auth:{persistSession:true,autoRefreshToken:true}}):null}
+function resetDb(){db={staff:[],leads:[],customers:[],work:[],inventory:[],deals:[],kyc:[],dnc:[],surveys:[],quotations:[],approvals:[],installations:[],suppliers:[],serviceTickets:[],payments:[],projects:[],followups:[]}}
+async function connectCloud(){supabaseClient=createCloudClient();if(!supabaseClient)throw Error("Enter your Supabase Project URL and anon/public key.");const {error}=await supabaseClient.from("profiles").select("id").limit(1);if(error)throw error;cloudReady=true}
+async function loadCloud(){if(!supabaseClient)throw Error("Supabase is not connected.");resetDb();const {data:profiles,error:pe}=await supabaseClient.from("profiles").select("id,employee_id,name,login_id,email,role,department,mobile,joining_date,status,remarks").order("created_at",{ascending:true});if(pe)throw pe;db.staff=(profiles||[]).map(p=>({id:p.id,employeeId:p.employee_id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",joiningDate:p.joining_date||"",status:p.status||"Active",remarks:p.remarks||""}));const {data:rows,error:re}=await supabaseClient.from("crm_records").select("id,module,record_id,data,created_by,assigned_to,updated_at").order("updated_at",{ascending:false});if(re)throw re;(rows||[]).forEach(r=>{if(db[r.module])db[r.module].push({...r.data,_cloudId:r.id,_createdBy:r.created_by,_assignedTo:r.assigned_to})})}
+async function upsertCloudRecord(module,record){if(!supabaseClient||!currentUser)return;const data={...record};delete data._cloudId;delete data._createdBy;delete data._assignedTo;const recordId=String(record.id||record.employeeId||module+"-"+Date.now());let target=record._assignedTo||null;const possibleNames=[record.assigned,record.staff,record.owner,record.engineer,record.supervisor,record.team];if(!target){const n=possibleNames.find(v=>v&&v!=="Sales Team"&&v!=="Site Supervisor");if(n){const sr=db.staff.find(x=>x.name===n);if(sr)target=sr.id}}const {data:old}=await supabaseClient.from("crm_records").select("id,created_by,assigned_to").eq("module",module).eq("record_id",recordId).maybeSingle();if(old){const {error}=await supabaseClient.from("crm_records").update({data,assigned_to:target||old.assigned_to||old.created_by,updated_at:new Date().toISOString()}).eq("id",old.id);if(error)throw error}else{const {error}=await supabaseClient.from("crm_records").insert({module,record_id:recordId,data,created_by:currentUser.id,assigned_to:target||currentUser.id});if(error)throw error}}
+async function save(){if(!supabaseClient||!currentUser)return;try{for(const m of CLOUD_MODULES){for(const r of (db[m]||[]))await upsertCloudRecord(m,r)}showToast("Cloud sync complete")}catch(e){console.error(e);showToast("Cloud sync failed: "+e.message)}}
+async function deleteCloudRecord(module,recordId){const {error}=await supabaseClient.from("crm_records").delete().eq("module",module).eq("record_id",String(recordId));if(error)throw error;await loadCloud();renderAll()}
 function el(id){return document.getElementById(id)}
 function showToast(msg){let t=el("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2400)}
 function toggleSide(){el("sidebar").classList.toggle("open")}
 function openModal(id){populateDynamic();el(id).classList.add("show")}
 function closeModal(id){el(id).classList.remove("show")}
 
-el("loginForm").addEventListener("submit",e=>{
- e.preventDefault();
- const id=el("loginId").value.trim(),pass=el("loginPass").value;
- const u=db.staff.find(x=>x.loginId.toLowerCase()===id.toLowerCase()&&x.password===pass&&x.status==="Active");
- if(!u){el("loginErr").textContent="Invalid Login ID or Password, or this account is inactive.";el("loginErr").style.display="block";return}
- currentUser=u;sessionStorage.setItem("numberdar_current_login",u.loginId);el("loginErr").style.display="none";el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp();
-});
-function logout(){sessionStorage.removeItem("numberdar_current_login");currentUser=null;el("app").classList.add("hidden");el("loginScreen").classList.remove("hidden");el("loginPass").value=""}
-function setupApp(){
- el("userName").textContent=currentUser.name;el("userRole").textContent=currentUser.role;el("avatar").textContent=currentUser.name.charAt(0).toUpperCase();
- el("roleLabel").textContent=currentUser.role;
- buildNav();renderAll();showPage("dashboard");
-}
+el("loginForm").addEventListener("submit",async e=>{e.preventDefault();try{el("loginErr").style.display="none";if(!supabaseClient)await connectCloud();const id=el("loginId").value.trim(),pass=el("loginPass").value;const {data:p,error:pe}=await supabaseClient.from("profiles").select("id,email,name,login_id,role,department,mobile,status,employee_id,joining_date,remarks").ilike("login_id",id).maybeSingle();if(pe)throw pe;if(!p)throw Error("Login ID not found in cloud.");if(p.status!=="Active")throw Error("This staff account is inactive.");const {error:ae}=await supabaseClient.auth.signInWithPassword({email:p.email,password:pass});if(ae)throw ae;currentUser={id:p.id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",employeeId:p.employee_id,status:p.status,joiningDate:p.joining_date||"",remarks:p.remarks||""};await loadCloud();el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp();startRealtime()}catch(err){el("loginErr").textContent=err.message||"Cloud login failed";el("loginErr").style.display="block"}});
+async function logout(){if(supabaseClient)await supabaseClient.auth.signOut();currentUser=null;resetDb();el("app").classList.add("hidden");el("loginScreen").classList.remove("hidden");el("loginPass").value=""}
+function setupApp(){el("userName").textContent=currentUser.name;el("userRole").textContent=currentUser.role;el("avatar").textContent=currentUser.name.charAt(0).toUpperCase();el("roleLabel").textContent=currentUser.role;buildNav();renderAll();showPage("dashboard")}
 function isAdmin(){return currentUser&&currentUser.role==="Owner / Super Admin"}
 function allowedPages(){
  if(isAdmin())return Object.keys(NAV);
@@ -422,7 +415,7 @@ function escapeAttr(v){return escapeHtml(v)}
 
 function renderAll(){populateDynamic();renderDashboard();renderLeads();renderCustomers();renderStaff();renderWorkReports();renderTables();renderInventory();renderDeals();renderKyc();renderDnc()}
 function renderDashboard(){
- el("dashLeads").textContent=db.leads.length;el("dashCustomers").textContent=db.customers.length;el("dashStaff").textContent=db.staff.filter(s=>s.role!=="Owner / Super Admin").length;el("dashProjects").textContent=14;el("dashService").textContent=1;
+ el("dashLeads").textContent=db.leads.length;el("dashCustomers").textContent=db.customers.length;el("dashStaff").textContent=db.staff.filter(s=>s.role!=="Owner / Super Admin").length;el("dashProjects").textContent=(db.projects?.length||0);el("dashService").textContent=1;
  el("liveDate").textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
  el("pipeline").innerHTML=STAGES.map(s=>`<div class="stage"><b>${db.leads.filter(x=>x.stage===s).length}</b><span>${s}</span></div>`).join("");
  const works=db.work.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
@@ -442,7 +435,7 @@ function renderCustomers(){
  const q=(el("customerSearch")?.value||"").toLowerCase();
  el("customerTable").innerHTML=db.customers.filter(x=>(x.name+" "+x.mobile).toLowerCase().includes(q)).map((x,i)=>`<tr><td>${escapeHtml(x.id)}</td><td><b>${escapeHtml(x.name)}</b></td><td>${escapeHtml(x.mobile)}</td><td>${escapeHtml(x.property)}</td><td>${escapeHtml(x.system)}</td><td><span class="badge ok">${escapeHtml(x.status)}</span></td><td><button class="btn danger" style="padding:6px 9px" onclick="deleteCustomer(${i})">Delete</button></td></tr>`).join("")||"<tr><td colspan='7'>No customers found.</td></tr>";
 }
-function deleteCustomer(i){if(!isAdmin()){showToast("Only Admin can delete customers.");return}if(confirm("Delete this customer from the local demo database?")){db.customers.splice(i,1);save();renderAll();showToast("Customer deleted")}}
+async function deleteCustomer(i){if(!isAdmin()){showToast("Only Admin can delete customers.");return}const x=db.customers[i];if(confirm("Delete this customer from cloud?")){try{await deleteCloudRecord("customers",x.id);showToast("Customer deleted from cloud")}catch(e){showToast("Delete failed: "+e.message)}}}
 function renderStaff(){
  const q=(el("staffSearch")?.value||"").toLowerCase();
  el("staffTable").innerHTML=db.staff.filter(x=>(x.name+" "+x.role+" "+x.loginId+" "+x.employeeId).toLowerCase().includes(q)).map((x,i)=>`<tr><td>${escapeHtml(x.employeeId)}</td><td><b>${escapeHtml(x.name)}</b><small style="display:block;color:#78827b">${escapeHtml(x.mobile||"")}</small></td><td>${escapeHtml(x.loginId)}</td><td>${escapeHtml(x.role)}</td><td>${escapeHtml(x.department)}</td><td>${x.role==="Owner / Super Admin"?"Everything":escapeHtml((ROLE_DEFS[x.role]?.access||[]).join(", "))}</td><td><span class="badge ${x.status==="Active"?"ok":"bad"}">${escapeHtml(x.status)}</span></td><td>${x.role==="Owner / Super Admin"?"<span class='badge info'>Protected</span>":`<button class="btn danger" style="padding:6px 8px" onclick="removeStaff(${i})">Delete</button>`}</td></tr>`).join("");
@@ -484,39 +477,48 @@ function renderDnc(){
 }
 
 function renderTables(){
- el("followTable").innerHTML=`<tr><td>10:00 AM</td><td>Raj Kumar</td><td>Call</td><td>Sales Executive</td><td>Discuss quotation</td><td><span class="badge wait">Due</span></td></tr><tr><td>11:30 AM</td><td>ABC Traders</td><td>Meeting</td><td>Sales Manager</td><td>Commercial proposal</td><td><span class="badge wait">Due</span></td></tr><tr><td>02:00 PM</td><td>Sunita Devi</td><td>WhatsApp</td><td>Inquiry Desk</td><td>Confirm survey</td><td><span class="badge wait">Due</span></td></tr>`;
- el("quoteTable").innerHTML=`<tr><td>QT-2026-001</td><td>Raj Kumar</td><td>5 kW</td><td>₹3,25,000</td><td>11 Sep 2026</td><td><span class="badge info">Sent</span></td></tr><tr><td>QT-2026-002</td><td>ABC Traders</td><td>20 kW</td><td>₹10,80,000</td><td>10 Sep 2026</td><td><span class="badge wait">Negotiation</span></td></tr>`;
- el("surveyTable").innerHTML=`<tr><td>SV-2026-021</td><td>Sunita Devi</td><td>Solar Engineer</td><td>12 Sep 2026</td><td>1,800 sq ft</td><td><span class="badge info">Scheduled</span></td></tr><tr><td>SV-2026-020</td><td>Raj Kumar</td><td>Solar Engineer</td><td>09 Sep 2026</td><td>2,400 sq ft</td><td><span class="badge ok">Feasible</span></td></tr>`;
- el("projectTable").innerHTML=`<tr><td>NSE-2026-0012</td><td>Raj Kumar</td><td>5 kW</td><td><span class="badge info">Installation</span></td><td>Project Manager</td><td>₹1L Pending</td></tr><tr><td>NSE-2026-0018</td><td>ABC Traders</td><td>20 kW</td><td><span class="badge wait">Approval</span></td><td>Project Manager</td><td>₹1L Pending</td></tr>`;
- el("approvalTable").innerHTML=`<tr><td>PSG-2026-0081</td><td>Raj Kumar</td><td>DHBVN</td><td>5 kW</td><td>05 Sep 2026</td><td><span class="badge ok">Installation Approved</span></td></tr><tr><td>PSG-2026-0084</td><td>Sunita Devi</td><td>DHBVN</td><td>3 kW</td><td>10 Sep 2026</td><td><span class="badge wait">Feasibility Pending</span></td></tr>`;
- el("installationTable").innerHTML=`<tr><td>INS-2026-011</td><td>NSE-2026-0012</td><td>Ravi Team</td><td>12 Sep 2026</td><td><div class="progress"><i style="width:70%"></i></div></td><td><span class="badge info">In Progress</span></td></tr><tr><td>INS-2026-009</td><td>NSE-2026-0009</td><td>Mahesh Team</td><td>08 Sep 2026</td><td><div class="progress"><i style="width:100%"></i></div></td><td><span class="badge ok">Completed</span></td></tr>`;
- el("supplierTable").innerHTML=`<tr><td>Solar Supplier A</td><td>Purchase Team</td><td>98XXXXXX11</td><td>Panels, Inverters</td><td>₹2.1L</td><td><span class="badge ok">Active</span></td></tr><tr><td>Electrical Supplier B</td><td>Store Team</td><td>97XXXXXX22</td><td>Cables, Protection</td><td>₹48K</td><td><span class="badge ok">Active</span></td></tr>`;
- el("serviceTable").innerHTML=`<tr><td>SRV-2026-021</td><td>Raj Kumar</td><td>Inverter check</td><td>Service Tech</td><td><span class="badge bad">High</span></td><td><span class="badge wait">Open</span></td></tr>`;
-}
-function renderInventory(){
- el("inventoryTable").innerHTML=db.inventory.map(x=>`<tr><td>${escapeHtml(x.sku)}</td><td><b>${escapeHtml(x.product)}</b></td><td>${escapeHtml(x.brand)}</td><td>${escapeHtml(x.model)}</td><td>${x.stock}</td><td>${x.reserved}</td><td><b>${Math.max(0,x.stock-x.reserved)}</b></td></tr>`).join("");
+ const f=db.followups||[];
+ el("followTable").innerHTML=f.length?f.map(x=>`<tr><td>${escapeHtml(x.date||"")} ${escapeHtml(x.time||"")}</td><td>${escapeHtml(x.customer||"")}</td><td>${escapeHtml(x.type||"Call")}</td><td>${escapeHtml(x.assigned||"")}</td><td>${escapeHtml(x.remarks||"")}</td><td><span class="badge ${x.status==="Completed"?"ok":"wait"}">${escapeHtml(x.status||"Pending")}</span></td></tr>`).join(""):"<tr><td colspan='6'>No follow-ups recorded yet.</td></tr>";
+ const q=db.quotations||[];
+ el("quoteTable").innerHTML=q.length?q.map(x=>`<tr><td>${escapeHtml(x.id)}</td><td>${escapeHtml(x.customer)}</td><td>${escapeHtml(x.system)} kW</td><td>₹${Number(x.total||0).toLocaleString("en-IN")}</td><td>${escapeHtml(x.date)}</td><td><span class="badge info">${escapeHtml(x.status||"Draft")}</span></td></tr>`).join(""):"<tr><td colspan='6'>No quotations yet. Create one above.</td></tr>";
+ const sv=db.surveys||[];
+ el("surveyTable").innerHTML=sv.length?sv.map(x=>`<tr><td>${escapeHtml(x.id)}</td><td>${escapeHtml(x.customer)}</td><td>${escapeHtml(x.engineer)}</td><td>${escapeHtml(x.date)}</td><td>${escapeHtml(x.roof||"—")}</td><td><span class="badge ${x.result==="Feasible"?"ok":"wait"}">${escapeHtml(x.result||"Scheduled")}</span></td></tr>`).join(""):"<tr><td colspan='6'>No site surveys yet. Schedule a survey above.</td></tr>";
+ const p=db.projects||[];
+ el("projectTable").innerHTML=p.length?p.map(x=>`<tr><td>${escapeHtml(x.id)}</td><td>${escapeHtml(x.customer)}</td><td>${escapeHtml(x.capacity)} kW</td><td><span class="badge info">${escapeHtml(x.stage)}</span></td><td>${escapeHtml(x.manager)}</td><td>₹${Number(x.pending||0).toLocaleString("en-IN")} Pending</td></tr>`).join(""):"<tr><td colspan='6'>No projects yet.</td></tr>";
+ const a=db.approvals||[];
+ el("approvalTable").innerHTML=a.length?a.map(x=>`<tr><td>${escapeHtml(x.id)}</td><td>${escapeHtml(x.customer)}</td><td>${escapeHtml(x.discom)}</td><td>${escapeHtml(x.capacity)} kW</td><td>${escapeHtml(x.date)}</td><td><span class="badge info">${escapeHtml(x.status)}</span></td></tr>`).join(""):"<tr><td colspan='6'>No DISCOM applications yet.</td></tr>";
+ const ins=db.installations||[];
+ el("installationTable").innerHTML=ins.length?ins.map(x=>`<tr><td>${escapeHtml(x.id)}</td><td>${escapeHtml(x.project)}</td><td>${escapeHtml(x.team)}</td><td>${escapeHtml(x.date)}</td><td><div class="progress"><i style="width:${Math.max(0,Math.min(100,+x.progress||0))}%"></i></div><small>${+x.progress||0}%</small></td><td><span class="badge ${x.status==="Completed"?"ok":"info"}">${escapeHtml(x.status)}</span></td></tr>`).join(""):"<tr><td colspan='6'>No installation jobs yet.</td></tr>";
+ const su=db.suppliers||[];
+ el("supplierTable").innerHTML=su.length?su.map(x=>`<tr><td>${escapeHtml(x.name)}</td><td>${escapeHtml(x.contact)}</td><td>${escapeHtml(x.phone)}</td><td>${escapeHtml(x.products)}</td><td>₹${Number(x.outstanding||0).toLocaleString("en-IN")}</td><td><span class="badge ok">${escapeHtml(x.status)}</span></td></tr>`).join(""):"<tr><td colspan='6'>No suppliers yet.</td></tr>";
+ const st=db.serviceTickets||[];
+ el("serviceTable").innerHTML=st.length?st.map(x=>`<tr><td>${escapeHtml(x.id)}</td><td>${escapeHtml(x.customer)}</td><td>${escapeHtml(x.issue)}</td><td>${escapeHtml(x.technician||"Unassigned")}</td><td><span class="badge ${x.priority==="Critical"||x.priority==="High"?"bad":"wait"}">${escapeHtml(x.priority)}</span></td><td><span class="badge info">${escapeHtml(x.status)}</span></td></tr>`).join(""):"<tr><td colspan='6'>No service tickets yet.</td></tr>";
+ const pays=db.payments||[];
+ el("paymentTable").innerHTML=pays.length?pays.map(x=>{const pending=Math.max(0,(+x.total||0)-(+x.received||0));return `<tr><td>${escapeHtml(x.project)}</td><td>${escapeHtml(x.customer)}</td><td>₹${Number(x.total||0).toLocaleString("en-IN")}</td><td>₹${Number(x.received||0).toLocaleString("en-IN")}</td><td>₹${pending.toLocaleString("en-IN")}</td><td><span class="badge ${pending>0?"wait":"ok"}">${escapeHtml(x.due||"—")}</span></td></tr>`}).join(""):"<tr><td colspan='6'>No payments recorded yet.</td></tr>";
 }
 
 el("leadForm").onsubmit=e=>{e.preventDefault();db.leads.unshift({name:el("ln").value.trim(),mobile:el("lm").value.trim(),property:el("lp").value,stage:"New Lead",assigned:el("la").value||"Sales Team",remarks:el("lr").value});save();closeModal("leadModal");e.target.reset();renderAll();showToast("Lead saved successfully")};
 el("customerForm").onsubmit=e=>{e.preventDefault();db.customers.unshift({id:"CUS-"+String(db.customers.length+1).padStart(3,"0"),name:el("cn").value.trim(),mobile:el("cm").value.trim(),property:el("cp").value,system:el("ck").value?el("ck").value+" kW":"—",status:"New",address:el("ca").value});save();closeModal("customerModal");e.target.reset();renderAll();showToast("Customer saved successfully")};
-el("staffForm").onsubmit=e=>{
- e.preventDefault();
- if(!isAdmin()){showToast("Only Admin can create staff logins.");return}
- const employeeId=el("se").value.trim(),name=el("sn").value.trim(),loginId=el("si").value.trim(),password=el("sp").value;
- if(db.staff.some(s=>s.employeeId.toLowerCase()===employeeId.toLowerCase())){showToast("Employee ID already exists.");return}
- if(db.staff.some(s=>s.loginId.toLowerCase()===loginId.toLowerCase())){showToast("Login ID already exists.");return}
- const role=el("sr").value;db.staff.push({employeeId,name,loginId,password,role,department:ROLE_DEFS[role].dept,mobile:el("sm").value,email:el("sx").value,joiningDate:el("sj").value,status:el("ss").value,remarks:el("sremarks").value});
- save();closeModal("staffModal");e.target.reset();renderAll();showToast("Staff login created: "+loginId);
+el("staffForm").onsubmit=async e=>{e.preventDefault();if(!isAdmin()){showToast("Only Admin can create staff logins.");return}try{const c=getConfig(),session=(await supabaseClient.auth.getSession()).data.session;if(!session)throw Error("Admin session expired. Login again.");const role=el("sr").value;const body={action:"create",employee_id:el("se").value.trim(),name:el("sn").value.trim(),login_id:el("si").value.trim(),password:el("sp").value,email:el("sx").value.trim(),role,department:ROLE_DEFS[role].dept,mobile:el("sm").value.trim(),joining_date:el("sj").value,status:el("ss").value,remarks:el("sremarks").value.trim()};const r=await fetch(c.url+"/functions/v1/staff-admin",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify(body)});const j=await r.json();if(!r.ok)throw Error(j.error||"Staff creation failed");await loadCloud();closeModal("staffModal");e.target.reset();renderAll();showToast("Staff login created in Supabase") }catch(x){showToast("Staff creation failed: "+x.message)}};
+el("workForm").onsubmit=async e=>{e.preventDefault();if(!isAdmin()&&el("ws").value!==currentUser.name){showToast("You can only submit your own work report.");return}const staffRec=db.staff.find(x=>x.name===el("ws").value);const record={id:"WORK-"+Date.now(),staff:el("ws").value,date:el("wd").value,type:el("wt").value,hours:+el("wh").value||0,details:el("wdetails").value.trim(),remarks:el("wremarks").value.trim(),_assignedTo:isAdmin()?(staffRec?.id||currentUser.id):currentUser.id};try{await upsertCloudRecord("work",record);await loadCloud();closeModal("workModal");e.target.reset();el("wd").value=new Date().toISOString().slice(0,10);renderAll();showToast("Work report saved to cloud")}catch(x){showToast("Save failed: "+x.message)}};
+el("surveyForm").onsubmit=e=>{
+ e.preventDefault();db.surveys=db.surveys||[];const ins=e.target.querySelectorAll("input");
+ db.surveys.unshift({id:"SV-"+new Date().getFullYear()+"-"+String(db.surveys.length+1).padStart(3,"0"),customer:ins[0].value.trim(),engineer:ins[1].value.trim(),date:ins[2].value,roof:(ins[3].value||"0")+" sq ft",result:"Scheduled"});
+ save();closeModal("surveyModal");e.target.reset();renderAll();showToast("Site survey saved successfully");
 };
-el("workForm").onsubmit=e=>{
- e.preventDefault();const staff=el("ws").value;
- if(!staff){showToast("Create a staff profile first.");return}
- db.work.push({id:Date.now(),staff,date:el("wd").value,type:el("wt").value,hours:+el("wh").value||0,details:el("wdetails").value.trim(),remarks:el("wremarks").value.trim()});
- save();closeModal("workModal");e.target.reset();el("wd").value=new Date().toISOString().slice(0,10);renderAll();showToast("Staff work report saved");
+el("quotationForm").onsubmit=e=>{
+ e.preventDefault();const ins=e.target.querySelectorAll("input"),customer=ins[0].value.trim(),system=+ins[1].value||0,subtotal=(+ins[2].value||0)+(+ins[3].value||0)+(+ins[4].value||0),gst=+ins[5].value||0,total=Math.round(subtotal*(1+gst/100));
+ db.quotations=db.quotations||[];db.quotations.unshift({id:"QT-"+new Date().getFullYear()+"-"+String(db.quotations.length+1).padStart(3,"0"),customer,system,total,date:new Date().toISOString().slice(0,10),status:"Draft"});
+ save();closeModal("quotationModal");e.target.reset();renderAll();showToast("Quotation saved successfully");
 };
-el("surveyForm").onsubmit=e=>{e.preventDefault();closeModal("surveyModal");e.target.reset();showToast("Site survey scheduled successfully")};
-el("quotationForm").onsubmit=e=>{e.preventDefault();closeModal("quotationModal");e.target.reset();showToast("Quotation created successfully")};
 el("inventoryForm").onsubmit=e=>{e.preventDefault();db.inventory.push({sku:el("is").value,product:el("ip").value,brand:el("ib").value||"—",model:el("im").value||"—",stock:+el("iq").value||0,reserved:+el("ir").value||0});save();closeModal("inventoryModal");e.target.reset();renderAll();showToast("Inventory item saved")};
+
+
+el("approvalForm").onsubmit=e=>{e.preventDefault();db.approvals.unshift({id:el("apid").value.trim(),customer:el("apcustomer").value.trim(),discom:el("apdiscom").value.trim(),capacity:+el("apkw").value||0,date:el("apdate").value||new Date().toISOString().slice(0,10),status:el("apstatus").value,remarks:el("apremarks").value});save();closeModal("approvalModal");e.target.reset();renderAll();showToast("DISCOM application saved")};
+el("installationForm").onsubmit=e=>{e.preventDefault();db.installations.unshift({id:el("inid").value.trim(),project:el("inproject").value.trim(),team:el("inteam").value.trim(),date:el("indate").value||new Date().toISOString().slice(0,10),progress:+el("inprogress").value||0,status:el("instatus").value,remarks:el("inremarks").value});save();closeModal("installationModal");e.target.reset();renderAll();showToast("Installation job saved")};
+el("supplierForm").onsubmit=e=>{e.preventDefault();db.suppliers.unshift({name:el("supname").value.trim(),contact:el("supcontact").value.trim(),phone:el("supphone").value.trim(),products:el("supproducts").value.trim(),outstanding:+el("supout").value||0,status:el("supstatus").value});save();closeModal("supplierModal");e.target.reset();renderAll();showToast("Supplier saved")};
+el("serviceForm").onsubmit=e=>{e.preventDefault();db.serviceTickets.unshift({id:el("srvid").value.trim(),customer:el("srvcustomer").value.trim(),issue:el("srvissue").value.trim(),technician:el("srvtech").value.trim(),priority:el("srvpriority").value,status:el("srvstatus").value,remarks:el("srvremarks").value});save();closeModal("serviceModal");e.target.reset();renderAll();showToast("Service ticket saved")};
+el("paymentForm").onsubmit=e=>{e.preventDefault();db.payments.unshift({project:el("payproject").value.trim(),customer:el("paycustomer").value.trim(),total:+el("paytotal").value||0,received:+el("payreceived").value||0,due:el("paydue").value||"",mode:el("paymode").value,remarks:el("payremarks").value});save();closeModal("paymentModal");e.target.reset();renderAll();showToast("Payment saved")};
 
 function csv(type){
  let rows;
@@ -526,9 +528,10 @@ function csv(type){
  let s=rows.map(r=>r.map(v=>'"'+String(v??"").replaceAll('"','""')+'"').join(",")).join("\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([s],{type:"text/csv"}));a.download="numberdar-"+type+"-report.csv";a.click();URL.revokeObjectURL(a.href);
 }
 window.addEventListener("afterprint",()=>{el("workreports").classList.remove("printing")});
-window.addEventListener("storage",()=>{db=JSON.parse(localStorage.getItem(KEY)||"null");if(currentUser)renderAll()});
-const savedLogin=sessionStorage.getItem("numberdar_current_login");if(savedLogin){const u=db.staff.find(x=>x.loginId===savedLogin&&x.status==="Active");if(u){currentUser=u;el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp()}}
 el("wd").value=new Date().toISOString().slice(0,10);
+el("cloudSetupForm").onsubmit=async e=>{e.preventDefault();try{localStorage.setItem(SUPABASE_CONFIG_KEY,JSON.stringify({url:el("sbUrl").value.trim().replace(/\/$/,""),key:el("sbKey").value.trim()}));await connectCloud();el("cloudStatus").textContent="✓ Connected to Supabase.";showToast("Supabase cloud connected")}catch(err){el("cloudStatus").textContent="Connection failed: "+err.message;showToast("Cloud connection failed")}};
+function startRealtime(){if(!supabaseClient)return;supabaseClient.channel("numberdar-live").on("postgres_changes",{event:"*",schema:"public",table:"crm_records"},async()=>{if(currentUser){try{await loadCloud();renderAll()}catch(e){console.warn(e)}}}).on("postgres_changes",{event:"*",schema:"public",table:"profiles"},async()=>{if(currentUser){try{await loadCloud();renderAll()}catch(e){console.warn(e)}}}).subscribe()}
+(async()=>{try{if(getConfig()){await connectCloud();const {data:{session}}=await supabaseClient.auth.getSession();if(session){const {data:p}=await supabaseClient.from("profiles").select("id,email,name,login_id,role,department,mobile,status,employee_id,joining_date,remarks").eq("id",session.user.id).single();if(p){currentUser={id:p.id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",employeeId:p.employee_id,status:p.status,joiningDate:p.joining_date||"",remarks:p.remarks||""};await loadCloud();el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp();startRealtime()}}}}catch(e){console.warn("Cloud auto connect:",e.message)}})();
 </script>
 </body>
 </html>
