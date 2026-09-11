@@ -60,7 +60,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
       <div class="loginField"><label>PASSWORD</label><input id="loginPass" type="password" autocomplete="current-password" required placeholder="Enter password"></div>
       <button class="btn primary" style="width:100%;padding:12px" type="submit">Secure Login →</button>
     </form>
-    <div class="loginHint"><b>Demo Admin:</b> admin &nbsp; / &nbsp; admin123<br>Staff accounts created by Admin appear automatically in the login system.</div>
+    <div class="loginHint"><b>Demo Admin:</b> admin / admin123<br>Admin creates staff Login ID + temporary password and assigns a company profile. Each profile receives its permitted modules.</div>
   </div>
 </div>
 
@@ -175,7 +175,50 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
  <div class="pageHead"><div><h1>Staff & Login Management</h1><div class="sub">Create role-based staff accounts and manage their profiles.</div></div><button class="btn primary" onclick="openModal('staffModal')">+ Create Staff Login</button></div>
  <div class="card"><div class="toolbar"><input class="search" id="staffSearch" oninput="renderStaff()" placeholder="Search staff / role"></div>
  <div class="tablewrap"><table><thead><tr><th>Employee ID</th><th>Name</th><th>Login ID</th><th>Role</th><th>Department</th><th>Access</th><th>Status</th><th>Action</th></tr></thead><tbody id="staffTable"></tbody></table></div></div>
- <div class="card"><h2>Available Staff Profiles</h2><div id="roleCards" class="grid three"></div></div>
+ <div class="card"><h2>Available Staff Profiles</h2><p class="sub">The roles below include the sales, telesales, presales, survey, KYC and DNC/operations positions shown in the supplied workflow documents.</p><div id="roleCards" class="grid three"></div></div>
+</section>
+
+
+<section class="page" id="deals">
+ <div class="pageHead"><div><h1>Deal Management</h1><div class="sub">Qualified leads move into a Deal and continue through survey, KYC and operations.</div></div></div>
+ <div class="card">
+  <div class="pipeline" style="grid-template-columns:repeat(5,1fr)">
+   <div class="stage"><b id="dealQualified">0</b><span>Qualified</span></div>
+   <div class="stage"><b id="dealSurvey">0</b><span>Survey</span></div>
+   <div class="stage"><b id="dealKyc">0</b><span>KYC</span></div>
+   <div class="stage"><b id="dealOps">0</b><span>Operations</span></div>
+   <div class="stage"><b id="dealDone">0</b><span>Completed</span></div>
+  </div>
+ </div>
+ <div class="card tablewrap"><table><thead><tr><th>Deal ID</th><th>Customer</th><th>Sales Owner</th><th>Presales</th><th>Survey</th><th>KYC</th><th>Operations</th><th>Status</th></tr></thead><tbody id="dealTable"></tbody></table></div>
+</section>
+
+<section class="page" id="kyc">
+ <div class="pageHead"><div><h1>KYC Management</h1><div class="sub">Document verification and the KYC workflow shown in the company documents.</div></div></div>
+ <div class="grid stats">
+  <div class="card stat"><div class="label">Documents Pending</div><div class="value" id="kycPending">0</div></div>
+  <div class="card stat"><div class="label">Verification</div><div class="value" id="kycVerify">0</div></div>
+  <div class="card stat"><div class="label">Name / Load / Connection</div><div class="value" id="kycConnection">0</div></div>
+  <div class="card stat"><div class="label">Net Meter</div><div class="value" id="kycMeter">0</div></div>
+  <div class="card stat"><div class="label">Bank</div><div class="value" id="kycBank">0</div></div>
+ </div>
+ <div class="card">
+  <h2>KYC Workflow</h2>
+  <div class="pipeline" style="grid-template-columns:repeat(6,1fr)">
+   <div class="stage"><b>1</b><span>Documents</span></div><div class="stage"><b>2</b><span>Verification</span></div><div class="stage"><b>3</b><span>Name / Load / New Connection</span></div><div class="stage"><b>4</b><span>Net Meter</span></div><div class="stage"><b>5</b><span>Bank</span></div><div class="stage"><b>6</b><span>NP</span></div>
+  </div>
+  <p class="sub" style="margin-top:12px">The PDFs use the term “NP”; its full form is not defined in the supplied documents, so it is intentionally kept as NP.</p>
+ </div>
+ <div class="card tablewrap"><table><thead><tr><th>Deal</th><th>Customer</th><th>KYC Owner</th><th>Documents</th><th>Verification</th><th>Current Stage</th><th>Remarks</th></tr></thead><tbody id="kycTable"></tbody></table></div>
+</section>
+
+<section class="page" id="dnc">
+ <div class="pageHead"><div><h1>DNC Operations</h1><div class="sub">Operational hand-off between DNC, stock and site supervision, following the supplied workflow.</div></div></div>
+ <div class="grid two">
+  <div class="card"><h2>DNC Flow</h2><div class="activity"><i class="dot"></i><div><b>DNC Head</b><small style="display:block;color:#78827b">Controls DNC work assignment and monitoring.</small></div></div><div class="activity"><i class="dot"></i><div><b>DNC Management Executive</b><small style="display:block;color:#78827b">Updates assigned operational work.</small></div></div><div class="activity"><i class="dot"></i><div><b>Stock Incharge</b><small style="display:block;color:#78827b">Handles project material availability and issue.</small></div></div><div class="activity"><i class="dot"></i><div><b>Site Supervisor</b><small style="display:block;color:#78827b">Performs site work and submits reports.</small></div></div></div>
+  <div class="card"><h2>Operations Status</h2><div id="dncSummary"></div></div>
+ </div>
+ <div class="card tablewrap"><table><thead><tr><th>Deal / Project</th><th>Customer</th><th>DNC Owner</th><th>Stock</th><th>Site Supervisor</th><th>Site Report</th><th>Status</th></tr></thead><tbody id="dncTable"></tbody></table></div>
 </section>
 
 <section class="page" id="workreports">
@@ -191,7 +234,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
   <div class="card"><h2>Sales Report</h2><p class="sub">Leads, pipeline and customers.</p><button class="btn dark" onclick="csv('leads')">Export CSV</button></div>
   <div class="card"><h2>Customer Report</h2><p class="sub">Customer master data.</p><button class="btn dark" onclick="csv('customers')">Export CSV</button></div>
   <div class="card"><h2>Staff Report</h2><p class="sub">Employee profile and role list.</p><button class="btn dark" onclick="csv('staff')">Export CSV</button></div>
-  <div class="card"><h2>Project Report</h2><p class="sub">Solar project stages and progress.</p><button class="btn dark" onclick="showToast('Project report ready for print from the Projects page.')">View</button></div>
+  <div class="card"><h2>Deal / KYC Report</h2><p class="sub">Track conversion, KYC stages and operational hand-off.</p><button class="btn dark" onclick="showPage('deals')">Open</button></div><div class="card"><h2>Project Report</h2><p class="sub">Solar project stages and progress.</p><button class="btn dark" onclick="showToast('Project report ready for print from the Projects page.')">View</button></div>
   <div class="card"><h2>Service Report</h2><p class="sub">Warranty and service tickets.</p><button class="btn dark" onclick="showToast('Service report ready.')">View</button></div>
  </div>
 </section>
@@ -253,6 +296,18 @@ const LOGO="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEhUTE
 document.getElementById('loginLogo').src=LOGO;document.getElementById('sideLogo').src=LOGO;
 
 const ROLE_DEFS={
+ "Sales Head":{dept:"Sales",access:["dashboard","leads","customers","followups","quotations","deals","workreports"]},
+ "SR. Telesales":{dept:"Sales / Telesales",access:["dashboard","leads","customers","followups","deals","workreports"]},
+ "Telesales Executive":{dept:"Sales / Telesales",access:["dashboard","leads","customers","followups","deals","workreports"]},
+ "Presales Executive":{dept:"Sales / Presales",access:["dashboard","leads","customers","followups","quotations","surveys","deals","workreports"]},
+ "Surveyor":{dept:"Field / Survey",access:["dashboard","surveys","deals","workreports"]},
+ "KYC Head":{dept:"KYC",access:["dashboard","kyc","deals","workreports"]},
+ "KYC CRM":{dept:"KYC / CRM",access:["dashboard","kyc","deals","workreports"]},
+ "KYC Executive":{dept:"KYC",access:["dashboard","kyc","deals","workreports"]},
+ "DNC Head":{dept:"DNC / Operations",access:["dashboard","dnc","deals","projects","workreports"]},
+ "DNC Management Executive":{dept:"DNC / Operations",access:["dashboard","dnc","deals","projects","workreports"]},
+ "Stock Incharge":{dept:"DNC / Stock",access:["dashboard","inventory","dnc","deals","workreports"]},
+ "Site Supervisor":{dept:"DNC / Site Operations",access:["dashboard","installation","dnc","deals","workreports"]},
  "Office Staff":{dept:"Office / Administration",access:["dashboard","customers","followups","workreports"]},
  "Sales Manager":{dept:"Sales",access:["dashboard","leads","customers","followups","quotations","workreports"]},
  "Sales Executive":{dept:"Sales",access:["dashboard","leads","customers","followups","quotations","workreports"]},
@@ -268,8 +323,8 @@ const ROLE_DEFS={
  "Reception / Front Desk":{dept:"Front Office",access:["dashboard","customers","followups","workreports"]}
 };
 const NAV={
-dashboard:["⌂","Dashboard","Overview"],leads:["◉","Leads & Sales","Sales CRM"],customers:["♙","Customers","Sales CRM"],followups:["◷","Follow-ups","Sales CRM"],quotations:["▤","Quotations","Sales CRM"],
-surveys:["⌖","Site Surveys","Projects"],projects:["▣","Solar Projects","Projects"],approvals:["✓","DISCOM / PM Surya Ghar","Projects"],installation:["⚙","Installation","Operations"],inventory:["▥","Inventory & Stock","Operations"],suppliers:["♜","Suppliers","Operations"],service:["♧","Service & Warranty","Operations"],finance:["₹","Finance","Finance"],staff:["♙","Staff & Login Management","Management"],workreports:["▤","Staff Working Reports","Management"],reports:["▥","Reports","Management"],settings:["⚙","Settings","Management"]
+dashboard:["⌂","Dashboard","Overview"],leads:["◉","Leads & Sales","Sales CRM"],customers:["♙","Customers","Sales CRM"],followups:["◷","Follow-ups","Sales CRM"],quotations:["▤","Quotations","Sales CRM"],deals:["◆","Deal Management","Sales CRM"],
+surveys:["⌖","Site Surveys","Projects"],projects:["▣","Solar Projects","Projects"],approvals:["✓","DISCOM / PM Surya Ghar","Projects"],installation:["⚙","Installation","Operations"],dnc:["⇄","DNC Operations","Operations"],inventory:["▥","Inventory & Stock","Operations"],suppliers:["♜","Suppliers","Operations"],service:["♧","Service & Warranty","Operations"],kyc:["✓","KYC Management","KYC"],finance:["₹","Finance","Finance"],staff:["♙","Staff & Login Management","Management"],workreports:["▤","Staff Working Reports","Management"],reports:["▥","Reports","Management"],settings:["⚙","Settings","Management"]
 };
 const STAGES=["New Lead","Survey","Quotation","Negotiation","Booking","Won"];
 const KEY="numberdar_solar_v3";
@@ -295,6 +350,18 @@ if(!db){
    {sku:"PNL-550",product:"Solar Panel 550W",brand:"Configure",model:"Mono",stock:120,reserved:20},
    {sku:"INV-5K",product:"Solar Inverter 5kW",brand:"Configure",model:"On-grid",stock:14,reserved:4},
    {sku:"BAT-150",product:"Battery 150Ah",brand:"Configure",model:"150Ah",stock:22,reserved:5}
+  ],
+  deals:[
+   {id:"DEAL-2026-0001",customer:"Raj Kumar",sales:"Sales Head",presales:"Presales Executive",survey:"Completed",kyc:"Document Verification",ops:"Stock Ready",status:"Active"},
+   {id:"DEAL-2026-0002",customer:"ABC Traders",sales:"SR. Telesales",presales:"Presales Executive",survey:"Pending",kyc:"Not Started",ops:"Not Started",status:"Qualified"}
+  ],
+  kyc:[
+   {deal:"DEAL-2026-0001",customer:"Raj Kumar",owner:"KYC CRM",documents:"Received",verification:"Pending",stage:"Document Verification",remarks:"Check customer documents"},
+   {deal:"DEAL-2026-0002",customer:"ABC Traders",owner:"KYC Executive",documents:"Pending",verification:"Not Started",stage:"Documents Requested",remarks:"Documents required"}
+  ],
+  dnc:[
+   {deal:"DEAL-2026-0001",customer:"Raj Kumar",owner:"DNC Management Executive",stock:"Ready",supervisor:"Site Supervisor",report:"Pending",status:"Ready for Site"},
+   {deal:"DEAL-2026-0002",customer:"ABC Traders",owner:"DNC Head",stock:"Pending",supervisor:"Site Supervisor",report:"Not Started",status:"Waiting Stock"}
   ]
  };
  save();
@@ -353,7 +420,7 @@ function populateDynamic(){
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function escapeAttr(v){return escapeHtml(v)}
 
-function renderAll(){populateDynamic();renderDashboard();renderLeads();renderCustomers();renderStaff();renderWorkReports();renderTables();renderInventory()}
+function renderAll(){populateDynamic();renderDashboard();renderLeads();renderCustomers();renderStaff();renderWorkReports();renderTables();renderInventory();renderDeals();renderKyc();renderDnc()}
 function renderDashboard(){
  el("dashLeads").textContent=db.leads.length;el("dashCustomers").textContent=db.customers.length;el("dashStaff").textContent=db.staff.filter(s=>s.role!=="Owner / Super Admin").length;el("dashProjects").textContent=14;el("dashService").textContent=1;
  el("liveDate").textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
@@ -384,12 +451,38 @@ function renderStaff(){
 function removeStaff(i){if(!isAdmin())return;let s=db.staff[i];if(confirm("Delete staff login "+s.name+"? Their old work report entries will remain for reporting.")){db.staff.splice(i,1);save();renderAll();showToast("Staff login deleted")}}
 function renderWorkReports(){
  const sf=el("workStaffFilter")?.value||"",from=el("workFrom")?.value||"",to=el("workTo")?.value||"";
- let rows=db.work.filter(w=>(!sf||w.staff===sf)&&(!from||w.date>=from)&&(!to||w.date<=to)).sort((a,b)=>b.date.localeCompare(a.date));
+ let rows=db.work.filter(w=>(isAdmin()?( !sf||w.staff===sf ):(w.staff===currentUser.name))&&(!from||w.date>=from)&&(!to||w.date<=to)).sort((a,b)=>b.date.localeCompare(a.date));
  const totalH=rows.reduce((a,b)=>a+(+b.hours||0),0);
- el("workReportArea").innerHTML=`<div class="reportHero"><h2>NUMBERDAR ENTERPRISES — STAFF WORKING REPORT</h2><p>Period: ${from||"All dates"} to ${to||"All dates"} • Staff: ${sf||"All staff"} • Total entries: ${rows.length} • Total hours: ${totalH}</p></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Employee</th><th>Work Type</th><th>Hours</th><th>Work Details</th><th>Remarks / Result</th></tr></thead><tbody>${rows.map(w=>`<tr><td>${escapeHtml(w.date)}</td><td><b>${escapeHtml(w.staff)}</b></td><td><span class="badge info">${escapeHtml(w.type)}</span></td><td>${escapeHtml(w.hours)}</td><td>${escapeHtml(w.details)}</td><td>${escapeHtml(w.remarks||"—")}</td></tr>`).join("")||"<tr><td colspan='6'>No work entries match the selected filters.</td></tr>"}</tbody></table></div><div class="printOnly" style="margin-top:25px;font-size:11px">Generated from Numberdar Solar CRM • ${new Date().toLocaleString("en-IN")}</div>`;
+ el("workReportArea").innerHTML=`<div class="reportHero"><h2>NUMBERDAR ENTERPRISES — ${isAdmin()?"STAFF WORKING REPORT":"MY WORKING REPORT"}</h2><p>Period: ${from||"All dates"} to ${to||"All dates"} • Staff: ${isAdmin()?(sf||"All staff"):currentUser.name} • Total entries: ${rows.length} • Total hours: ${totalH}</p></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Employee</th><th>Work Type</th><th>Hours</th><th>Work Details</th><th>Remarks / Result</th></tr></thead><tbody>${rows.map(w=>`<tr><td>${escapeHtml(w.date)}</td><td><b>${escapeHtml(w.staff)}</b></td><td><span class="badge info">${escapeHtml(w.type)}</span></td><td>${escapeHtml(w.hours)}</td><td>${escapeHtml(w.details)}</td><td>${escapeHtml(w.remarks||"—")}</td></tr>`).join("")||"<tr><td colspan='6'>No work entries match the selected filters.</td></tr>"}</tbody></table></div><div class="printOnly" style="margin-top:25px;font-size:11px">Generated from Numberdar Solar CRM • ${new Date().toLocaleString("en-IN")}</div>`;
 }
 function clearWorkFilters(){el("workStaffFilter").value="";el("workFrom").value="";el("workTo").value="";renderWorkReports()}
 function printWorkReport(){if(!isAdmin()){showToast("Staff working PDF report is available to Admin only.");return}document.querySelectorAll(".page").forEach(p=>p.classList.remove("printing"));el("workreports").classList.add("printing");window.print()}
+
+function renderDeals(){
+ const deals=db.deals||[];
+ el("dealQualified").textContent=deals.filter(d=>d.status==="Qualified").length;
+ el("dealSurvey").textContent=deals.filter(d=>d.survey!=="Completed").length;
+ el("dealKyc").textContent=deals.filter(d=>d.kyc!=="Completed").length;
+ el("dealOps").textContent=deals.filter(d=>d.ops!=="Completed").length;
+ el("dealDone").textContent=deals.filter(d=>d.status==="Completed").length;
+ el("dealTable").innerHTML=deals.map(d=>`<tr><td><b>${escapeHtml(d.id)}</b></td><td>${escapeHtml(d.customer)}</td><td>${escapeHtml(d.sales)}</td><td>${escapeHtml(d.presales)}</td><td><span class="badge ${d.survey==="Completed"?"ok":"wait"}">${escapeHtml(d.survey)}</span></td><td><span class="badge ${d.kyc==="Completed"?"ok":"wait"}">${escapeHtml(d.kyc)}</span></td><td><span class="badge info">${escapeHtml(d.ops)}</span></td><td><span class="badge ${d.status==="Completed"?"ok":"info"}">${escapeHtml(d.status)}</span></td></tr>`).join("")||"<tr><td colspan='8'>No deals yet.</td></tr>";
+}
+function renderKyc(){
+ const rows=db.kyc||[];
+ el("kycPending").textContent=rows.filter(x=>x.documents!=="Verified").length;
+ el("kycVerify").textContent=rows.filter(x=>x.verification!=="Completed").length;
+ el("kycConnection").textContent=rows.filter(x=>/Name|Load|Connection/i.test(x.stage)).length;
+ el("kycMeter").textContent=rows.filter(x=>x.stage==="Net Meter").length;
+ el("kycBank").textContent=rows.filter(x=>x.stage==="Bank").length;
+ el("kycTable").innerHTML=rows.map(x=>`<tr><td>${escapeHtml(x.deal)}</td><td>${escapeHtml(x.customer)}</td><td>${escapeHtml(x.owner)}</td><td><span class="badge ${x.documents==="Received"||x.documents==="Verified"?"ok":"wait"}">${escapeHtml(x.documents)}</span></td><td><span class="badge ${x.verification==="Completed"?"ok":"wait"}">${escapeHtml(x.verification)}</span></td><td>${escapeHtml(x.stage)}</td><td>${escapeHtml(x.remarks||"—")}</td></tr>`).join("")||"<tr><td colspan='7'>No KYC records yet.</td></tr>";
+}
+function renderDnc(){
+ const rows=db.dnc||[];
+ const ready=rows.filter(x=>x.status==="Ready for Site"||x.status==="Completed").length;
+ el("dncSummary").innerHTML=`<div class="taskRow"><span>Ready for Site</span><b>${ready}</b></div><div class="taskRow"><span>Waiting Stock</span><b>${rows.filter(x=>x.stock==="Pending").length}</b></div><div class="taskRow"><span>Reports Pending</span><b>${rows.filter(x=>x.report!=="Completed").length}</b></div>`;
+ el("dncTable").innerHTML=rows.map(x=>`<tr><td>${escapeHtml(x.deal)}</td><td>${escapeHtml(x.customer)}</td><td>${escapeHtml(x.owner)}</td><td><span class="badge ${x.stock==="Ready"?"ok":"wait"}">${escapeHtml(x.stock)}</span></td><td>${escapeHtml(x.supervisor)}</td><td>${escapeHtml(x.report)}</td><td><span class="badge info">${escapeHtml(x.status)}</span></td></tr>`).join("")||"<tr><td colspan='7'>No DNC records yet.</td></tr>";
+}
+
 function renderTables(){
  el("followTable").innerHTML=`<tr><td>10:00 AM</td><td>Raj Kumar</td><td>Call</td><td>Sales Executive</td><td>Discuss quotation</td><td><span class="badge wait">Due</span></td></tr><tr><td>11:30 AM</td><td>ABC Traders</td><td>Meeting</td><td>Sales Manager</td><td>Commercial proposal</td><td><span class="badge wait">Due</span></td></tr><tr><td>02:00 PM</td><td>Sunita Devi</td><td>WhatsApp</td><td>Inquiry Desk</td><td>Confirm survey</td><td><span class="badge wait">Due</span></td></tr>`;
  el("quoteTable").innerHTML=`<tr><td>QT-2026-001</td><td>Raj Kumar</td><td>5 kW</td><td>₹3,25,000</td><td>11 Sep 2026</td><td><span class="badge info">Sent</span></td></tr><tr><td>QT-2026-002</td><td>ABC Traders</td><td>20 kW</td><td>₹10,80,000</td><td>10 Sep 2026</td><td><span class="badge wait">Negotiation</span></td></tr>`;
