@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -317,7 +317,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 <div class="modal" id="customerModal"><div class="modalbox"><div class="mh"><h2>Create Customer</h2><button class="close" onclick="closeModal('customerModal')">×</button></div><form id="customerForm" class="formgrid">
 <div class="field"><label>Customer Name *</label><input id="cn" required></div><div class="field"><label>Mobile *</label><input id="cm" required></div><div class="field"><label>Property</label><select id="cp"><option>Residential</option><option>Commercial</option><option>Industrial</option><option>Agricultural</option></select></div><div class="field"><label>System Size kW</label><input id="ck" type="number" step=".1"></div><div class="field full"><label>Address</label><textarea id="ca"></textarea></div><div class="full"><button class="btn primary">Save Customer</button></div></form></div></div>
 
-<div class="modal" id="staffModal"><div class="modalbox"><div class="mh"><h2>Create Staff Login & Profile</h2><button class="close" onclick="closeModal('staffModal')">×</button></div><form id="staffForm" class="formgrid">
+<div class="modal" id="staffModal"><div class="modalbox"><div class="mh"><h2>Create Staff Login & Profile</h2><button class="close" onclick="closeModal('staffModal')">×</button></div><form id="staffForm" class="formgrid"><input type="hidden" id="staffEditId">
 <div class="field"><label>Employee ID *</label><input id="se" required placeholder="e.g. NSE-EMP-001"></div><div class="field"><label>Full Name *</label><input id="sn" required></div>
 <div class="field"><label>Login ID *</label><input id="si" required placeholder="Unique login ID"></div><div class="field"><label>Temporary Password *</label><input id="sp" required type="password"></div>
 <div class="field"><label>Staff Profile / Role *</label><select id="sr" required></select></div><div class="field"><label>Department</label><select id="sd"></select></div>
@@ -681,8 +681,76 @@ async function toggleStaffStatus(i){
   const s=db.staff[i];if(!s||s.role==="Owner / Super Admin")return;
   const next=s.status==="Active"?"Inactive":"Active";
   if(!confirm(`${next==="Inactive"?"Deactivate":"Activate"} ${s.name}'s login?`))return;
-  try{const {error}=await supabaseClient.from("profiles").update({status:next}).eq("id",s.id);if(error)throw error;await loadCloud();renderAll();showToast(`Staff account ${next.toLowerCase()}.`)}catch(e){showToast("Status update failed: "+e.message)}
+  try{
+    if(localMode){
+      s.status=next;saveLocalDb();renderAll();showToast(`Staff account ${next.toLowerCase()}.`);return;
+    }
+    if(!supabaseClient)throw Error("Supabase is not connected.");
+    const {error}=await supabaseClient.from("profiles").update({status:next}).eq("id",s.id);
+    if(error)throw error;
+    await loadCloud();renderAll();showToast(`Staff account ${next.toLowerCase()}.`);
+  }catch(e){showToast("Status update failed: "+e.message)}
 }
+
+async function createOrUpdateStaff(e){
+  e.preventDefault();
+  if(!isAdmin())return showToast("Only Admin can create or update staff.");
+  const editId=el("staffEditId").value.trim();
+  const employeeId=el("se").value.trim(), name=el("sn").value.trim(), loginId=el("si").value.trim();
+  const password=el("sp").value, role=el("sr").value, department=el("sd").value;
+  const mobile=el("sm").value.trim(), email=el("sx").value.trim();
+  const joiningDate=el("sj").value, status=el("ss").value, remarks=el("sremarks").value.trim();
+
+  if(!employeeId||!name||!loginId)return showToast("Employee ID, Name and Login ID are required.");
+  if(!editId && !password)return showToast("Temporary Password is required.");
+  if(role==="Owner / Super Admin")return showToast("Owner / Super Admin is protected and cannot be created here.");
+
+  try{
+    if(editId){
+      // Profile editing: local mode is fully supported; cloud updates the profile row.
+      const idx=db.staff.findIndex(s=>String(s.id)===String(editId));
+      if(idx<0)throw Error("Staff profile not found.");
+      const updated={...db.staff[idx],employeeId,name,role,department,mobile,email,joiningDate,status,remarks};
+      if(localMode){
+        db.staff[idx]=updated;saveLocalDb();renderAll();closeModal("staffModal");resetStaffModal();showToast("Staff profile updated.");return;
+      }
+      if(!supabaseClient)throw Error("Supabase is not connected.");
+      const {error}=await supabaseClient.from("profiles").update({
+        employee_id:employeeId,name,role,department,mobile,joining_date:joiningDate||null,status,remarks
+      }).eq("id",editId);
+      if(error)throw error;
+      await loadCloud();renderAll();closeModal("staffModal");resetStaffModal();showToast("Staff profile updated in cloud.");return;
+    }
+
+    const newStaff={
+      id:newId("STAFF"),employeeId,name,loginId,email:email||"",
+      role,department,mobile,joiningDate,status,remarks
+    };
+
+    if(localMode){
+      if(db.staff.some(s=>s.loginId.toLowerCase()===loginId.toLowerCase()))throw Error("Login ID already exists.");
+      if(db.staff.some(s=>s.employeeId.toLowerCase()===employeeId.toLowerCase()))throw Error("Employee ID already exists.");
+      db.staff.unshift(newStaff);saveLocalDb();renderAll();closeModal("staffModal");resetStaffModal();showToast("Staff login created successfully.");return;
+    }
+
+    if(!supabaseClient)throw Error("Supabase is not connected.");
+    if(!email)throw Error("For cloud staff login, enter a real email address.");
+
+    // Secure staff creation is done server-side by the Supabase Edge Function.
+    const {data,error}=await supabaseClient.functions.invoke("numberdar-staff-admin",{
+      body:{action:"create",employeeId,name,loginId,email,password,role,department,mobile,joiningDate,status,remarks}
+    });
+    if(error)throw error;
+    if(data?.error)throw Error(data.error);
+    await loadCloud();renderAll();closeModal("staffModal");resetStaffModal();
+    showToast("Staff login created successfully in Supabase.");
+  }catch(err){
+    console.error("Staff save:",err);
+    showToast("Staff save failed: "+(err.message||err));
+  }
+}
+
+el("staffForm").addEventListener("submit",createOrUpdateStaff);
 
 function renderWorkReports(){
  const sf=el("workStaffFilter")?.value||"",from=el("workFrom")?.value||"",to=el("workTo")?.value||"";
@@ -750,7 +818,7 @@ el("installationForm").onsubmit=async e=>{e.preventDefault();try{const record={i
 el("supplierForm").onsubmit=async e=>{e.preventDefault();try{const record={id:newId("SUP"),name:el("supname").value.trim(),contact:el("supcontact").value.trim(),phone:el("supphone").value.trim(),products:el("supproducts").value.trim(),outstanding:+el("supout").value||0,status:el("supstatus").value,createdAt:new Date().toISOString()};await persistRecord("suppliers",record);closeModal("supplierModal");e.target.reset();showToast("Supplier saved to cloud")}catch(x){showToast("Supplier save failed: "+x.message)}};
 el("serviceForm").onsubmit=async e=>{e.preventDefault();try{const record={id:el("srvid").value.trim()||newId("SRV"),customer:el("srvcustomer").value.trim(),issue:el("srvissue").value.trim(),technician:el("srvtech").value.trim(),priority:el("srvpriority").value,status:el("srvstatus").value,remarks:el("srvremarks").value,createdAt:new Date().toISOString()};await persistRecord("serviceTickets",record);closeModal("serviceModal");e.target.reset();showToast("Service ticket saved to cloud")}catch(x){showToast("Service save failed: "+x.message)}};
 el("paymentForm").onsubmit=async e=>{e.preventDefault();try{const record={id:newId("PAY"),project:el("payproject").value.trim(),customer:el("paycustomer").value.trim(),total:+el("paytotal").value||0,received:+el("payreceived").value||0,due:el("paydue").value||"",mode:el("paymode").value,remarks:el("payremarks").value,createdAt:new Date().toISOString()};if(record.received>record.total&&record.total>0)throw Error("Received amount cannot be greater than total project value.");await persistRecord("payments",record);closeModal("paymentModal");e.target.reset();showToast("Payment saved to cloud")}catch(x){showToast("Payment save failed: "+x.message)}};
-function resetStaffModal(){el("staffEditId").value="";el("staffForm").reset();el("si").disabled=false;el("sx").disabled=false;el("sp").required=true;document.querySelector("#staffModal h2").textContent="Create Staff Login & Profile";el("staffSubmitBtn").textContent="Create Staff Login"}
+function resetStaffModal(){if(el("staffEditId"))el("staffEditId").value="";el("staffForm").reset();el("si").disabled=false;el("sx").disabled=false;el("sp").required=true;document.querySelector("#staffModal h2").textContent="Create Staff Login & Profile";el("staffSubmitBtn").textContent="Create Staff Login"}
 
 function csv(type){
  let rows;
