@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Numberdar Enterprises Solar Energy | CRM & Staff ERP V6 Cloud</title>
+<title>Numberdar Enterprises Solar Energy | CRM & Staff ERP V8 Admin Reset</title>
 <meta name="description" content="Numberdar Enterprises Solar Energy CRM, staff management, sales, projects, inventory, finance and service system.">
 <style>
 :root{
@@ -50,6 +50,33 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 /* V7 production/cloud hardening */
 @media print{body.master-printing>*{display:none!important}body.master-printing #masterPrintArea{display:block!important;position:static!important}#masterPrintArea{display:none}}
 .master-report{font-family:Arial,sans-serif;color:#111;background:#fff;padding:24px}.master-report h1{margin:0 0 4px;font-size:24px}.master-report h2{margin:24px 0 8px;font-size:17px;border-bottom:1px solid #ddd;padding-bottom:6px}.master-report .meta{font-size:11px;color:#555;margin-bottom:12px}.master-report table{width:100%;border-collapse:collapse;font-size:9px}.master-report th,.master-report td{border:1px solid #ddd;padding:5px;text-align:left;vertical-align:top}.master-report th{background:#f2f4f2}.master-report .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.master-report .box{border:1px solid #ddd;padding:8px}.master-report .num{font-size:18px;font-weight:700}.cloud-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;padding:5px 9px;border-radius:999px;background:#eef8ef;color:#1c6b2b;border:1px solid #cce8cf}.cloud-badge.off{background:#fff4f4;color:#9b2727;border-color:#f0caca}
+
+/* ===== V8 VIRTUAL CRM INTERFACE ===== */
+.virtualPanel{margin-top:15px;background:linear-gradient(135deg,#07110c,#0e2417 48%,#102d3b);border-radius:20px;padding:18px;color:#fff;position:relative;overflow:hidden;box-shadow:0 18px 45px rgba(5,20,10,.18)}
+.virtualPanel:before{content:"";position:absolute;inset:-50%;background:repeating-linear-gradient(90deg,transparent 0 38px,#ffffff08 39px 40px),repeating-linear-gradient(0deg,transparent 0 38px,#ffffff08 39px 40px);transform:perspective(500px) rotateX(58deg) translateY(80px);animation:gridMove 9s linear infinite}
+.virtualHead{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.virtualHead h2{margin:0;font-size:16px}.virtualHead p{margin:4px 0 0;color:#b9cfc1;font-size:11px}
+.livePulse{display:inline-flex;align-items:center;gap:7px;background:#ffffff12;border:1px solid #ffffff1c;border-radius:999px;padding:7px 10px;font-size:10px}
+.livePulse i{width:8px;height:8px;border-radius:50%;background:#72b82a;box-shadow:0 0 0 0 #72b82a88;animation:pulse 1.7s infinite}
+.virtualGrid{position:relative;z-index:2;display:grid;grid-template-columns:1.25fr .75fr;gap:12px;margin-top:13px}
+.orbitStage{min-height:185px;border:1px solid #ffffff14;border-radius:15px;background:#ffffff08;position:relative;overflow:hidden;display:grid;place-items:center}
+.core{width:78px;height:78px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#ffd45a 0 16%,#78bd2f 17% 32%,#1b78d5 33% 52%,#07110c 53%);box-shadow:0 0 35px #72b82a66;animation:corePulse 3s ease-in-out infinite}
+.ring{position:absolute;width:120px;height:120px;border:1px solid #78bd2f88;border-radius:50%;animation:orbit 7s linear infinite}
+.ring.r2{width:155px;height:155px;border-color:#48a8ff66;animation-duration:10s;animation-direction:reverse}
+.ring.r3{width:190px;height:190px;border-color:#ffd45a44;animation-duration:14s}
+.node{position:absolute;width:9px;height:9px;border-radius:50%;background:#fff;box-shadow:0 0 12px #fff;transform:translateX(95px)}
+.ring.r2 .node{transform:translateX(77px)}.ring.r3 .node{transform:translateX(95px)}
+.virtualMetrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vMetric{background:#ffffff09;border:1px solid #ffffff12;border-radius:13px;padding:12px}
+.vMetric small{display:block;color:#9eb2a4;font-size:9px;text-transform:uppercase;letter-spacing:.7px}.vMetric b{display:block;font-size:22px;margin-top:5px}
+.vMetric span{font-size:9px;color:#b8cbbd}.virtualFoot{position:relative;z-index:2;display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.virtualFoot span{font-size:9px;border:1px solid #ffffff14;background:#ffffff08;padding:6px 9px;border-radius:999px;color:#c5d5ca}
+@keyframes gridMove{to{transform:perspective(500px) rotateX(58deg) translateY(120px)}}
+@keyframes pulse{70%{box-shadow:0 0 0 10px transparent}}
+@keyframes corePulse{50%{transform:scale(1.08);box-shadow:0 0 55px #72b82a99}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+@media(max-width:820px){.virtualGrid{grid-template-columns:1fr}.orbitStage{min-height:160px}}
+
 </style></head>
 <body><div id="masterPrintArea"></div>
 
@@ -65,7 +92,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
       <div class="loginField"><label>PASSWORD</label><input id="loginPass" type="password" autocomplete="current-password" required placeholder="Enter password"></div>
       <button class="btn primary" style="width:100%;padding:12px" type="submit">Secure Login →</button>
     </form>
-    <div class="loginHint"><b>Cloud CRM:</b> Connect your Supabase project below. All company records are stored in Supabase and shared across computers.</div><button type="button" class="btn light" style="width:100%;margin-top:8px" onclick="openCloudSetup()">☁ Supabase Cloud Setup</button>
+    <div class="loginHint"><b>Fresh Admin (Local Test):</b> Login ID <b>admin</b> • Password <b>Numberdar@2026!</b><br>For multi-computer cloud use, connect Supabase and use Supabase Auth accounts.</div><div class="loginHint"><b>Cloud CRM:</b> Connect your Supabase project below. All company records are stored in Supabase and shared across computers.</div><button type="button" class="btn light" style="width:100%;margin-top:8px" onclick="openCloudSetup()">☁ Supabase Cloud Setup</button>
   </div>
 </div>
 
@@ -101,6 +128,29 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
     <div class="card stat"><div class="label">Projects</div><div class="value" id="dashProjects">0</div><div class="change">Solar projects</div></div>
     <div class="card stat"><div class="label">Open Service</div><div class="value" id="dashService">0</div><div class="change">Tickets</div></div>
   </div>
+
+  <div class="virtualPanel">
+    <div class="virtualHead">
+      <div><h2>Virtual Solar Command Center</h2><p>Live visual overview of your CRM operations</p></div>
+      <div class="livePulse"><i></i> SYSTEM ONLINE</div>
+    </div>
+    <div class="virtualGrid">
+      <div class="orbitStage">
+        <div class="ring"><i class="node"></i></div>
+        <div class="ring r2"><i class="node"></i></div>
+        <div class="ring r3"><i class="node"></i></div>
+        <div class="core">☀</div>
+      </div>
+      <div class="virtualMetrics">
+        <div class="vMetric"><small>Lead Flow</small><b id="vLeadFlow">0</b><span>active prospects</span></div>
+        <div class="vMetric"><small>Projects</small><b id="vProjects">0</b><span>solar projects</span></div>
+        <div class="vMetric"><small>Staff</small><b id="vStaff">0</b><span>team profiles</span></div>
+        <div class="vMetric"><small>Service</small><b id="vService">0</b><span>open tickets</span></div>
+      </div>
+    </div>
+    <div class="virtualFoot"><span>⚡ Sales</span><span>◈ KYC</span><span>⇄ Operations</span><span>▥ Inventory</span><span>₹ Finance</span><span>♧ Service</span></div>
+  </div>
+
   <div class="grid two">
     <div class="card"><h2>Sales Pipeline</h2><div id="pipeline" class="pipeline"></div></div>
     <div class="card"><h2>Today's Work</h2><div id="todayWork"></div></div>
@@ -274,7 +324,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 <div class="field"><label>Mobile</label><input id="sm"></div><div class="field"><label>Email</label><input id="sx" type="email"></div>
 <div class="field"><label>Joining Date</label><input id="sj" type="date"></div><div class="field"><label>Status</label><select id="ss"><option>Active</option><option>Inactive</option></select></div>
 <div class="field full"><label>Profile Remarks / Assigned Work</label><textarea id="sremarks" placeholder="Example: Handle incoming inquiries and daily calling."></textarea></div>
-<div class="full"><div style="background:#f5f8f4;border:1px solid #e4ebe3;border-radius:10px;padding:10px;font-size:11px;color:#667168">The selected role controls the staff menu. Supabase RLS must also enforce access on the database; hiding a menu is not a security boundary.</div></div>
+<div class="full"><div style="background:#f5f8f4;border:1px solid #e4ebe3;border-radius:10px;padding:10px;font-size:11px;color:#667168">The selected role controls the staff menu. Roles are permission profiles; no old staff credentials are embedded in this file. Supabase RLS must also enforce access on the database; hiding a menu is not a security boundary.</div></div>
 <div class="full"><button class="btn primary" id="staffSubmitBtn">Create Staff Login</button></div>
 </form></div></div>
 
@@ -363,6 +413,51 @@ surveys:["⌖","Site Surveys","Projects"],projects:["▣","Solar Projects","Proj
 };
 const STAGES=["New Lead","Survey","Quotation","Negotiation","Booking","Won"];
 const SUPABASE_CONFIG_KEY="numberdar_supabase_config_v2";
+/* ===== FRESH ADMIN / LOCAL DEMO ACCESS =====
+   This V8 file contains NO old demo user accounts.
+   Local/offline Admin:
+   Login ID: admin
+   Password: Numberdar@2026!
+   Cloud mode still uses Supabase Auth.
+*/
+const LOCAL_ADMIN_ID="admin";
+const LOCAL_ADMIN_PASSWORD_SHA256="7806f2cd757c745326b29cd3e4789ade592d33e4db7c58be6815f25df502d8cf";
+const LOCAL_ADMIN_UUID="00000000-0000-4000-8000-000000000001";
+const LOCAL_ADMIN_EMAIL="admin@numberdarsolar.com";
+let localMode=false;
+
+async function sha256Hex(value){
+  const data=new TextEncoder().encode(value);
+  const hash=await crypto.subtle.digest("SHA-256",data);
+  return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function enterLocalAdmin(){
+  localMode=true;
+  cloudReady=false;
+  currentUser={
+    id:LOCAL_ADMIN_UUID,name:"Numberdar Admin",loginId:LOCAL_ADMIN_ID,
+    email:LOCAL_ADMIN_EMAIL,role:"Owner / Super Admin",department:"Management",
+    mobile:"",employeeId:"ADMIN-001",status:"Active",joiningDate:"",remarks:"Fresh Admin"
+  };
+  loadLocalDb();
+  el("loginScreen").classList.add("hidden");
+  el("app").classList.remove("hidden");
+  setupApp();
+}
+function loadLocalDb(){
+  try{
+    const saved=JSON.parse(localStorage.getItem("numberdar_local_db_v8")||"null");
+    if(saved && typeof saved==="object") db=saved;
+  }catch(e){ resetDb(); }
+}
+function saveLocalDb(){
+  try{localStorage.setItem("numberdar_local_db_v8",JSON.stringify(db));}catch(e){}
+}
+function clearFreshLocalData(){
+  localStorage.removeItem("numberdar_local_db_v8");
+  resetDb(); renderAll();
+}
+
 const CLOUD_MODULES=["leads","customers","work","inventory","deals","kyc","dnc","surveys","quotations","approvals","installations","suppliers","serviceTickets","payments","projects","followups"];
 let supabaseClient=null;
 let cloudReady=false;
@@ -408,7 +503,15 @@ async function upsertCloudRecord(module,record){
     if(error)throw error;
   }
 }
-async function persistRecord(module,record){await upsertCloudRecord(module,record);await loadCloud();renderAll()}
+async function persistRecord(module,record){
+  if(localMode){
+    if(!db[module])throw Error("Unknown local module: "+module);
+    const idx=db[module].findIndex(x=>String(x.id)===String(record.id));
+    if(idx>=0)db[module][idx]=record;else db[module].unshift(record);
+    saveLocalDb();renderAll();return;
+  }
+  await upsertCloudRecord(module,record);await loadCloud();renderAll()
+}
 async function save(){
   if(!supabaseClient||!currentUser)return;
   try{
@@ -417,6 +520,10 @@ async function save(){
   }catch(e){console.error(e);showToast("Cloud sync failed: "+e.message)}
 }
 async function deleteCloudRecord(module,recordId){
+  if(localMode){
+    db[module]=(db[module]||[]).filter(x=>String(x.id)!==String(recordId));
+    saveLocalDb();renderAll();return;
+  }
   if(!supabaseClient||!currentUser)throw Error("Not connected.");
   const {error}=await supabaseClient.from("crm_records").delete().eq("module",module).eq("record_id",String(recordId));
   if(error)throw error;
@@ -432,8 +539,46 @@ function openCloudSetup(){ const modal=el("cloudSetupModal"); if(!modal){showToa
 function openModal(id){populateDynamic();if(id==="staffModal"&&!el("staffEditId")?.value)resetStaffModal();el(id).classList.add("show")}
 function closeModal(id){el(id).classList.remove("show")}
 
-el("loginForm").addEventListener("submit",async e=>{e.preventDefault();try{el("loginErr").style.display="none";if(!supabaseClient)await connectCloud();const id=el("loginId").value.trim(),pass=el("loginPass").value;const {data:p,error:pe}=await supabaseClient.from("profiles").select("id,email,name,login_id,role,department,mobile,status,employee_id,joining_date,remarks").ilike("login_id",id).maybeSingle();if(pe)throw pe;if(!p)throw Error("Login ID not found in cloud.");if(p.status!=="Active")throw Error("This staff account is inactive.");const {error:ae}=await supabaseClient.auth.signInWithPassword({email:p.email,password:pass});if(ae)throw ae;currentUser={id:p.id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",employeeId:p.employee_id,status:p.status,joiningDate:p.joining_date||"",remarks:p.remarks||""};await loadCloud();el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp();startRealtime()}catch(err){el("loginErr").textContent=err.message||"Cloud login failed";el("loginErr").style.display="block"}});
-async function logout(){if(supabaseClient&&window.numberdarRealtimeChannel){await supabaseClient.removeChannel(window.numberdarRealtimeChannel);window.numberdarRealtimeChannel=null}if(supabaseClient)await supabaseClient.auth.signOut();currentUser=null;resetDb();el("app").classList.add("hidden");el("loginScreen").classList.remove("hidden");el("loginPass").value="";cloudReady=!!getConfig();updateCloudBadge()}
+el("loginForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ try{
+   el("loginErr").style.display="none";
+   const id=el("loginId").value.trim(),pass=el("loginPass").value;
+
+   // Fresh local Admin is always available for local testing.
+   // This takes priority only for the fresh admin credentials; cloud staff still use Supabase.
+   const hash=await sha256Hex(pass);
+   if(id.toLowerCase()===LOCAL_ADMIN_ID && hash===LOCAL_ADMIN_PASSWORD_SHA256){
+     enterLocalAdmin(); return;
+   }
+
+   if(!getConfig()){
+     throw Error("No Supabase connection found. Use the Fresh Admin credentials or connect Supabase.");
+   }
+
+   if(!supabaseClient)await connectCloud();
+   const {data:p,error:pe}=await supabaseClient.from("profiles")
+     .select("id,email,name,login_id,role,department,mobile,status,employee_id,joining_date,remarks")
+     .ilike("login_id",id).maybeSingle();
+   if(pe)throw pe;
+   if(!p)throw Error("Login ID not found in cloud.");
+   if(p.status!=="Active")throw Error("This staff account is inactive.");
+   if(!p.email)throw Error("This profile has no email. Add an email column/value in Supabase profiles.");
+   const {error:ae}=await supabaseClient.auth.signInWithPassword({email:p.email,password:pass});
+   if(ae)throw ae;
+   localMode=false;
+   currentUser={id:p.id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",employeeId:p.employee_id,status:p.status,joiningDate:p.joining_date||"",remarks:p.remarks||""};
+   await loadCloud();el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp();startRealtime();
+ }catch(err){
+   el("loginErr").textContent=err.message||"Login failed";
+   el("loginErr").style.display="block";
+ }
+});
+async function logout(){
+  if(supabaseClient&&window.numberdarRealtimeChannel){await supabaseClient.removeChannel(window.numberdarRealtimeChannel);window.numberdarRealtimeChannel=null}
+  if(supabaseClient&&!localMode)await supabaseClient.auth.signOut();
+  currentUser=null;localMode=false;resetDb();el("app").classList.add("hidden");el("loginScreen").classList.remove("hidden");el("loginPass").value="";cloudReady=!!getConfig();updateCloudBadge();
+}
 function setupApp(){el("userName").textContent=currentUser.name;el("userRole").textContent=currentUser.role;el("avatar").textContent=currentUser.name.charAt(0).toUpperCase();el("roleLabel").textContent=currentUser.role;buildNav();renderAll();showPage("dashboard")}
 function isAdmin(){return currentUser&&currentUser.role==="Owner / Super Admin"}
 function allowedPages(){
@@ -474,6 +619,10 @@ function renderDashboard(){
   el("dashStaff").textContent=db.staff.filter(s=>s.role!=="Owner / Super Admin").length;
   el("dashProjects").textContent=db.projects?.length||0;
   el("dashService").textContent=(db.serviceTickets||[]).filter(x=>x.status!=="Closed"&&x.status!=="Completed").length;
+  if(el("vLeadFlow"))el("vLeadFlow").textContent=db.leads.length;
+  if(el("vProjects"))el("vProjects").textContent=(db.projects||[]).length;
+  if(el("vStaff"))el("vStaff").textContent=db.staff.filter(s=>s.role!=="Owner / Super Admin").length;
+  if(el("vService"))el("vService").textContent=(db.serviceTickets||[]).filter(x=>x.status!=="Closed"&&x.status!=="Completed").length;
   el("liveDate").textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
   el("pipeline").innerHTML=STAGES.map(s=>`<div class="stage"><b>${db.leads.filter(x=>x.stage===s).length}</b><span>${s}</span></div>`).join("");
   const works=db.work.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).slice(0,5);
