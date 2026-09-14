@@ -46,8 +46,12 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+<style>
+/* V7 production/cloud hardening */
+@media print{body.master-printing>*{display:none!important}body.master-printing #masterPrintArea{display:block!important;position:static!important}#masterPrintArea{display:none}}
+.master-report{font-family:Arial,sans-serif;color:#111;background:#fff;padding:24px}.master-report h1{margin:0 0 4px;font-size:24px}.master-report h2{margin:24px 0 8px;font-size:17px;border-bottom:1px solid #ddd;padding-bottom:6px}.master-report .meta{font-size:11px;color:#555;margin-bottom:12px}.master-report table{width:100%;border-collapse:collapse;font-size:9px}.master-report th,.master-report td{border:1px solid #ddd;padding:5px;text-align:left;vertical-align:top}.master-report th{background:#f2f4f2}.master-report .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.master-report .box{border:1px solid #ddd;padding:8px}.master-report .num{font-size:18px;font-weight:700}.cloud-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;padding:5px 9px;border-radius:999px;background:#eef8ef;color:#1c6b2b;border:1px solid #cce8cf}.cloud-badge.off{background:#fff4f4;color:#9b2727;border-color:#f0caca}
+</style></head>
+<body><div id="masterPrintArea"></div>
 
 <!-- LOGIN -->
 <div id="loginScreen" class="login">
@@ -86,7 +90,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
       <div class="heroPills"><span>LIVE CRM</span><span id="liveDate">—</span><span>ROHTAK • HARYANA</span></div>
       <h1>Powering Business With Smarter Solar Operations.</h1>
       <p>Manage leads, staff, site surveys, projects, inventory, payments and customer service from one premium control center.</p>
-      <div class="actions"><button class="btn primary" onclick="openModal('leadModal')">+ New Lead</button><button class="btn light" onclick="openModal('staffModal')">+ Create Staff</button></div>
+      <div class="actions"><button class="btn primary" onclick="openModal('leadModal')">+ New Lead</button><button class="btn light" onclick="openModal('staffModal')">+ Create Staff</button><span id="cloudBadge" class="cloud-badge off">● Cloud not connected</span></div>
     </div>
     <div class="energyOrb"><i></i></div>
   </div>
@@ -167,9 +171,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 <section class="page" id="finance">
  <div class="pageHead"><div><h1>Finance & Payments</h1><div class="sub">Project collections and outstanding amounts.</div></div><button class="btn primary" onclick="openModal('paymentModal')">+ Add Payment</button></div>
  <div class="grid stats">
-  <div class="card stat"><div class="label">Total Sales</div><div class="value">₹24.8L</div></div><div class="card stat"><div class="label">Received</div><div class="value">₹18.4L</div></div><div class="card stat"><div class="label">Outstanding</div><div class="value">₹6.4L</div></div><div class="card stat"><div class="label">Overdue</div><div class="value">₹1.8L</div></div><div class="card stat"><div class="label">Collection</div><div class="value">74%</div></div>
- </div>
- <div class="card tablewrap"><table><thead><tr><th>Project</th><th>Customer</th><th>Total</th><th>Received</th><th>Pending</th><th>Due</th></tr></thead><tbody id="paymentTable"></tbody></table></div>
+<div class="card stat"><div class="label">Total Sales</div><div class="value" id="finTotal">₹0</div></div><div class="card stat"><div class="label">Received</div><div class="value" id="finReceived">₹0</div></div><div class="card stat"><div class="label">Outstanding</div><div class="value" id="finOutstanding">₹0</div></div><div class="card stat"><div class="label">Overdue</div><div class="value" id="finOverdue">₹0</div></div><div class="card stat"><div class="label">Collection</div><div class="value" id="finCollection">0%</div></div>
+</div>
+<div class="card tablewrap"><table><thead><tr><th>Project</th><th>Customer</th><th>Total</th><th>Received</th><th>Pending</th><th>Due</th></tr></thead><tbody id="paymentTable"></tbody></table></div>
 </section>
 
 <section class="page" id="staff">
@@ -236,7 +240,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
   <div class="card"><h2>Customer Report</h2><p class="sub">Customer master data.</p><button class="btn dark" onclick="csv('customers')">Export CSV</button></div>
   <div class="card"><h2>Staff Report</h2><p class="sub">Employee profile and role list.</p><button class="btn dark" onclick="csv('staff')">Export CSV</button></div>
   <div class="card"><h2>Deal / KYC Report</h2><p class="sub">Track conversion, KYC stages and operational hand-off.</p><button class="btn dark" onclick="showPage('deals')">Open</button></div><div class="card"><h2>Project Report</h2><p class="sub">Solar project stages and progress.</p><button class="btn dark" onclick="showToast('Project report ready for print from the Projects page.')">View</button></div>
-  <div class="card"><h2>Service Report</h2><p class="sub">Warranty and service tickets.</p><button class="btn dark" onclick="showToast('Service report ready.')">View</button></div>
+  <div class="card"><h2>Service Report</h2><p class="sub">Warranty and service tickets.</p><button class="btn dark" onclick="showPage('service')">View</button></div><div class="card"><h2>Master Company Report</h2><p class="sub">One printable report containing sales, staff, projects, KYC, DNC, stock, finance and service data.</p><button class="btn primary" onclick="printMasterReport()">Print / Save PDF</button></div>
  </div>
 </section>
 
@@ -249,7 +253,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
   <div class="field"><label>Website</label><input value="www.numberdarsolar.com"></div>
   <div class="field full"><label>Address</label><textarea>Jind Road, Opposite MLA Balraj Kundu Farm, Near Suncity Bypass Chowk, Rohtak, Haryana – 124001</textarea></div>
  </div></div>
- <div class="card"><h2>Security Note</h2><p class="sub">This standalone GitHub HTML version uses browser-local demo authentication. For real multi-device company security, connect the same interface to Supabase Auth + PostgreSQL + Row Level Security. Never store plaintext passwords in a production database.</p></div>
+ <div class="card"><h2>Security Note</h2><p class="sub">This version is designed for Supabase Auth + PostgreSQL + Row Level Security. The browser stores only the public Supabase project URL/key; passwords are handled by Supabase Auth. Keep the service-role key only inside the Supabase Edge Function and never put it in this HTML.</p></div>
 </section>
 
 </div></main></div>
@@ -270,8 +274,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 <div class="field"><label>Mobile</label><input id="sm"></div><div class="field"><label>Email</label><input id="sx" type="email"></div>
 <div class="field"><label>Joining Date</label><input id="sj" type="date"></div><div class="field"><label>Status</label><select id="ss"><option>Active</option><option>Inactive</option></select></div>
 <div class="field full"><label>Profile Remarks / Assigned Work</label><textarea id="sremarks" placeholder="Example: Handle incoming inquiries and daily calling."></textarea></div>
-<div class="full"><div style="background:#f5f8f4;border:1px solid #e4ebe3;border-radius:10px;padding:10px;font-size:11px;color:#667168">The selected role automatically controls the staff menu in this standalone demo. Production deployment should enforce the same permissions using Supabase RLS.</div></div>
-<div class="full"><button class="btn primary">Create Staff Login</button></div>
+<div class="full"><div style="background:#f5f8f4;border:1px solid #e4ebe3;border-radius:10px;padding:10px;font-size:11px;color:#667168">The selected role controls the staff menu. Supabase RLS must also enforce access on the database; hiding a menu is not a security boundary.</div></div>
+<div class="full"><button class="btn primary" id="staffSubmitBtn">Create Staff Login</button></div>
 </form></div></div>
 
 <div class="modal" id="workModal"><div class="modalbox"><div class="mh"><h2>Add Staff Working Report</h2><button class="close" onclick="closeModal('workModal')">×</button></div><form id="workForm" class="formgrid">
@@ -367,20 +371,69 @@ let db={staff:[],leads:[],customers:[],work:[],inventory:[],deals:[],kyc:[],dnc:
 function getConfig(){try{return JSON.parse(localStorage.getItem(SUPABASE_CONFIG_KEY)||"null")}catch(e){return null}}
 function createCloudClient(){const c=getConfig();return c?.url&&c?.key?window.supabase.createClient(c.url,c.key,{auth:{persistSession:true,autoRefreshToken:true}}):null}
 function resetDb(){db={staff:[],leads:[],customers:[],work:[],inventory:[],deals:[],kyc:[],dnc:[],surveys:[],quotations:[],approvals:[],installations:[],suppliers:[],serviceTickets:[],payments:[],projects:[],followups:[]}}
-async function connectCloud(){supabaseClient=createCloudClient();if(!supabaseClient)throw Error("Enter your Supabase Project URL and anon/public key.");const {error}=await supabaseClient.from("profiles").select("id").limit(1);if(error)throw error;cloudReady=true}
-async function loadCloud(){if(!supabaseClient)throw Error("Supabase is not connected.");resetDb();const {data:profiles,error:pe}=await supabaseClient.from("profiles").select("id,employee_id,name,login_id,email,role,department,mobile,joining_date,status,remarks").order("created_at",{ascending:true});if(pe)throw pe;db.staff=(profiles||[]).map(p=>({id:p.id,employeeId:p.employee_id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",joiningDate:p.joining_date||"",status:p.status||"Active",remarks:p.remarks||""}));const {data:rows,error:re}=await supabaseClient.from("crm_records").select("id,module,record_id,data,created_by,assigned_to,updated_at").order("updated_at",{ascending:false});if(re)throw re;(rows||[]).forEach(r=>{if(db[r.module])db[r.module].push({...r.data,_cloudId:r.id,_createdBy:r.created_by,_assignedTo:r.assigned_to})})}
-async function upsertCloudRecord(module,record){if(!supabaseClient||!currentUser)return;const data={...record};delete data._cloudId;delete data._createdBy;delete data._assignedTo;const recordId=String(record.id||record.employeeId||module+"-"+Date.now());let target=record._assignedTo||null;const possibleNames=[record.assigned,record.staff,record.owner,record.engineer,record.supervisor,record.team];if(!target){const n=possibleNames.find(v=>v&&v!=="Sales Team"&&v!=="Site Supervisor");if(n){const sr=db.staff.find(x=>x.name===n);if(sr)target=sr.id}}const {data:old}=await supabaseClient.from("crm_records").select("id,created_by,assigned_to").eq("module",module).eq("record_id",recordId).maybeSingle();if(old){const {error}=await supabaseClient.from("crm_records").update({data,assigned_to:target||old.assigned_to||old.created_by,updated_at:new Date().toISOString()}).eq("id",old.id);if(error)throw error}else{const {error}=await supabaseClient.from("crm_records").insert({module,record_id:recordId,data,created_by:currentUser.id,assigned_to:target||currentUser.id});if(error)throw error}}
-async function save(){if(!supabaseClient||!currentUser)return;try{for(const m of CLOUD_MODULES){for(const r of (db[m]||[]))await upsertCloudRecord(m,r)}showToast("Cloud sync complete")}catch(e){console.error(e);showToast("Cloud sync failed: "+e.message)}}
-async function deleteCloudRecord(module,recordId){const {error}=await supabaseClient.from("crm_records").delete().eq("module",module).eq("record_id",String(recordId));if(error)throw error;await loadCloud();renderAll()}
+async function connectCloud(){
+  supabaseClient=createCloudClient();
+  if(!supabaseClient)throw Error("Enter your Supabase Project URL and anon/public key.");
+  const {error}=await supabaseClient.from("profiles").select("id").limit(1);
+  if(error)throw error;
+  cloudReady=true;
+  updateCloudBadge();
+}
+async function loadCloud(){
+  if(!supabaseClient)throw Error("Supabase is not connected.");
+  resetDb();
+  const {data:profiles,error:pe}=await supabaseClient.from("profiles").select("id,employee_id,name,login_id,email,role,department,mobile,joining_date,status,remarks").order("created_at",{ascending:true});
+  if(pe)throw pe;
+  db.staff=(profiles||[]).map(p=>({id:p.id,employeeId:p.employee_id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",joiningDate:p.joining_date||"",status:p.status||"Active",remarks:p.remarks||""}));
+  const {data:rows,error:re}=await supabaseClient.from("crm_records").select("id,module,record_id,data,created_by,assigned_to,updated_at").order("updated_at",{ascending:false});
+  if(re)throw re;
+  (rows||[]).forEach(r=>{if(db[r.module])db[r.module].push({...r.data,_cloudId:r.id,_createdBy:r.created_by,_assignedTo:r.assigned_to})});
+  updateCloudBadge();
+}
+async function upsertCloudRecord(module,record){
+  if(!supabaseClient||!currentUser)throw Error("You are not connected/logged in.");
+  if(!CLOUD_MODULES.includes(module))throw Error("Unknown CRM module: "+module);
+  const data={...record};delete data._cloudId;delete data._createdBy;delete data._assignedTo;
+  const recordId=String(record.id||record.employeeId||module+"-"+Date.now());
+  let target=record._assignedTo||null;
+  const possibleNames=[record.assigned,record.staff,record.owner,record.engineer,record.supervisor,record.team,record.technician];
+  if(!target){const n=possibleNames.find(v=>v&&v!=="Sales Team"&&v!=="Site Supervisor"&&v!=="Unassigned");if(n){const sr=db.staff.find(x=>x.name===n);if(sr)target=sr.id}}
+  const {data:old,error:findError}=await supabaseClient.from("crm_records").select("id,created_by,assigned_to").eq("module",module).eq("record_id",recordId).maybeSingle();
+  if(findError)throw findError;
+  if(old){
+    const {error}=await supabaseClient.from("crm_records").update({data,assigned_to:target||old.assigned_to||old.created_by,updated_at:new Date().toISOString()}).eq("id",old.id);
+    if(error)throw error;
+  }else{
+    const {error}=await supabaseClient.from("crm_records").insert({module,record_id:recordId,data,created_by:currentUser.id,assigned_to:target||currentUser.id});
+    if(error)throw error;
+  }
+}
+async function persistRecord(module,record){await upsertCloudRecord(module,record);await loadCloud();renderAll()}
+async function save(){
+  if(!supabaseClient||!currentUser)return;
+  try{
+    for(const m of CLOUD_MODULES){for(const r of (db[m]||[]))await upsertCloudRecord(m,r)}
+    await loadCloud();renderAll();showToast("Cloud sync complete");
+  }catch(e){console.error(e);showToast("Cloud sync failed: "+e.message)}
+}
+async function deleteCloudRecord(module,recordId){
+  if(!supabaseClient||!currentUser)throw Error("Not connected.");
+  const {error}=await supabaseClient.from("crm_records").delete().eq("module",module).eq("record_id",String(recordId));
+  if(error)throw error;
+  await loadCloud();renderAll();
+}
+function updateCloudBadge(){const b=el("cloudBadge");if(!b)return;b.className="cloud-badge "+(cloudReady?"":"off");b.textContent=cloudReady?"● Supabase Cloud Connected":"● Cloud not connected"}
+function newId(prefix){return prefix+"-"+Date.now()+"-"+Math.random().toString(36).slice(2,7).toUpperCase()}
+
 function el(id){return document.getElementById(id)}
 function showToast(msg){let t=el("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2400)}
 function toggleSide(){el("sidebar").classList.toggle("open")}
 function openCloudSetup(){ const modal=el("cloudSetupModal"); if(!modal){showToast("Cloud setup window is unavailable."); return;} const c=getConfig(); if(c){el("sbUrl").value=c.url||""; el("sbKey").value=c.key||"";} el("cloudStatus").textContent=""; modal.classList.add("show"); }
-function openModal(id){populateDynamic();el(id).classList.add("show")}
+function openModal(id){populateDynamic();if(id==="staffModal"&&!el("staffEditId")?.value)resetStaffModal();el(id).classList.add("show")}
 function closeModal(id){el(id).classList.remove("show")}
 
 el("loginForm").addEventListener("submit",async e=>{e.preventDefault();try{el("loginErr").style.display="none";if(!supabaseClient)await connectCloud();const id=el("loginId").value.trim(),pass=el("loginPass").value;const {data:p,error:pe}=await supabaseClient.from("profiles").select("id,email,name,login_id,role,department,mobile,status,employee_id,joining_date,remarks").ilike("login_id",id).maybeSingle();if(pe)throw pe;if(!p)throw Error("Login ID not found in cloud.");if(p.status!=="Active")throw Error("This staff account is inactive.");const {error:ae}=await supabaseClient.auth.signInWithPassword({email:p.email,password:pass});if(ae)throw ae;currentUser={id:p.id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",employeeId:p.employee_id,status:p.status,joiningDate:p.joining_date||"",remarks:p.remarks||""};await loadCloud();el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp();startRealtime()}catch(err){el("loginErr").textContent=err.message||"Cloud login failed";el("loginErr").style.display="block"}});
-async function logout(){if(supabaseClient)await supabaseClient.auth.signOut();currentUser=null;resetDb();el("app").classList.add("hidden");el("loginScreen").classList.remove("hidden");el("loginPass").value=""}
+async function logout(){if(supabaseClient&&window.numberdarRealtimeChannel){await supabaseClient.removeChannel(window.numberdarRealtimeChannel);window.numberdarRealtimeChannel=null}if(supabaseClient)await supabaseClient.auth.signOut();currentUser=null;resetDb();el("app").classList.add("hidden");el("loginScreen").classList.remove("hidden");el("loginPass").value="";cloudReady=!!getConfig();updateCloudBadge()}
 function setupApp(){el("userName").textContent=currentUser.name;el("userRole").textContent=currentUser.role;el("avatar").textContent=currentUser.name.charAt(0).toUpperCase();el("roleLabel").textContent=currentUser.role;buildNav();renderAll();showPage("dashboard")}
 function isAdmin(){return currentUser&&currentUser.role==="Owner / Super Admin"}
 function allowedPages(){
@@ -416,14 +469,37 @@ function escapeAttr(v){return escapeHtml(v)}
 
 function renderAll(){populateDynamic();renderDashboard();renderLeads();renderCustomers();renderStaff();renderWorkReports();renderTables();renderInventory();renderDeals();renderKyc();renderDnc()}
 function renderDashboard(){
- el("dashLeads").textContent=db.leads.length;el("dashCustomers").textContent=db.customers.length;el("dashStaff").textContent=db.staff.filter(s=>s.role!=="Owner / Super Admin").length;el("dashProjects").textContent=(db.projects?.length||0);el("dashService").textContent=1;
- el("liveDate").textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
- el("pipeline").innerHTML=STAGES.map(s=>`<div class="stage"><b>${db.leads.filter(x=>x.stage===s).length}</b><span>${s}</span></div>`).join("");
- const works=db.work.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
- el("todayWork").innerHTML=works.length?works.map(w=>`<div class="activity"><i class="dot"></i><div><b>${escapeHtml(w.staff)}</b><div style="font-size:11px;color:#758078">${escapeHtml(w.type)} • ${w.hours}h</div><small>${escapeHtml(w.details)}</small></div></div>`).join(""):"<div class='sub'>No work entries yet.</div>";
- const vals=[18,27,22,34,29,41,37,46,52,44,61,68];el("chart").innerHTML=vals.map((v,i)=>`<div class="bar" style="height:${v*2}px"><span>${["Oct","Nov","Dec","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep"][i]}</span></div>`).join("");
- el("projectProgress").innerHTML=[["Survey",12,35],["Approval",8,48],["Installation",7,68],["Commissioning",4,82]].map(x=>`<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span>${x[0]}</span><b>${x[1]}</b></div><div class="progress"><i style="width:${x[2]}%"></i></div></div>`).join("");
+  el("dashLeads").textContent=db.leads.length;
+  el("dashCustomers").textContent=db.customers.length;
+  el("dashStaff").textContent=db.staff.filter(s=>s.role!=="Owner / Super Admin").length;
+  el("dashProjects").textContent=db.projects?.length||0;
+  el("dashService").textContent=(db.serviceTickets||[]).filter(x=>x.status!=="Closed"&&x.status!=="Completed").length;
+  el("liveDate").textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  el("pipeline").innerHTML=STAGES.map(s=>`<div class="stage"><b>${db.leads.filter(x=>x.stage===s).length}</b><span>${s}</span></div>`).join("");
+  const works=db.work.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).slice(0,5);
+  el("todayWork").innerHTML=works.length?works.map(w=>`<div class="activity"><i class="dot"></i><div><b>${escapeHtml(w.staff)}</b><div style="font-size:11px;color:#758078">${escapeHtml(w.type)} • ${escapeHtml(w.hours)}h</div><small>${escapeHtml(w.details)}</small></div></div>`).join(""):"<div class='sub'>No work entries yet.</div>";
+  const now=new Date(), months=[];
+  for(let i=11;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),label:d.toLocaleString("en-IN",{month:"short"})})}
+  const counts=months.map(m=>db.leads.filter(x=>String(x.createdAt||x.date||x.created_at||"").slice(0,7)===m.key).length);
+  const max=Math.max(1,...counts);el("chart").innerHTML=months.map((m,i)=>`<div class="bar" style="height:${Math.max(12,counts[i]/max*120)}px"><span>${m.label}</span><b style="position:absolute;top:-16px;font-size:9px">${counts[i]}</b></div>`).join("");
+  const stages=["Survey","Approval","Installation","Commissioning"], total=db.projects.length;
+  const progress=stages.map(stage=>{let arr=db.projects.filter(p=>String(p.stage||"").toLowerCase().includes(stage.toLowerCase()));let pct=arr.length?Math.round(arr.reduce((a,p)=>a+(+p.progress||0),0)/arr.length):0;return [stage,arr.length,pct]});
+  el("projectProgress").innerHTML=progress.map(x=>`<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span>${x[0]}</span><b>${x[1]}</b></div><div class="progress"><i style="width:${x[2]}%"></i></div></div>`).join("");
+  renderFinance();
 }
+function money(v){return "₹"+Number(v||0).toLocaleString("en-IN")}
+function renderFinance(){
+  const pays=db.payments||[];
+  const total=pays.reduce((a,x)=>a+(+x.total||0),0), received=pays.reduce((a,x)=>a+(+x.received||0),0), outstanding=Math.max(0,total-received);
+  const overdue=pays.reduce((a,x)=>{const pending=Math.max(0,(+x.total||0)-(+x.received||0));return a+(pending>0&&x.due&&new Date(x.due)<new Date()?pending:0)},0);
+  const collection=total?Math.round(received/total*100):0;
+  if(el("finTotal"))el("finTotal").textContent=money(total);
+  if(el("finReceived"))el("finReceived").textContent=money(received);
+  if(el("finOutstanding"))el("finOutstanding").textContent=money(outstanding);
+  if(el("finOverdue"))el("finOverdue").textContent=money(overdue);
+  if(el("finCollection"))el("finCollection").textContent=collection+"%";
+}
+
 function renderLeads(){
  const q=(el("leadSearch")?.value||"").toLowerCase(),f=el("leadFilter")?.value||"";
  el("leadBoard").innerHTML=STAGES.map(s=>{
@@ -431,18 +507,34 @@ function renderLeads(){
   return `<div class="kcol"><h3>${s} <span style="float:right">${items.length}</span></h3>${items.map((x,i)=>`<div class="lead"><b>${escapeHtml(x.name)}</b><small>${escapeHtml(x.mobile)} • ${escapeHtml(x.property)}</small><span class="badge info">${escapeHtml(x.assigned||"Unassigned")}</span><div class="actions" style="margin-top:8px"><button class="btn light" style="padding:6px 9px" onclick="advanceLead(${db.leads.indexOf(x)})">Move →</button></div></div>`).join("")||"<div style='font-size:10px;color:#8a948d;padding:8px'>No leads</div>"}</div>`;
  }).join("");
 }
-function advanceLead(i){let x=db.leads[i],n=Math.min(STAGES.indexOf(x.stage)+1,STAGES.length-1);x.stage=STAGES[n];save();renderAll();showToast("Lead moved to "+x.stage)}
+async function advanceLead(i){try{let x=db.leads[i],n=Math.min(STAGES.indexOf(x.stage)+1,STAGES.length-1);x.stage=STAGES[n];await upsertCloudRecord("leads",x);await loadCloud();renderAll();showToast("Lead moved to "+x.stage)}catch(e){showToast("Lead update failed: "+e.message)}}
 function renderCustomers(){
  const q=(el("customerSearch")?.value||"").toLowerCase();
  el("customerTable").innerHTML=db.customers.filter(x=>(x.name+" "+x.mobile).toLowerCase().includes(q)).map((x,i)=>`<tr><td>${escapeHtml(x.id)}</td><td><b>${escapeHtml(x.name)}</b></td><td>${escapeHtml(x.mobile)}</td><td>${escapeHtml(x.property)}</td><td>${escapeHtml(x.system)}</td><td><span class="badge ok">${escapeHtml(x.status)}</span></td><td><button class="btn danger" style="padding:6px 9px" onclick="deleteCustomer(${i})">Delete</button></td></tr>`).join("")||"<tr><td colspan='7'>No customers found.</td></tr>";
 }
 async function deleteCustomer(i){if(!isAdmin()){showToast("Only Admin can delete customers.");return}const x=db.customers[i];if(confirm("Delete this customer from cloud?")){try{await deleteCloudRecord("customers",x.id);showToast("Customer deleted from cloud")}catch(e){showToast("Delete failed: "+e.message)}}}
 function renderStaff(){
- const q=(el("staffSearch")?.value||"").toLowerCase();
- el("staffTable").innerHTML=db.staff.filter(x=>(x.name+" "+x.role+" "+x.loginId+" "+x.employeeId).toLowerCase().includes(q)).map((x,i)=>`<tr><td>${escapeHtml(x.employeeId)}</td><td><b>${escapeHtml(x.name)}</b><small style="display:block;color:#78827b">${escapeHtml(x.mobile||"")}</small></td><td>${escapeHtml(x.loginId)}</td><td>${escapeHtml(x.role)}</td><td>${escapeHtml(x.department)}</td><td>${x.role==="Owner / Super Admin"?"Everything":escapeHtml((ROLE_DEFS[x.role]?.access||[]).join(", "))}</td><td><span class="badge ${x.status==="Active"?"ok":"bad"}">${escapeHtml(x.status)}</span></td><td>${x.role==="Owner / Super Admin"?"<span class='badge info'>Protected</span>":`<button class="btn danger" style="padding:6px 8px" onclick="removeStaff(${i})">Delete</button>`}</td></tr>`).join("");
- el("roleCards").innerHTML=Object.entries(ROLE_DEFS).map(([r,v])=>`<div style="border:1px solid #e6ebe5;border-radius:12px;padding:13px;background:#fafcfa"><b>${escapeHtml(r)}</b><small style="display:block;color:#778079;margin:4px 0 8px">${escapeHtml(v.dept)}</small><span class="badge info">${v.access.length} modules</span></div>`).join("");
+  const q=(el("staffSearch")?.value||"").toLowerCase();
+  el("staffTable").innerHTML=db.staff.filter(x=>(x.name+" "+x.role+" "+x.loginId+" "+x.employeeId).toLowerCase().includes(q)).map((x,i)=>{
+    const action=x.role==="Owner / Super Admin"?"<span class='badge info'>Protected</span>":`<button class="btn light" style="padding:6px 8px" onclick="editStaff(${i})">Edit</button> <button class="btn ${x.status==="Active"?"danger":"primary"}" style="padding:6px 8px" onclick="toggleStaffStatus(${i})">${x.status==="Active"?"Deactivate":"Activate"}</button>`;
+    return `<tr><td>${escapeHtml(x.employeeId)}</td><td><b>${escapeHtml(x.name)}</b><small style="display:block;color:#78827b">${escapeHtml(x.mobile||"")}</small></td><td>${escapeHtml(x.loginId)}</td><td>${escapeHtml(x.role)}</td><td>${escapeHtml(x.department)}</td><td>${x.role==="Owner / Super Admin"?"Everything":escapeHtml((ROLE_DEFS[x.role]?.access||[]).join(", "))}</td><td><span class="badge ${x.status==="Active"?"ok":"bad"}">${escapeHtml(x.status)}</span></td><td>${action}</td></tr>`;
+  }).join("")||"<tr><td colspan='8'>No staff found.</td></tr>";
+  el("roleCards").innerHTML=Object.entries(ROLE_DEFS).map(([r,v])=>`<div style="border:1px solid #e6ebe5;border-radius:12px;padding:13px;background:#fafcfa"><b>${escapeHtml(r)}</b><small style="display:block;color:#778079;margin:4px 0 8px">${escapeHtml(v.dept)}</small><span class="badge info">${v.access.length} modules</span></div>`).join("");
 }
-function removeStaff(i){if(!isAdmin())return;let s=db.staff[i];if(confirm("Delete staff login "+s.name+"? Their old work report entries will remain for reporting.")){db.staff.splice(i,1);save();renderAll();showToast("Staff login deleted")}}
+function editStaff(i){
+  if(!isAdmin())return showToast("Only Admin can edit staff profiles.");
+  const s=db.staff[i];if(!s||s.role==="Owner / Super Admin")return;
+  el("staffEditId").value=s.id;el("se").value=s.employeeId||"";el("sn").value=s.name||"";el("si").value=s.loginId||"";el("sp").value="";el("sr").value=s.role||Object.keys(ROLE_DEFS)[0];el("sd").value=s.department||ROLE_DEFS[s.role]?.dept||"";el("sm").value=s.mobile||"";el("sx").value=s.email||"";el("sj").value=s.joiningDate||"";el("ss").value=s.status||"Active";el("sremarks").value=s.remarks||"";
+  document.querySelector("#staffModal h2").textContent="Edit Staff Profile";el("staffSubmitBtn").textContent="Update Staff Profile";el("si").disabled=true;el("sx").disabled=true;el("sp").required=false;openModal("staffModal");
+}
+async function toggleStaffStatus(i){
+  if(!isAdmin())return showToast("Only Admin can change staff status.");
+  const s=db.staff[i];if(!s||s.role==="Owner / Super Admin")return;
+  const next=s.status==="Active"?"Inactive":"Active";
+  if(!confirm(`${next==="Inactive"?"Deactivate":"Activate"} ${s.name}'s login?`))return;
+  try{const {error}=await supabaseClient.from("profiles").update({status:next}).eq("id",s.id);if(error)throw error;await loadCloud();renderAll();showToast(`Staff account ${next.toLowerCase()}.`)}catch(e){showToast("Status update failed: "+e.message)}
+}
+
 function renderWorkReports(){
  const sf=el("workStaffFilter")?.value||"",from=el("workFrom")?.value||"",to=el("workTo")?.value||"";
  let rows=db.work.filter(w=>(isAdmin()?( !sf||w.staff===sf ):(w.staff===currentUser.name))&&(!from||w.date>=from)&&(!to||w.date<=to)).sort((a,b)=>b.date.localeCompare(a.date));
@@ -498,28 +590,18 @@ function renderTables(){
  el("paymentTable").innerHTML=pays.length?pays.map(x=>{const pending=Math.max(0,(+x.total||0)-(+x.received||0));return `<tr><td>${escapeHtml(x.project)}</td><td>${escapeHtml(x.customer)}</td><td>₹${Number(x.total||0).toLocaleString("en-IN")}</td><td>₹${Number(x.received||0).toLocaleString("en-IN")}</td><td>₹${pending.toLocaleString("en-IN")}</td><td><span class="badge ${pending>0?"wait":"ok"}">${escapeHtml(x.due||"—")}</span></td></tr>`}).join(""):"<tr><td colspan='6'>No payments recorded yet.</td></tr>";
 }
 
-el("leadForm").onsubmit=e=>{e.preventDefault();db.leads.unshift({name:el("ln").value.trim(),mobile:el("lm").value.trim(),property:el("lp").value,stage:"New Lead",assigned:el("la").value||"Sales Team",remarks:el("lr").value});save();closeModal("leadModal");e.target.reset();renderAll();showToast("Lead saved successfully")};
-el("customerForm").onsubmit=e=>{e.preventDefault();db.customers.unshift({id:"CUS-"+String(db.customers.length+1).padStart(3,"0"),name:el("cn").value.trim(),mobile:el("cm").value.trim(),property:el("cp").value,system:el("ck").value?el("ck").value+" kW":"—",status:"New",address:el("ca").value});save();closeModal("customerModal");e.target.reset();renderAll();showToast("Customer saved successfully")};
-el("staffForm").onsubmit=async e=>{e.preventDefault();if(!isAdmin()){showToast("Only Admin can create staff logins.");return}try{const c=getConfig(),session=(await supabaseClient.auth.getSession()).data.session;if(!session)throw Error("Admin session expired. Login again.");const role=el("sr").value;const body={action:"create",employee_id:el("se").value.trim(),name:el("sn").value.trim(),login_id:el("si").value.trim(),password:el("sp").value,email:el("sx").value.trim(),role,department:ROLE_DEFS[role].dept,mobile:el("sm").value.trim(),joining_date:el("sj").value,status:el("ss").value,remarks:el("sremarks").value.trim()};const r=await fetch(c.url+"/functions/v1/staff-admin",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+session.access_token},body:JSON.stringify(body)});const j=await r.json();if(!r.ok)throw Error(j.error||"Staff creation failed");await loadCloud();closeModal("staffModal");e.target.reset();renderAll();showToast("Staff login created in Supabase") }catch(x){showToast("Staff creation failed: "+x.message)}};
-el("workForm").onsubmit=async e=>{e.preventDefault();if(!isAdmin()&&el("ws").value!==currentUser.name){showToast("You can only submit your own work report.");return}const staffRec=db.staff.find(x=>x.name===el("ws").value);const record={id:"WORK-"+Date.now(),staff:el("ws").value,date:el("wd").value,type:el("wt").value,hours:+el("wh").value||0,details:el("wdetails").value.trim(),remarks:el("wremarks").value.trim(),_assignedTo:isAdmin()?(staffRec?.id||currentUser.id):currentUser.id};try{await upsertCloudRecord("work",record);await loadCloud();closeModal("workModal");e.target.reset();el("wd").value=new Date().toISOString().slice(0,10);renderAll();showToast("Work report saved to cloud")}catch(x){showToast("Save failed: "+x.message)}};
-el("surveyForm").onsubmit=e=>{
- e.preventDefault();db.surveys=db.surveys||[];const ins=e.target.querySelectorAll("input");
- db.surveys.unshift({id:"SV-"+new Date().getFullYear()+"-"+String(db.surveys.length+1).padStart(3,"0"),customer:ins[0].value.trim(),engineer:ins[1].value.trim(),date:ins[2].value,roof:(ins[3].value||"0")+" sq ft",result:"Scheduled"});
- save();closeModal("surveyModal");e.target.reset();renderAll();showToast("Site survey saved successfully");
-};
-el("quotationForm").onsubmit=e=>{
- e.preventDefault();const ins=e.target.querySelectorAll("input"),customer=ins[0].value.trim(),system=+ins[1].value||0,subtotal=(+ins[2].value||0)+(+ins[3].value||0)+(+ins[4].value||0),gst=+ins[5].value||0,total=Math.round(subtotal*(1+gst/100));
- db.quotations=db.quotations||[];db.quotations.unshift({id:"QT-"+new Date().getFullYear()+"-"+String(db.quotations.length+1).padStart(3,"0"),customer,system,total,date:new Date().toISOString().slice(0,10),status:"Draft"});
- save();closeModal("quotationModal");e.target.reset();renderAll();showToast("Quotation saved successfully");
-};
-el("inventoryForm").onsubmit=e=>{e.preventDefault();db.inventory.push({sku:el("is").value,product:el("ip").value,brand:el("ib").value||"—",model:el("im").value||"—",stock:+el("iq").value||0,reserved:+el("ir").value||0});save();closeModal("inventoryModal");e.target.reset();renderAll();showToast("Inventory item saved")};
-
-
-el("approvalForm").onsubmit=e=>{e.preventDefault();db.approvals.unshift({id:el("apid").value.trim(),customer:el("apcustomer").value.trim(),discom:el("apdiscom").value.trim(),capacity:+el("apkw").value||0,date:el("apdate").value||new Date().toISOString().slice(0,10),status:el("apstatus").value,remarks:el("apremarks").value});save();closeModal("approvalModal");e.target.reset();renderAll();showToast("DISCOM application saved")};
-el("installationForm").onsubmit=e=>{e.preventDefault();db.installations.unshift({id:el("inid").value.trim(),project:el("inproject").value.trim(),team:el("inteam").value.trim(),date:el("indate").value||new Date().toISOString().slice(0,10),progress:+el("inprogress").value||0,status:el("instatus").value,remarks:el("inremarks").value});save();closeModal("installationModal");e.target.reset();renderAll();showToast("Installation job saved")};
-el("supplierForm").onsubmit=e=>{e.preventDefault();db.suppliers.unshift({name:el("supname").value.trim(),contact:el("supcontact").value.trim(),phone:el("supphone").value.trim(),products:el("supproducts").value.trim(),outstanding:+el("supout").value||0,status:el("supstatus").value});save();closeModal("supplierModal");e.target.reset();renderAll();showToast("Supplier saved")};
-el("serviceForm").onsubmit=e=>{e.preventDefault();db.serviceTickets.unshift({id:el("srvid").value.trim(),customer:el("srvcustomer").value.trim(),issue:el("srvissue").value.trim(),technician:el("srvtech").value.trim(),priority:el("srvpriority").value,status:el("srvstatus").value,remarks:el("srvremarks").value});save();closeModal("serviceModal");e.target.reset();renderAll();showToast("Service ticket saved")};
-el("paymentForm").onsubmit=e=>{e.preventDefault();db.payments.unshift({project:el("payproject").value.trim(),customer:el("paycustomer").value.trim(),total:+el("paytotal").value||0,received:+el("payreceived").value||0,due:el("paydue").value||"",mode:el("paymode").value,remarks:el("payremarks").value});save();closeModal("paymentModal");e.target.reset();renderAll();showToast("Payment saved")};
+el("leadForm").onsubmit=async e=>{e.preventDefault();try{const record={id:newId("LEAD"),name:el("ln").value.trim(),mobile:el("lm").value.trim(),property:el("lp").value,monthlyBill:+el("lb").value||0,source:el("ls").value,stage:"New Lead",assigned:el("la").value||"Sales Team",remarks:el("lr").value,createdAt:new Date().toISOString()};await persistRecord("leads",record);closeModal("leadModal");e.target.reset();renderAll();showToast("Lead saved to cloud")}catch(x){showToast("Lead save failed: "+x.message)}};
+el("customerForm").onsubmit=async e=>{e.preventDefault();try{const record={id:newId("CUS"),name:el("cn").value.trim(),mobile:el("cm").value.trim(),property:el("cp").value,system:el("ck").value?el("ck").value+" kW":"—",status:"New",address:el("ca").value,createdAt:new Date().toISOString()};await persistRecord("customers",record);closeModal("customerModal");e.target.reset();renderAll();showToast("Customer saved to cloud")}catch(x){showToast("Customer save failed: "+x.message)}};
+el("workForm").onsubmit=async e=>{e.preventDefault();if(!isAdmin()&&el("ws").value!==currentUser.name){showToast("You can only submit your own work report.");return}try{const staffRec=db.staff.find(x=>x.name===el("ws").value);const record={id:newId("WORK"),staff:el("ws").value,date:el("wd").value,type:el("wt").value,hours:+el("wh").value||0,details:el("wdetails").value.trim(),remarks:el("wremarks").value.trim(),_assignedTo:isAdmin()?(staffRec?.id||currentUser.id):currentUser.id,createdAt:new Date().toISOString()};await persistRecord("work",record);closeModal("workModal");e.target.reset();el("wd").value=new Date().toISOString().slice(0,10);showToast("Work report saved to cloud")}catch(x){showToast("Save failed: "+x.message)}};
+el("surveyForm").onsubmit=async e=>{e.preventDefault();try{const ins=e.target.querySelectorAll("input"),record={id:newId("SV"),customer:ins[0].value.trim(),engineer:ins[1].value.trim(),date:ins[2].value,roof:(ins[3].value||"0")+" sq ft",result:"Scheduled",createdAt:new Date().toISOString()};await persistRecord("surveys",record);closeModal("surveyModal");e.target.reset();showToast("Site survey saved to cloud")}catch(x){showToast("Survey save failed: "+x.message)}};
+el("quotationForm").onsubmit=async e=>{e.preventDefault();try{const ins=e.target.querySelectorAll("input"),customer=ins[0].value.trim(),system=+ins[1].value||0,subtotal=(+ins[2].value||0)+(+ins[3].value||0)+(+ins[4].value||0),gst=+ins[5].value||0,total=Math.round(subtotal*(1+gst/100)),record={id:newId("QT"),customer,system,total,date:new Date().toISOString().slice(0,10),status:"Draft",subtotal,gst,createdAt:new Date().toISOString()};await persistRecord("quotations",record);closeModal("quotationModal");e.target.reset();showToast("Quotation saved to cloud")}catch(x){showToast("Quotation save failed: "+x.message)}};
+el("inventoryForm").onsubmit=async e=>{e.preventDefault();try{const record={id:el("is").value.trim()||newId("SKU"),sku:el("is").value.trim(),product:el("ip").value.trim(),brand:el("ib").value||"—",model:el("im").value||"—",stock:+el("iq").value||0,reserved:+el("ir").value||0,createdAt:new Date().toISOString()};await persistRecord("inventory",record);closeModal("inventoryModal");e.target.reset();showToast("Inventory item saved to cloud")}catch(x){showToast("Inventory save failed: "+x.message)}};
+el("approvalForm").onsubmit=async e=>{e.preventDefault();try{const record={id:el("apid").value.trim()||newId("AP"),customer:el("apcustomer").value.trim(),discom:el("apdiscom").value.trim(),capacity:+el("apkw").value||0,date:el("apdate").value||new Date().toISOString().slice(0,10),status:el("apstatus").value,remarks:el("apremarks").value,createdAt:new Date().toISOString()};await persistRecord("approvals",record);closeModal("approvalModal");e.target.reset();showToast("DISCOM application saved to cloud")}catch(x){showToast("Approval save failed: "+x.message)}};
+el("installationForm").onsubmit=async e=>{e.preventDefault();try{const record={id:el("inid").value.trim()||newId("INS"),project:el("inproject").value.trim(),team:el("inteam").value.trim(),date:el("indate").value||new Date().toISOString().slice(0,10),progress:Math.max(0,Math.min(100,+el("inprogress").value||0)),status:el("instatus").value,remarks:el("inremarks").value,createdAt:new Date().toISOString()};await persistRecord("installations",record);closeModal("installationModal");e.target.reset();showToast("Installation job saved to cloud")}catch(x){showToast("Installation save failed: "+x.message)}};
+el("supplierForm").onsubmit=async e=>{e.preventDefault();try{const record={id:newId("SUP"),name:el("supname").value.trim(),contact:el("supcontact").value.trim(),phone:el("supphone").value.trim(),products:el("supproducts").value.trim(),outstanding:+el("supout").value||0,status:el("supstatus").value,createdAt:new Date().toISOString()};await persistRecord("suppliers",record);closeModal("supplierModal");e.target.reset();showToast("Supplier saved to cloud")}catch(x){showToast("Supplier save failed: "+x.message)}};
+el("serviceForm").onsubmit=async e=>{e.preventDefault();try{const record={id:el("srvid").value.trim()||newId("SRV"),customer:el("srvcustomer").value.trim(),issue:el("srvissue").value.trim(),technician:el("srvtech").value.trim(),priority:el("srvpriority").value,status:el("srvstatus").value,remarks:el("srvremarks").value,createdAt:new Date().toISOString()};await persistRecord("serviceTickets",record);closeModal("serviceModal");e.target.reset();showToast("Service ticket saved to cloud")}catch(x){showToast("Service save failed: "+x.message)}};
+el("paymentForm").onsubmit=async e=>{e.preventDefault();try{const record={id:newId("PAY"),project:el("payproject").value.trim(),customer:el("paycustomer").value.trim(),total:+el("paytotal").value||0,received:+el("payreceived").value||0,due:el("paydue").value||"",mode:el("paymode").value,remarks:el("payremarks").value,createdAt:new Date().toISOString()};if(record.received>record.total&&record.total>0)throw Error("Received amount cannot be greater than total project value.");await persistRecord("payments",record);closeModal("paymentModal");e.target.reset();showToast("Payment saved to cloud")}catch(x){showToast("Payment save failed: "+x.message)}};
+function resetStaffModal(){el("staffEditId").value="";el("staffForm").reset();el("si").disabled=false;el("sx").disabled=false;el("sp").required=true;document.querySelector("#staffModal h2").textContent="Create Staff Login & Profile";el("staffSubmitBtn").textContent="Create Staff Login"}
 
 function csv(type){
  let rows;
@@ -528,11 +610,19 @@ function csv(type){
  else rows=[["Name","Mobile","Property","Stage","Assigned"],...db.leads.map(x=>[x.name,x.mobile,x.property,x.stage,x.assigned])];
  let s=rows.map(r=>r.map(v=>'"'+String(v??"").replaceAll('"','""')+'"').join(",")).join("\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([s],{type:"text/csv"}));a.download="numberdar-"+type+"-report.csv";a.click();URL.revokeObjectURL(a.href);
 }
-window.addEventListener("afterprint",()=>{el("workreports").classList.remove("printing")});
+window.addEventListener("afterprint",()=>{el("workreports").classList.remove("printing");document.body.classList.remove("master-printing")});
 el("wd").value=new Date().toISOString().slice(0,10);
-el("cloudSetupForm").onsubmit=async e=>{e.preventDefault();try{localStorage.setItem(SUPABASE_CONFIG_KEY,JSON.stringify({url:el("sbUrl").value.trim().replace(/\/$/,""),key:el("sbKey").value.trim()}));await connectCloud();el("cloudStatus").textContent="✓ Connected to Supabase.";showToast("Supabase cloud connected")}catch(err){el("cloudStatus").textContent="Connection failed: "+err.message;showToast("Cloud connection failed")}};
-function startRealtime(){if(!supabaseClient)return;supabaseClient.channel("numberdar-live").on("postgres_changes",{event:"*",schema:"public",table:"crm_records"},async()=>{if(currentUser){try{await loadCloud();renderAll()}catch(e){console.warn(e)}}}).on("postgres_changes",{event:"*",schema:"public",table:"profiles"},async()=>{if(currentUser){try{await loadCloud();renderAll()}catch(e){console.warn(e)}}}).subscribe()}
-(async()=>{try{if(getConfig()){await connectCloud();const {data:{session}}=await supabaseClient.auth.getSession();if(session){const {data:p}=await supabaseClient.from("profiles").select("id,email,name,login_id,role,department,mobile,status,employee_id,joining_date,remarks").eq("id",session.user.id).single();if(p){currentUser={id:p.id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",employeeId:p.employee_id,status:p.status,joiningDate:p.joining_date||"",remarks:p.remarks||""};await loadCloud();el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp();startRealtime()}}}}catch(e){console.warn("Cloud auto connect:",e.message)}})();
+el("cloudSetupForm").onsubmit=async e=>{e.preventDefault();try{localStorage.setItem(SUPABASE_CONFIG_KEY,JSON.stringify({url:el("sbUrl").value.trim().replace(/\/$/,""),key:el("sbKey").value.trim()}));await connectCloud();el("cloudStatus").textContent="✓ Connected to Supabase.";showToast("Supabase cloud connected")}catch(err){el("cloudStatus").textContent="Connection failed: "+err.message;cloudReady=false;updateCloudBadge();showToast("Cloud connection failed")}};
+function startRealtime(){if(!supabaseClient)return;if(window.numberdarRealtimeChannel){supabaseClient.removeChannel(window.numberdarRealtimeChannel)}window.numberdarRealtimeChannel=supabaseClient.channel("numberdar-live").on("postgres_changes",{event:"*",schema:"public",table:"crm_records"},async()=>{if(currentUser){try{await loadCloud();renderAll()}catch(e){console.warn(e)}}}).on("postgres_changes",{event:"*",schema:"public",table:"profiles"},async()=>{if(currentUser){try{await loadCloud();renderAll()}catch(e){console.warn(e)}}}).subscribe()}
+function printMasterReport(){
+  if(!isAdmin()){showToast("Master company PDF is available to Admin only.");return}
+  const area=el("masterPrintArea"),fmt=(v)=>escapeHtml(v??"—");
+  const rows=(arr,cols)=>arr.map(x=>`<tr>${cols.map(c=>`<td>${fmt(typeof c==="function"?c(x):x[c])}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="${cols.length}">No records.</td></tr>`;
+  const total=(db.payments||[]).reduce((a,x)=>a+(+x.total||0),0),received=(db.payments||[]).reduce((a,x)=>a+(+x.received||0),0);
+  area.innerHTML=`<div class="master-report"><h1>NUMBERDAR ENTERPRISES — MASTER CRM REPORT</h1><div class="meta">Solar Energy • Rohtak, Haryana • Generated ${new Date().toLocaleString("en-IN")}</div><div class="summary"><div class="box"><div>Leads</div><div class="num">${db.leads.length}</div></div><div class="box"><div>Customers</div><div class="num">${db.customers.length}</div></div><div class="box"><div>Projects</div><div class="num">${db.projects.length}</div></div><div class="box"><div>Outstanding</div><div class="num">${money(Math.max(0,total-received))}</div></div></div><h2>Staff</h2><table><thead><tr><th>Employee ID</th><th>Name</th><th>Login ID</th><th>Role</th><th>Department</th><th>Status</th></tr></thead><tbody>${rows(db.staff,["employeeId","name","loginId","role","department","status"])}</tbody></table><h2>Leads</h2><table><thead><tr><th>Name</th><th>Mobile</th><th>Property</th><th>Stage</th><th>Assigned</th><th>Remarks</th></tr></thead><tbody>${rows(db.leads,["name","mobile","property","stage","assigned","remarks"])}</tbody></table><h2>Customers</h2><table><thead><tr><th>ID</th><th>Name</th><th>Mobile</th><th>Property</th><th>System</th><th>Status</th></tr></thead><tbody>${rows(db.customers,["id","name","mobile","property","system","status"])}</tbody></table><h2>Projects</h2><table><thead><tr><th>ID</th><th>Customer</th><th>Capacity</th><th>Stage</th><th>Manager</th><th>Pending</th></tr></thead><tbody>${rows(db.projects,["id","customer",x=>(x.capacity||0)+" kW","stage","manager",x=>money(x.pending||0)])}</tbody></table><h2>KYC</h2><table><thead><tr><th>Deal</th><th>Customer</th><th>Owner</th><th>Documents</th><th>Verification</th><th>Stage</th></tr></thead><tbody>${rows(db.kyc,["deal","customer","owner","documents","verification","stage"])}</tbody></table><h2>DNC / Operations</h2><table><thead><tr><th>Deal</th><th>Customer</th><th>Owner</th><th>Stock</th><th>Supervisor</th><th>Report</th><th>Status</th></tr></thead><tbody>${rows(db.dnc,["deal","customer","owner","stock","supervisor","report","status"])}</tbody></table><h2>Inventory</h2><table><thead><tr><th>SKU</th><th>Product</th><th>Brand</th><th>Model</th><th>Stock</th><th>Reserved</th></tr></thead><tbody>${rows(db.inventory,["sku","product","brand","model","stock","reserved"])}</tbody></table><h2>Finance / Payments</h2><table><thead><tr><th>Project</th><th>Customer</th><th>Total</th><th>Received</th><th>Pending</th><th>Due</th></tr></thead><tbody>${rows(db.payments,["project","customer",x=>money(x.total),x=>money(x.received),x=>money(Math.max(0,(+x.total||0)-(+x.received||0))),"due"])}</tbody></table><h2>Service</h2><table><thead><tr><th>ID</th><th>Customer</th><th>Issue</th><th>Technician</th><th>Priority</th><th>Status</th></tr></thead><tbody>${rows(db.serviceTickets,["id","customer","issue","technician","priority","status"])}</tbody></table><h2>Staff Work Reports</h2><table><thead><tr><th>Date</th><th>Employee</th><th>Type</th><th>Hours</th><th>Details</th><th>Remarks</th></tr></thead><tbody>${rows(db.work,["date","staff","type","hours","details","remarks"])}</tbody></table></div>`;
+  document.body.classList.add("master-printing");window.print();
+}
+(async()=>{try{if(getConfig()){await connectCloud();const {data:{session}}=await supabaseClient.auth.getSession();if(session){const {data:p}=await supabaseClient.from("profiles").select("id,email,name,login_id,role,department,mobile,status,employee_id,joining_date,remarks").eq("id",session.user.id).single();if(p&&p.status==="Active"){currentUser={id:p.id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",employeeId:p.employee_id,status:p.status,joiningDate:p.joining_date||"",remarks:p.remarks||""};await loadCloud();el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp();startRealtime()}}}}catch(e){console.warn("Cloud auto connect:",e.message);cloudReady=false;updateCloudBadge()}})();
 </script>
 </body>
 </html>
