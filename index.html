@@ -453,6 +453,15 @@ function loadLocalDb(){
 function saveLocalDb(){
   try{localStorage.setItem("numberdar_local_db_v8",JSON.stringify(db));}catch(e){}
 }
+async function localStaffLogin(loginId,password){
+  const s=(db.staff||[]).find(x=>String(x.loginId||"").toLowerCase()===String(loginId||"").toLowerCase());
+  if(!s)throw Error("Login ID not found.");
+  if(s.status!=="Active")throw Error("This staff account is inactive.");
+  if(!s.passwordHash)throw Error("This staff account needs its password reset by Admin.");
+  if(await sha256Hex(password)!==s.passwordHash)throw Error("Invalid password.");
+  currentUser={id:s.id,name:s.name,loginId:s.loginId,email:s.email||"",role:s.role,department:s.department,mobile:s.mobile||"",employeeId:s.employeeId,status:s.status,joiningDate:s.joiningDate||"",remarks:s.remarks||""};
+  localMode=true;cloudReady=false;el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp();
+}
 function clearFreshLocalData(){
   localStorage.removeItem("numberdar_local_db_v8");
   resetDb(); renderAll();
@@ -557,7 +566,9 @@ el("loginForm").addEventListener("submit",async e=>{
    }
 
    if(!supabaseClient)await connectCloud();
-   const {data:p,error:pe}=await supabaseClient.from("profiles")
+   loadLocalDb();
+    if((db.staff||[]).some(s=>String(s.loginId||"").toLowerCase()===id.toLowerCase())){ await localStaffLogin(id,pass); return; }
+    const {data:p,error:pe}=await supabaseClient.from("profiles")
      .select("id,email,name,login_id,role,department,mobile,status,employee_id,joining_date,remarks")
      .ilike("login_id",id).maybeSingle();
    if(pe)throw pe;
@@ -730,7 +741,8 @@ async function createOrUpdateStaff(e){
     if(localMode){
       if(db.staff.some(s=>s.loginId.toLowerCase()===loginId.toLowerCase()))throw Error("Login ID already exists.");
       if(db.staff.some(s=>s.employeeId.toLowerCase()===employeeId.toLowerCase()))throw Error("Employee ID already exists.");
-      db.staff.unshift(newStaff);saveLocalDb();renderAll();closeModal("staffModal");resetStaffModal();showToast("Staff login created successfully.");return;
+      newStaff.passwordHash=await sha256Hex(password);
+        db.staff.unshift(newStaff);saveLocalDb();renderAll();closeModal("staffModal");resetStaffModal();showToast("Staff login created successfully.");return;
     }
 
     if(!supabaseClient)throw Error("Supabase is not connected.");
@@ -740,7 +752,7 @@ async function createOrUpdateStaff(e){
     const {data,error}=await supabaseClient.functions.invoke("numberdar-staff-admin",{
       body:{action:"create",employeeId,name,loginId,email,password,role,department,mobile,joiningDate,status,remarks}
     });
-    if(error)throw error;
+    if(error)throw Error("Staff creation service failed: deploy the Supabase Edge Function numberdar-staff-admin and check its configuration.");
     if(data?.error)throw Error(data.error);
     await loadCloud();renderAll();closeModal("staffModal");resetStaffModal();
     showToast("Staff login created successfully in Supabase.");
