@@ -575,16 +575,19 @@ el("loginForm").addEventListener("submit",async e=>{
      throw Error("Login ID not found. Use the Fresh Admin credentials, ask your Admin to create your staff login, or connect Supabase for cloud accounts.");
    }
 
-   if(!supabaseClient)await connectCloud();
-    const {data:p,error:pe}=await supabaseClient.from("profiles")
-     .select("id,email,name,login_id,role,department,mobile,status,employee_id,joining_date,remarks")
-     .ilike("login_id",id).maybeSingle();
-   if(pe)throw pe;
-   if(!p)throw Error("Login ID not found in cloud.");
-   if(p.status!=="Active")throw Error("This staff account is inactive.");
-   if(!p.email)throw Error("This profile has no email. Add an email column/value in Supabase profiles.");
-   const {error:ae}=await supabaseClient.auth.signInWithPassword({email:p.email,password:pass});
+    if(!supabaseClient)await connectCloud();
+   const {data:lookupRows,error:le}=await supabaseClient.rpc("resolve_login_email",{p_login_id:id});
+   if(le)throw le;
+   const lookup=Array.isArray(lookupRows)?lookupRows[0]:lookupRows;
+   if(!lookup||!lookup.email)throw Error("Login ID not found in cloud.");
+   if(lookup.status!=="Active")throw Error("This staff account is inactive.");
+   const {data:signIn,error:ae}=await supabaseClient.auth.signInWithPassword({email:lookup.email,password:pass});
    if(ae)throw ae;
+   const {data:p,error:pe}=await supabaseClient.from("profiles")
+     .select("id,email,name,login_id,role,department,mobile,status,employee_id,joining_date,remarks")
+     .eq("id",signIn.user.id).maybeSingle();
+   if(pe)throw pe;
+   if(!p)throw Error("Signed in, but no CRM profile was found for this account.");
    localMode=false;
    currentUser={id:p.id,name:p.name,loginId:p.login_id,email:p.email,role:p.role,department:p.department,mobile:p.mobile||"",employeeId:p.employee_id,status:p.status,joiningDate:p.joining_date||"",remarks:p.remarks||""};
    await loadCloud();el("loginScreen").classList.add("hidden");el("app").classList.remove("hidden");setupApp();startRealtime();
